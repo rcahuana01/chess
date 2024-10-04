@@ -62,18 +62,21 @@ public class ChessGame {
 
         for (ChessMove move : possibleMoves) {
             ChessPosition newPos = move.getEndPosition();
-            ChessBoard tempBoard = board.copyBoard();
-            tempBoard.addPiece(newPos, piece);
-            tempBoard.addPiece(startPosition, null);
-            if (!this.isInCheck(teamColor)) {
+            if (isWithinLimits(newPos.getRow(), newPos.getColumn())){
+                ChessBoard tempBoard = board.copyBoard();
+                tempBoard.addPiece(newPos, piece);
+                tempBoard.addPiece(startPosition, null);
+                if (!this.isInCheck(teamColor)) {
                     validMoves.add(move);
+                }
             }
+
         }
 
         return validMoves;
     }
     private boolean isWithinLimits(int row, int col){
-        return (row > 0 && row <= 8) && (col > 0 && col <= 8);
+        return (row >=1 && row <= 8) && (col >=1 && col <= 8);
     }
     /**
      * Makes a move in a chess game
@@ -82,9 +85,30 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        ChessPosition startPos = move.getStartPosition();
+        ChessPosition endPos = move.getEndPosition();
 
+        ChessPiece movingPiece = this.board.getPiece(startPos);
+        if (movingPiece == null) {
+            throw new InvalidMoveException();
+        }
+        Collection<ChessMove> possibleMoves = validMoves(startPos);
+        if (!possibleMoves.contains(move)){
+            throw new InvalidMoveException();
+        }
+        ChessPiece capturedPiece = board.getPiece(endPos);
+        board.addPiece(endPos, movingPiece);
+        board.addPiece(startPos, null);
+        if (isInCheck(movingPiece.getTeamColor())){
+            board.addPiece(startPos, movingPiece);
+            board.addPiece(endPos, capturedPiece);
+            throw new InvalidMoveException();
+        }
+        setTeamTurn(movingPiece.getTeamColor() == TeamColor.WHITE ? TeamColor.BLACK : TeamColor.WHITE);
 
     }
+
+
     public ChessPosition locateKing(TeamColor teamColor, ChessBoard board) {
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
