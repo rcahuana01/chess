@@ -14,20 +14,17 @@ public class ChessBoard {
     public ChessBoard() {
 
     }
-    public ChessBoard(ChessBoard board) {
-        this.squares = new ChessPiece[8][8];
+    public ChessBoard copyBoard() {
+        ChessBoard newBoard = new ChessBoard();
 
         for (int row = 0; row < 8; row++) {
             for (int col = 0; col < 8; col++) {
-                ChessPiece piece = board.squares[row][col];
-
-                if (piece != null) {
-                    this.squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
-                } else {
-                    this.squares[row][col] = null;
-                }
+                ChessPosition pos = new ChessPosition(row, col);
+                ChessPiece piece = this.getPiece(pos);
+                newBoard.addPiece(pos, piece);
             }
         }
+        return newBoard;
     }
 
 //public ChessBoard(ChessBoard board){
