@@ -2,6 +2,7 @@ package chess;
 
 import java.util.ArrayList;
 import java.util.Collection;
+import java.util.Objects;
 
 /**
  * For a class that can manage a chess game, making moves on a board
@@ -50,27 +51,26 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-//        ChessPiece piece = board.getPiece(startPosition);
-//        if (piece == null){
-//            return null;
-//        }
-//        Collection<ChessMove> validMoves = new ArrayList<>();
-//            switch (piece.getPieceType()){
-//                case PAWN:
-//                    break;
-//                case KING:
-//                    break;
-//                case KNIGHT:
-//                    break;
-//                case QUEEN:
-//                    break;
-//                case ROOK:
-//                    break;
-//                case BISHOP:
-//                    break;
-//            }
-//        return validMoves;
-        throw new RuntimeException("Not implemented");
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece == null){
+            return null;
+        }
+        Collection<ChessMove> validMoves = new ArrayList<>();
+            switch (piece.getPieceType()){
+                case PAWN:
+                    break;
+                case KING:
+                    break;
+                case KNIGHT:
+                    break;
+                case QUEEN:
+                    break;
+                case ROOK:
+                    break;
+                case BISHOP:
+                    break;
+            }
+        return validMoves;
 
     }
 
@@ -97,6 +97,19 @@ public class ChessGame {
         return null;
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return currentTurn == chessGame.currentTurn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTurn, board);
+    }
+
     /**
      * Determines if the given team is in check
      *
@@ -104,8 +117,31 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
+        ChessPosition kingPosition = locateKing(teamColor, board);
 
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(curPos);
+
+                if (piece != null && piece.getTeamColor() != teamColor) {
+                    Collection<ChessMove> possibleMoves = piece.pieceMoves(board, curPos);
+
+                    for (ChessMove move : possibleMoves) {
+                        ChessPosition newPos = move.getEndPosition();
+
+                        if (newPos.equals(kingPosition)) {
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        return false;
     }
+
+
 
     /**
      * Determines if the given team is in checkmate
