@@ -48,7 +48,7 @@ public class ChessBoard {
             for (int col = 0; col < 8; col++) {
                 ChessPiece piece = board.squares[row][col];
                 if (board.squares[row][col] != null) {
-                    this.squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                    squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
                 }
             }
         }

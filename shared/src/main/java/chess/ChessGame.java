@@ -43,19 +43,6 @@ public class ChessGame {
         BLACK
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessGame chessGame = (ChessGame) o;
-        return currentTurn == chessGame.currentTurn && Objects.equals(board, chessGame.board);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(currentTurn, board);
-    }
-
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -77,16 +64,16 @@ public class ChessGame {
 
         for (ChessMove move : possibleMoves) {
             ChessPosition newPos = move.getEndPosition();
-
             if (isWithinLimits(newPos.getRow(), newPos.getColumn())) {
-                ChessBoard tempBoard = new ChessBoard(this.board);
+                ChessPiece capturedPiece = board.getPiece(newPos);
+                ChessBoard tempBoard = new ChessBoard(board);
                 tempBoard.addPiece(newPos, piece);
                 tempBoard.addPiece(startPosition, null);
-
-                if (!this.isInCheck(teamColor)) {
+                if (!isInCheck(teamColor)){
                     validMovesSet.add(move);
                 }
-                tempBoard.addPiece(startPosition, piece);
+                board.addPiece(startPosition, piece);
+                board.addPiece(newPos,capturedPiece);
             }
         }
 
@@ -98,6 +85,20 @@ public class ChessGame {
     private boolean isWithinLimits(int row, int col){
         return (row >=1 && row <= 8) && (col >=1 && col <= 8);
     }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return currentTurn == chessGame.currentTurn && Objects.equals(getBoard(), chessGame.getBoard());
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTurn, getBoard());
+    }
+
     /**
      * Makes a move in a chess game
      *
@@ -110,7 +111,7 @@ public class ChessGame {
 
         ChessPiece movingPiece = this.board.getPiece(startPos);
         if (movingPiece == null || movingPiece.getTeamColor() != currentTurn) {
-            throw new InvalidMoveException("No piece at start position");
+            throw new InvalidMoveException();
         }
 
         Collection<ChessMove> possibleMoves = validMoves(startPos);
@@ -188,7 +189,6 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        ChessPosition kingPosition = locateKing(teamColor, board);
         if (!isInCheck(teamColor)) {
             return false;
         }
