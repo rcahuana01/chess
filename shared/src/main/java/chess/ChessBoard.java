@@ -12,8 +12,28 @@ import java.util.Objects;
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[8][8];
     public ChessBoard() {
-        
+
     }
+    public ChessBoard(ChessBoard board) {
+        this.squares = new ChessPiece[8][8];
+
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.squares[row][col];
+
+                if (piece != null) {
+                    this.squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                } else {
+                    this.squares[row][col] = null;
+                }
+            }
+        }
+    }
+
+//public ChessBoard(ChessBoard board){
+//
+//        squares = Arrays.copyOf(board.squares, board.squares.length);
+//    }
 
     /**
      * Adds a chess piece to the chessboard

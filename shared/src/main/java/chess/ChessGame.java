@@ -1,5 +1,6 @@
 package chess;
 
+import java.util.ArrayList;
 import java.util.Collection;
 
 /**
@@ -12,7 +13,8 @@ public class ChessGame {
     private TeamColor currentTurn;
     private ChessBoard board;
     public ChessGame() {
-        this.board = new ChessBoard board;
+        this.board = new ChessBoard();
+        this.board.resetBoard();
         this.currentTurn = TeamColor.WHITE;
     }
 
@@ -48,12 +50,27 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        if (startPosition == null){
-            return validMoves;
-        } else {
-            return ChessPiece.PieceType
-        }
+//        ChessPiece piece = board.getPiece(startPosition);
+//        if (piece == null){
+//            return null;
+//        }
+//        Collection<ChessMove> validMoves = new ArrayList<>();
+//            switch (piece.getPieceType()){
+//                case PAWN:
+//                    break;
+//                case KING:
+//                    break;
+//                case KNIGHT:
+//                    break;
+//                case QUEEN:
+//                    break;
+//                case ROOK:
+//                    break;
+//                case BISHOP:
+//                    break;
+//            }
+//        return validMoves;
+        throw new RuntimeException("Not implemented");
 
     }
 
@@ -64,7 +81,20 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        throw new RuntimeException("Not implemented");
 
+    }
+    public ChessPosition locateKing(TeamColor teamColor, ChessBoard board) {
+        for (int row = 1; row <= 8; row++) {
+            for (int col = 1; col <= 8; col++) {
+                ChessPosition curPos = new ChessPosition(row, col);
+                ChessPiece piece = board.getPiece(curPos);
+                if (piece != null && piece.getPieceType() == ChessPiece.PieceType.KING && piece.getTeamColor() == teamColor) {
+                    return curPos;
+                }
+            }
+        }
+        return null;
     }
 
     /**
@@ -116,20 +146,6 @@ public class ChessGame {
         return this.board;
     }
 
-    public ChessBoard clone() {
-        ChessBoard clonedBoard = new ChessBoard();
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                if (this.squares[row][col] != null) {
-                    // Clone each piece if it exists
-                    clonedBoard.squares[row][col] = new ChessPiece(
-                            this.squares[row][col].getTeamColor(),
-                            this.squares[row][col].getPieceType()
-                    );
-                }
-            }
-        }
-        return clonedBoard;
-    }
+
 
 }
