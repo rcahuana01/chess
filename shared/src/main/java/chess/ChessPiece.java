@@ -45,6 +45,13 @@ public class ChessPiece {
                 '}';
     }
 
+    /**
+     * @return which type of chess piece this piece is
+     */
+    public PieceType getPieceType() {
+        return this.type;
+    }
+
     @Override
     public boolean equals(Object o) {
         if (this == o) return true;
@@ -56,13 +63,6 @@ public class ChessPiece {
     @Override
     public int hashCode() {
         return Objects.hash(color, type);
-    }
-
-    /**
-     * @return which type of chess piece this piece is
-     */
-    public PieceType getPieceType() {
-        return this.type;
     }
 
     /**

@@ -18,7 +18,7 @@ public class KnightMoves implements PlaceMovesCalculator{
     Collection<ChessMove> validMoves = new ArrayList<>();
     int curRow = position.getRow();
     int curCol = position.getColumn();
-    System.out.println("CurrentPos Knight = (" + curRow + "," + curCol + ")");
+//    System.out.println("CurrentPos Knight = (" + curRow + "," + curCol + ")");
     printBoard(board,position);
     for (int[]moves : knightMoves){
         int newRow = curRow + moves[0];
@@ -27,19 +27,19 @@ public class KnightMoves implements PlaceMovesCalculator{
             ChessPosition newPosition = new ChessPosition(newRow, newCol);
             ChessPiece pieceNewPos = board.getPiece(newPosition);
             ChessPiece curPos = board.getPiece(position);
-            System.out.println("Checking position: (" + newRow + "," + newCol + ")");
+//            System.out.println("Checking position: (" + newRow + "," + newCol + ")");
             if (pieceNewPos == null) {
                 validMoves.add(new ChessMove(position, newPosition, null));
-                System.out.println("Valid move to empty square: " + newPosition);
+//                System.out.println("Valid move to empty square: " + newPosition);
             } else if (curPos.getTeamColor() != pieceNewPos.getTeamColor()) {
                 validMoves.add(new ChessMove(position, newPosition, null));
-                System.out.println("Captured Enemy at = (" + newRow + "," + newCol + ")");
+//                System.out.println("Captured Enemy at = (" + newRow + "," + newCol + ")");
             } else {
-                System.out.println("Invalid move blocked by friend: " + newPosition);
+//                System.out.println("Invalid move blocked by friend: " + newPosition);
             }
 
         } else {
-            System.out.println("InvalidMove King = (" + newRow + "," + newCol + ") - out of bounds");
+//            System.out.println("InvalidMove King = (" + newRow + "," + newCol + ") - out of bounds");
         }
     }
 

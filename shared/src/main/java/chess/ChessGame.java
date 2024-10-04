@@ -43,6 +43,19 @@ public class ChessGame {
         BLACK
     }
 
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessGame chessGame = (ChessGame) o;
+        return currentTurn == chessGame.currentTurn && Objects.equals(board, chessGame.board);
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(currentTurn, board);
+    }
+
     /**
      * Gets a valid moves for a piece at the given location
      *
@@ -51,30 +64,37 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
+        Collection<ChessMove> validMovesSet = new ArrayList<>();
 
         ChessPiece piece = board.getPiece(startPosition);
-        if (piece == null){
+        if (piece == null) {
             return null;
         }
+
+
         TeamColor teamColor = piece.getTeamColor();
         Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
 
         for (ChessMove move : possibleMoves) {
             ChessPosition newPos = move.getEndPosition();
-            if (isWithinLimits(newPos.getRow(), newPos.getColumn())){
-                ChessBoard tempBoard = board.copyBoard();
+
+            if (isWithinLimits(newPos.getRow(), newPos.getColumn())) {
+                ChessBoard tempBoard = new ChessBoard(this.board);
                 tempBoard.addPiece(newPos, piece);
                 tempBoard.addPiece(startPosition, null);
-                if (!this.isInCheck(teamColor)) {
-                    validMoves.add(move);
-                }
-            }
 
+                if (!this.isInCheck(teamColor)) {
+                    validMovesSet.add(move);
+                }
+                tempBoard.addPiece(startPosition, piece);
+            }
         }
 
-        return validMoves;
+
+        return validMovesSet;
     }
+
+
     private boolean isWithinLimits(int row, int col){
         return (row >=1 && row <= 8) && (col >=1 && col <= 8);
     }
@@ -169,40 +189,35 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         ChessPosition kingPosition = locateKing(teamColor, board);
-
+        if (!isInCheck(teamColor)) {
+            return false;
+        }
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition curPos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(curPos);
 
-                if (piece != null && piece.getTeamColor() != teamColor) {
+                if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> possibleMoves = piece.pieceMoves(board, curPos);
 
                     for (ChessMove move : possibleMoves) {
                         ChessPosition newPos = move.getEndPosition();
-
-                        if (isInCheck(teamColor) && newPos.equals(kingPosition)) {
-                            return true;
+                        ChessPiece capturedPiece = board.getPiece(newPos);
+                        board.addPiece(curPos, null);
+                        board.addPiece(newPos,piece);
+                        if (!isInCheck(teamColor)) {
+                            board.addPiece(curPos, piece);
+                            board.addPiece(newPos, capturedPiece);
+                            return false;
                         }
+                        board.addPiece(curPos, piece);
+                        board.addPiece(newPos, capturedPiece);
                     }
                 }
             }
         }
 
-        return false;
-    }
-
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
-        ChessGame chessGame = (ChessGame) o;
-        return currentTurn == chessGame.currentTurn && Objects.equals(board, chessGame.board);
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(currentTurn, board);
+        return true;
     }
 
     /**
@@ -216,25 +231,30 @@ public class ChessGame {
        /* The player's king is not threatened by any other pieces
         The player cannot move to any other square without putting their king in check
         None of the player's other pieces can make a legal move to save the king */
-        if (!isInCheck(teamColor)){
-            return true;
+
+        if (isInCheck(teamColor)){
+            return false;
         }
         for (int row = 1; row <= 8; row++) {
             for (int col = 1; col <= 8; col++) {
                 ChessPosition curPos = new ChessPosition(row, col);
                 ChessPiece piece = board.getPiece(curPos);
 
-                if (piece != null && piece.getTeamColor() != teamColor) {
+                if (piece != null && piece.getTeamColor() == teamColor) {
                     Collection<ChessMove> possibleMoves = piece.pieceMoves(board, curPos);
 
                     for (ChessMove move : possibleMoves) {
-                        ChessBoard tempBoard = board.copyBoard();
-                        tempBoard.addPiece(move.getEndPosition(), piece);
-                        tempBoard.addPiece(curPos, null);
-
-                        if (!this.isInCheck(teamColor)){
-                                return false;
-                            }
+                        ChessPosition newPos = move.getEndPosition();
+                        ChessPiece capturedPiece = board.getPiece(newPos);
+                        board.addPiece(curPos, null);
+                        board.addPiece(newPos,piece);
+                        if (!isInCheck(teamColor)) {
+                            board.addPiece(curPos, piece);
+                            board.addPiece(newPos, capturedPiece);
+                            return false;
+                        }
+                        board.addPiece(curPos, piece);
+                        board.addPiece(newPos, capturedPiece);
                     }
                 }
             }

@@ -38,7 +38,7 @@ public class QueenMoves implements PlaceMovesCalculator{
         Collection<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();
         int curCol = position.getColumn();
-        System.out.println("CurrentPos Rook = (" + curRow + "," + curCol + ")");
+//        System.out.println("CurrentPos Rook = (" + curRow + "," + curCol + ")");
         printBoard(board, position);
 
         for (int []moves : queenMoves) {
@@ -55,13 +55,13 @@ public class QueenMoves implements PlaceMovesCalculator{
 
                 if (pieceNewPos == null) {
                     validMoves.add(new ChessMove(position, newPosition, null));
-                    System.out.println("Valid move to empty square: " + newPosition);
+//                    System.out.println("Valid move to empty square: " + newPosition);
                 } else if (curPiece.getTeamColor() != pieceNewPos.getTeamColor()) {
                     validMoves.add(new ChessMove(position, newPosition, null));
-                    System.out.println("Captured Enemy at = (" + newRow + "," + newCol + ")");
+//                    System.out.println("Captured Enemy at = (" + newRow + "," + newCol + ")");
                     break;
                 } else {
-                    System.out.println("Invalid move blocked by friend: " + newPosition);
+//                    System.out.println("Invalid move blocked by friend: " + newPosition);
                     break;
                 }
 
