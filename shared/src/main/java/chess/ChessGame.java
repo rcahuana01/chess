@@ -51,29 +51,30 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
+
         ChessPiece piece = board.getPiece(startPosition);
         if (piece == null){
             return null;
         }
-        Collection<ChessMove> validMoves = new ArrayList<>();
-            switch (piece.getPieceType()){
-                case PAWN:
-                    break;
-                case KING:
-                    break;
-                case KNIGHT:
-                    break;
-                case QUEEN:
-                    break;
-                case ROOK:
-                    break;
-                case BISHOP:
-                    break;
+        TeamColor teamColor = piece.getTeamColor();
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
+
+        for (ChessMove move : possibleMoves) {
+            ChessPosition newPos = move.getEndPosition();
+            ChessBoard tempBoard = board.copyBoard();
+            tempBoard.addPiece(newPos, piece);
+            tempBoard.addPiece(startPosition, null);
+            if (!this.isInCheck(teamColor)) {
+                    validMoves.add(move);
             }
+        }
+
         return validMoves;
-
     }
-
+    private boolean isWithinLimits(int row, int col){
+        return (row > 0 && row <= 8) && (col > 0 && col <= 8);
+    }
     /**
      * Makes a move in a chess game
      *
@@ -81,7 +82,7 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        throw new RuntimeException("Not implemented");
+
 
     }
     public ChessPosition locateKing(TeamColor teamColor, ChessBoard board) {
