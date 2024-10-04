@@ -89,16 +89,22 @@ public class ChessGame {
         ChessPosition endPos = move.getEndPosition();
 
         ChessPiece movingPiece = this.board.getPiece(startPos);
-        if (movingPiece == null) {
-            throw new InvalidMoveException();
+        if (movingPiece == null || movingPiece.getTeamColor() != currentTurn) {
+            throw new InvalidMoveException("No piece at start position");
         }
+
         Collection<ChessMove> possibleMoves = validMoves(startPos);
         if (!possibleMoves.contains(move)){
             throw new InvalidMoveException();
         }
         ChessPiece capturedPiece = board.getPiece(endPos);
-        board.addPiece(endPos, movingPiece);
         board.addPiece(startPos, null);
+        if (move.getPromotionPiece() != null){
+            ChessPiece promotedPiece = new ChessPiece(movingPiece.getTeamColor(), move.getPromotionPiece());
+            board.addPiece(endPos, promotedPiece);
+        } else {
+            board.addPiece(endPos, movingPiece);
+        }
         if (isInCheck(movingPiece.getTeamColor())){
             board.addPiece(startPos, movingPiece);
             board.addPiece(endPos, capturedPiece);
