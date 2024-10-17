@@ -1,14 +1,12 @@
 package dataaccess;
 import java.util.HashMap;
-import java.util.List;
 import java.util.Map;
-import java.util.ArrayList;
-import java.util.HashMap;
+
 import model.UserData;
 import chess.ChessGame;
 import model.AuthData;
 
-public class InMemoryDataAccess implements DataAccess{
+public class MemoryDataDAO implements UserDAO {
     private Map<String, UserData> users = new HashMap<>();
     private Map<String, ChessGame> games = new HashMap<>();
     private Map<String, AuthData> authToken = new HashMap<>();

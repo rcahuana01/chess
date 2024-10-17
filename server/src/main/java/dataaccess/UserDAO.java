@@ -2,8 +2,10 @@ package dataaccess;
 
 import chess.ChessGame;
 import model.UserData;
+import model.AuthData;
+import java.util.List;
 
-public interface DataAccess {
+public interface UserDAO {
     void clear();
     void createUser(UserData user);
     UserData getUser(String username);
