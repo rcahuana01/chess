@@ -7,10 +7,12 @@ public class SQLUserDAOTest {
 
     @BeforeEach
     void setUp() throws DataAccessException {
-        authDAO.clear();
+        userDAO.clear();
     }
     @AfterEach
-    void 
+    void tearDown() throws  DataAccessException {
+        userDAO.clear();
+    }
 
 
 
