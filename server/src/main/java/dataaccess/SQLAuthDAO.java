@@ -6,8 +6,7 @@ import java.util.Map;
 import java.util.UUID;
 
 public class SQLAuthDAO implements AuthDAO {
-    // A mock database using a HashMap
-    private final Map<String, AuthData> authDatabase = new HashMap<>();
+    private final HashMap<String, AuthData> authDatabase = new HashMap<>();
 
     public SQLAuthDAO() {}
 
@@ -16,17 +15,9 @@ public class SQLAuthDAO implements AuthDAO {
         if (username == null || username.isEmpty()) {
             throw new ResponseException(500, "Error: Username cannot be empty");
         }
-
-        // Generate a new authToken using UUID
         String authToken = UUID.randomUUID().toString();
-
-        // Create a new AuthData object
         AuthData authData = new AuthData(authToken, username);
-
-        // Simulate storing the authData in the mock database
         authDatabase.put(authToken, authData);
-
-        // Return the created AuthData object
         return authData;
     }
 
@@ -52,7 +43,6 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public void clear() throws ResponseException {
-        // Simulate clearing all auth data from the mock database
         authDatabase.clear();
     }
 }

@@ -46,6 +46,7 @@ public class SQLGameDAO implements GameDAO {
         return new ArrayList<>(gameDataList);
     }
 
+
     @Override
     public void updateGame(GameData game) throws ResponseException {
         if (game == null) {

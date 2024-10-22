@@ -23,7 +23,6 @@ public class UserService {
             throw new ResponseException(403, "Error: already taken");
         }
 
-        // Store the password in plain text (no hashing)
         try {
             userDAO.createUser(user);
             return authDAO.createAuth(user.username());
@@ -37,24 +36,15 @@ public class UserService {
             throw new ResponseException(401, "Error: unauthorized - Missing credentials");
         }
 
-        // Retrieve the user from the database
         UserData currentUser = userDAO.getUser(user.username());
 
-        // Debugging: Check if user exists
         if (currentUser == null) {
-            System.out.println("User not found for username: " + user.username());
             throw new ResponseException(401, "Error: unauthorized - User not found");
         }
-
-        // Debugging: Check if password matches
         if (!user.password().equals(currentUser.password())) {
-            System.out.println("Passwords do not match!");
-            System.out.println("Entered password: " + user.password());
-            System.out.println("Stored password: " + currentUser.password());
             throw new ResponseException(401, "Error: unauthorized - Invalid password");
         }
 
-        // If successful, create and return an auth token
         try {
             return authDAO.createAuth(user.username());
         } catch (Exception e) {
