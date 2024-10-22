@@ -22,8 +22,8 @@ public class RookMoves implements PlaceMovesCalculator {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) { return true; }
+        if (o == null || getClass() != o.getClass()) {return false; }
         RookMoves rookMoves1 = (RookMoves) o;
         return Objects.deepEquals(rookMoves, rookMoves1.rookMoves);
     }
@@ -37,7 +37,6 @@ public class RookMoves implements PlaceMovesCalculator {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();
         int curCol = position.getColumn();
-//        System.out.println("CurrentPos Rook = (" + curRow + "," + curCol + ")");
         printBoard(board, position);
 
         for (int[] moves : rookMoves) {
@@ -91,19 +90,4 @@ public class RookMoves implements PlaceMovesCalculator {
         System.out.println();
 
     }
-    //     private int moveStraight (ChessBoard board, ChessPosition position,int rowStep, int colStep, int steps){
-//         Collection<ChessMove> validMoves = new ArrayList<>();
-//         int currentRow = position.getRow();
-//         int currentCol = position.getColumn();
-//         for (int i = 1; i <= steps; i++) {
-//             int newRow = currentRow + i * rowStep;
-//             int newCol = currentRow + i * colStep;
-//             if (isWithinLimits(newRow, newCol)) {
-//                 validMoves.add(new ChessPosition(newRow, newCol));
-//             }
-//         }
-//         return validMoves;
-//
-//
-//     }
 }

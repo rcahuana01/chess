@@ -20,8 +20,8 @@ public class KingMoves implements PlaceMovesCalculator {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         KingMoves kingMoves1 = (KingMoves) o;
         return Objects.deepEquals(kingMoves, kingMoves1.kingMoves);
     }
@@ -61,16 +61,11 @@ public class KingMoves implements PlaceMovesCalculator {
                 } else {
 //                    System.out.println("Invalid move blocked by friend: " + newPosition);
                 }
-
             } else {
 //                System.out.println("InvalidMove King = (" + newRow + "," + newCol + ") - out of bounds");
             }
         }
-
-
         return validMoves;
-
-
     }
 
     private void printBoard(ChessBoard board, ChessPosition kingPosition) {
@@ -92,21 +87,6 @@ public class KingMoves implements PlaceMovesCalculator {
         return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
     }
 
-//     private int moveStraight (ChessBoard board, ChessPosition position,int rowStep, int colStep, int steps){
-//         Collection<ChessMove> validMoves = new ArrayList<>();
-//         int currentRow = position.getRow();
-//         int currentCol = position.getColumn();
-//         for (int i = 1; i <= steps; i++) {
-//             int newRow = currentRow + i * rowStep;
-//             int newCol = currentRow + i * colStep;
-//             if (isWithinLimits(newRow, newCol)) {
-//                 validMoves.add(new ChessPosition(newRow, newCol));
-//             }
-//         }
-//         return validMoves;
-//
-//
-//     }
 }
 
 

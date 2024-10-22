@@ -22,8 +22,8 @@ public class BishopMoves implements PlaceMovesCalculator {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) { return false;}
         BishopMoves that = (BishopMoves) o;
         return Objects.deepEquals(bishopMoves, that.bishopMoves);
     }
@@ -80,7 +80,6 @@ public class BishopMoves implements PlaceMovesCalculator {
             System.out.println();
         }
         System.out.println();
-
     }
 
     private boolean isWithinLimits(int row, int col) {

@@ -26,8 +26,8 @@ public class QueenMoves implements PlaceMovesCalculator {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()) {return false;}
         QueenMoves that = (QueenMoves) o;
         return Objects.deepEquals(queenMoves, that.queenMoves);
     }
@@ -70,11 +70,7 @@ public class QueenMoves implements PlaceMovesCalculator {
 
             }
         }
-
-
         return validMoves;
-
-
     }
 
     private boolean isWithinLimits(int row, int col) {
