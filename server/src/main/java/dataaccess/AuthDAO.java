@@ -1,6 +1,5 @@
 package dataaccess;
 
-import dataaccess.*;
 import model.AuthData;
 
 public interface AuthDAO {

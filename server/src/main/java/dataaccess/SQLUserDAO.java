@@ -6,16 +6,16 @@ import java.util.Collection;
 import java.util.List;
 
 public class SQLUserDAO implements UserDAO {
-    private final List<UserData> userDataList; // In-memory storage for user data
+    private final List<UserData> userDataList;
 
     public SQLUserDAO() {
-        this.userDataList = new ArrayList<>(); // Initialize the list
+        this.userDataList = new ArrayList<>();
     }
 
     @Override
     public void createUser(UserData newUser) throws ResponseException {
-        if (newUser == null || newUser.username() == null || newUser.username().isEmpty()) {
-            throw new ResponseException(400, "Error: Bad request"); // Validate user data
+        if (newUser == null || newUser.username() == null || newUser.username().isEmpty() || newUser.password() == null) {
+            throw new ResponseException(500, "Error: Bad request");
         }
 
         // Check if the user already exists
@@ -25,10 +25,8 @@ public class SQLUserDAO implements UserDAO {
             }
         }
 
-        // Create a new UserData instance from the fields of newUser
-        UserData createdUser = new UserData(newUser.username(), newUser.email(), newUser.password()); // Adjust field names based on your UserData structure
+        UserData createdUser = new UserData(newUser.username(), newUser.password(), newUser.email());
 
-        // Add the new user to the in-memory list
         userDataList.add(createdUser);
     }
 
@@ -36,19 +34,18 @@ public class SQLUserDAO implements UserDAO {
     public UserData getUser(String username) throws ResponseException {
         for (UserData user : userDataList) {
             if (user.username().equals(username)) {
-                return user; // Return the user if found
+                return user;
             }
         }
-        throw new ResponseException(404, "Error: User not found"); // User not found
+        return null;
     }
 
     @Override
     public void clear() throws ResponseException {
-        userDataList.clear(); // Clear the in-memory list of users
+        userDataList.clear();
     }
 
-    // Additional method to list all users (optional)
     public Collection<UserData> listUsers() throws ResponseException {
-        return new ArrayList<>(userDataList); // Return a copy of the user list
+        return new ArrayList<>(userDataList);
     }
 }

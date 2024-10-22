@@ -9,8 +9,8 @@ import java.util.Objects;
 
 public class GameService {
 
-    private GameDAO gameDAO;
-    private AuthDAO authDAO;
+    private final GameDAO gameDAO;
+    private final AuthDAO authDAO;
 
     public GameService(GameDAO gameDAO , AuthDAO authDAO){
         this.gameDAO = gameDAO;

@@ -1,6 +1,7 @@
 package service;
 
 import dataaccess.*;
+import dataaccess.ResponseException;
 import model.AuthData;
 import model.UserData;
 import org.junit.jupiter.api.Assertions;
@@ -14,10 +15,10 @@ public class UserServiceTests {
 
     @BeforeEach
     public void setUp() throws ResponseException {
-        UserDAO userDAO = new SQLUserDAO();
-        userDAO.clear();
+        UserDAO userDao = new SQLUserDAO();
+        userDao.clear();
         AuthDAO authDao = new MemoryAuthDAO();
-        userService = new UserService(userDAO, authDao);
+        userService = new UserService(userDao, authDao);
     }
 
     @Test

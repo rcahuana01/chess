@@ -12,7 +12,21 @@
     <orderEntry type="library" name="lib" level="project" />
     <orderEntry type="library" name="junit.jupiter" level="project" />
     <orderEntry type="library" name="google.code.gson" level="project" />
-    <orderEntry type="library" name="sparkjava.spark.core" level="project" />
     <orderEntry type="library" name="slf4j.simple" level="project" />
+    <orderEntry type="library" name="sparkjava.spark.core" level="project" />
+    <orderEntry type="module-library">
+      <library>
+        <CLASSES>
+          <root url="file://$MODULE_DIR$/../../Oracle_JDK-22/lib" />
+        </CLASSES>
+        <JAVADOC />
+        <SOURCES>
+          <root url="file://$MODULE_DIR$/../../Oracle_JDK-22/lib" />
+        </SOURCES>
+        <jarDirectory url="file://$MODULE_DIR$/../../Oracle_JDK-22/lib" recursive="false" />
+        <jarDirectory url="file://$MODULE_DIR$/../../Oracle_JDK-22/lib" recursive="false" type="SOURCES" />
+      </library>
+    </orderEntry>
+    <orderEntry type="library" name="jbcrypt-0.4" level="project" />
   </component>
 </module>
