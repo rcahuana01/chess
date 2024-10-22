@@ -45,8 +45,4 @@ public class SQLUserDAO implements UserDAO {
     public void clear() throws ResponseException {
         userDataList.clear();
     }
-
-    public Collection<UserData> listUsers() throws ResponseException {
-        return new ArrayList<>(userDataList);
-    }
 }

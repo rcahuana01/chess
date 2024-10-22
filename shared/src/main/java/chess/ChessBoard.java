@@ -42,19 +42,6 @@ public class ChessBoard {
         return Arrays.deepHashCode(squares);
     }
 
-    public ChessBoard copyBoard() {
-        ChessBoard newBoard = new ChessBoard();
-
-        for (int row = 1; row <= 8; row++) {
-            for (int col = 1; col <= 8; col++) {
-                ChessPosition pos = new ChessPosition(row, col);
-                ChessPiece piece = this.getPiece(pos);
-                newBoard.addPiece(pos, piece);
-            }
-        }
-        return newBoard;
-    }
-
     /**
      * Adds a chess piece to the chessboard
      *

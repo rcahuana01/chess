@@ -16,7 +16,8 @@ public class UserService {
     }
 
     public AuthData register(UserData user) throws ResponseException {
-        if (user == null || user.username() == null || user.username().isEmpty() || user.password() == null || user.password().isEmpty() || user.email() == null || user.email().isEmpty()) {
+        if (user == null || user.username() == null || user.username().isEmpty() || user.password() == null
+                || user.password().isEmpty() || user.email() == null || user.email().isEmpty()) {
             throw new ResponseException(400, "Error: Bad Request");
         }
 
