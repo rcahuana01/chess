@@ -6,7 +6,7 @@ import java.util.Collection;
 public abstract class AbstractPieceMoves implements PlaceMovesCalculator {
 
     protected boolean isWithinLimits(int row, int col) {
-        return (row > 0 && row <= 8) && (col > 0 && col <= 8);
+        return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
     }
 
     protected Collection<ChessMove> calculateMoves(ChessBoard board, ChessPosition position, int[][] moveDirections) {
