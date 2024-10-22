@@ -19,7 +19,6 @@ public class KnightMoves implements PlaceMovesCalculator {
         Collection<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();
         int curCol = position.getColumn();
-        printBoard(board, position);
         for (int[] moves : knightMoves) {
             int newRow = curRow + moves[0];
             int newCol = curCol + moves[1];
@@ -49,20 +48,5 @@ public class KnightMoves implements PlaceMovesCalculator {
 
     private boolean isWithinLimits(int row, int col) {
         return (row > 0 && row <= 8) && (col > 0 && col <= 8);
-    }
-
-    private void printBoard(ChessBoard board, ChessPosition kingPosition) {
-        for (int row = 7; row >= 0; row--) {
-            for (int col = 0; col < 8; col++) {
-                if (row == kingPosition.getRow() - 1 && col == kingPosition.getColumn() - 1) {
-                    System.out.print('k');
-                } else {
-                    System.out.print('.');
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-
     }
 }
