@@ -1,11 +1,12 @@
 package service;
 
-import dataaccess.*;
+import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
+import dataaccess.ResponseException;
 import model.AuthData;
 import model.GameData;
 
 import java.util.Collection;
-import java.util.Objects;
 
 public class GameService {
 
@@ -28,11 +29,11 @@ public class GameService {
         }
     }
 
-    public Integer createGame(String authToken, GameData game) throws ResponseException {
+    public Integer createGame(String authToken, String game) throws ResponseException {
         if (authToken == null || authToken.isEmpty() || authDAO.getAuth(authToken) == null) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        if (game == null || game.gameName() == null || game.gameName().isEmpty()) {
+        if (game == null) {
             throw new ResponseException(400, "Error: bad request");
         }
         try {

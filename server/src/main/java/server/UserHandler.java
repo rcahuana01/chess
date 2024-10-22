@@ -1,7 +1,6 @@
 package server;
 
 import com.google.gson.Gson;
-
 import dataaccess.ResponseException;
 import model.UserData;
 import service.UserService;

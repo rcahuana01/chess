@@ -1,6 +1,9 @@
 package chess;
 
-import java.util.*;
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
 public class QueenMoves implements PlaceMovesCalculator {
     private final int[][] queenMoves = {

@@ -2,8 +2,12 @@ package service;
 
 import chess.ChessGame;
 import dataaccess.*;
-import model.*;
-import org.junit.jupiter.api.*;
+import model.AuthData;
+import model.GameData;
+import model.UserData;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.Collection;
 
@@ -25,19 +29,19 @@ public class GameServiceTests {
     @Test
     public void positiveCreateGameTest() throws ResponseException {
         AuthData authData = userService.register(userData);
-        Integer gameId = gameService.createGame(authData.authToken(), validGameData);
+        Integer gameId = gameService.createGame(authData.authToken(), validGameData.gameName());
         Assertions.assertNotNull(gameId);
     }
 
     @Test
     public void negativeCreateGameTest() {
-        Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(null, validGameData));
+        Assertions.assertThrows(ResponseException.class, () -> gameService.createGame(null, validGameData.gameName()));
     }
 
     @Test
     public void positiveListGamesTest() throws ResponseException {
         AuthData authData = userService.register(userData);
-        gameService.createGame(authData.authToken(), validGameData);
+        gameService.createGame(authData.authToken(), validGameData.gameName());
         Collection<GameData> games = gameService.listGames(authData.authToken());
         Assertions.assertNotNull(games);
     }
@@ -50,7 +54,7 @@ public class GameServiceTests {
     @Test
     public void positiveJoinGameTest() throws ResponseException {
         AuthData authData = userService.register(userData);
-        Integer gameId = gameService.createGame(authData.authToken(), validGameData);
+        Integer gameId = gameService.createGame(authData.authToken(), validGameData.gameName());
         gameService.joinGame(authData.authToken(), "BLACK", gameId);
     }
 

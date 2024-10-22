@@ -5,7 +5,8 @@ import dataaccess.ResponseException;
 import model.GameData;
 import model.JoinGameData;
 import service.GameService;
-import spark.*;
+import spark.Request;
+import spark.Response;
 
 import java.util.Collection;
 import java.util.Map;
@@ -19,20 +20,23 @@ public class GameHandler {
 
     public Object listGames(Request req, Response res) {
         try {
+            System.out.println("Received request for listGames with Authorization: " + req.headers("Authorization"));
             Collection<GameData> games = gameService.listGames(req.headers("Authorization"));
             res.status(200);
             return new Gson().toJson(Map.of("games", games));
         } catch (ResponseException e) {
+            System.out.println("Error in listGames: " + e.getMessage());
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
     }
 
+
     public Object createGame(Request req, Response res) {
         try {
             GameData game = new Gson().fromJson(req.body(), GameData.class);
             res.status(200);
-            return new Gson().toJson(Map.of("gameID", gameService.createGame(req.headers("Authorization"), game)));
+            return new Gson().toJson(Map.of("gameID", gameService.createGame(req.headers("Authorization"), game.gameName())));
         } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));

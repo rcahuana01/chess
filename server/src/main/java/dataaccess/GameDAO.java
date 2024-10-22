@@ -1,12 +1,11 @@
 package dataaccess;
 
-import dataaccess.*;
 import model.GameData;
 
 import java.util.Collection;
 
 public interface GameDAO {
-    int createGame(GameData newGame) throws ResponseException;
+    int createGame(String newGame) throws ResponseException;
 
     GameData getGame(int gameId) throws ResponseException;
 

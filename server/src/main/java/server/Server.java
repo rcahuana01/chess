@@ -1,12 +1,15 @@
 package server;
 
 import com.google.gson.Gson;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import dataaccess.SQLUserDAO;
+import service.GameService;
+import service.SystemService;
+import service.UserService;
 import spark.Request;
 import spark.Response;
 import spark.Spark;
-
-import dataaccess.*;
-import service.*;
 
 import java.util.Map;
 

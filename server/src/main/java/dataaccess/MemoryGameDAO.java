@@ -1,6 +1,6 @@
 package dataaccess;
 
-import dataaccess.*;
+import chess.ChessGame;
 import model.GameData;
 
 import java.util.Collection;
@@ -10,9 +10,9 @@ public class MemoryGameDAO implements GameDAO {
     private HashMap<Integer, GameData> games = new HashMap<>();
 
     @Override
-    public int createGame(GameData newGame) throws ResponseException {
+    public int createGame(String newGame) throws ResponseException {
         int gameId = games.size() + 1;
-        GameData existingGame = new GameData(gameId, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), newGame.game());
+        GameData existingGame = new GameData(gameId, null, null, newGame, new ChessGame());
         games.put(gameId, existingGame);
         return gameId;
     }

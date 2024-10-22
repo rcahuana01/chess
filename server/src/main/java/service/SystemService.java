@@ -1,6 +1,9 @@
 package service;
 
-import dataaccess.*;
+import dataaccess.AuthDAO;
+import dataaccess.GameDAO;
+import dataaccess.ResponseException;
+import dataaccess.UserDAO;
 
 public class SystemService {
     private final UserDAO userDAO;

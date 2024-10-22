@@ -1,8 +1,10 @@
 package dataaccess;
 
-import dataaccess.ResponseException;
 import model.GameData;
-import org.junit.jupiter.api.*;
+import org.junit.jupiter.api.AfterEach;
+import org.junit.jupiter.api.Assertions;
+import org.junit.jupiter.api.BeforeEach;
+import org.junit.jupiter.api.Test;
 
 import java.util.ArrayList;
 import java.util.Collection;
@@ -24,18 +26,18 @@ public class SQLGameDAOTest {
 
     @Test
     void positiveCreateGameTest() throws ResponseException {
-        gameDAO.createGame(validGameData);
+        gameDAO.createGame(validGameData.gameName());
     }
 
     @Test
     void negativeCreateGameTest() {
-        ResponseException e = Assertions.assertThrows(ResponseException.class, () -> gameDAO.createGame(invalidGameData));
+        ResponseException e = Assertions.assertThrows(ResponseException.class, () -> gameDAO.createGame(invalidGameData.gameName()));
         Assertions.assertEquals(500, e.getStatusCode());
     }
 
     @Test
     void positiveGetGameTest() throws ResponseException {
-        int gameId = gameDAO.createGame(validGameData);
+        int gameId = gameDAO.createGame(validGameData.gameName());
         Assertions.assertNotNull(gameDAO.getGame((gameId)));
     }
 
@@ -46,7 +48,7 @@ public class SQLGameDAOTest {
 
     @Test
     void positiveListGamesTest() throws ResponseException {
-        gameDAO.createGame(validGameData);
+        gameDAO.createGame(validGameData.gameName());
         Collection<GameData> games = gameDAO.listGames();
         Assertions.assertNotNull(games);
     }
@@ -59,7 +61,7 @@ public class SQLGameDAOTest {
 
     @Test
     void positiveUpdateGameTest() throws ResponseException {
-        int gameId = gameDAO.createGame(validGameData);
+        int gameId = gameDAO.createGame(validGameData.gameName());
         GameData updatedGameData = new GameData(gameId, "white1", "black1", "game1", null);
         gameDAO.updateGame(updatedGameData);
         GameData retrievedGame = gameDAO.getGame(gameId);
@@ -75,7 +77,7 @@ public class SQLGameDAOTest {
 
     @Test
     void positiveClearTest() throws ResponseException {
-        gameDAO.createGame(validGameData);
+        gameDAO.createGame(validGameData.gameName());
         gameDAO.clear();
     }
 }

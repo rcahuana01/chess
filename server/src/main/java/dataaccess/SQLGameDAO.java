@@ -18,14 +18,14 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public int createGame(GameData newGame) throws ResponseException {
-        if (newGame == null || newGame.whiteUsername() == null || newGame.gameName() == null) {
+    public int createGame(String newGame) throws ResponseException {
+        if (newGame == null) {
             throw new ResponseException(500, "Error: Bad request");
         }
 
         ChessGame chessGame = new ChessGame();
         String gameJson = new Gson().toJson(chessGame);
-        GameData gameData = new GameData(nextGameId++, newGame.whiteUsername(), newGame.blackUsername(), newGame.gameName(), chessGame);
+        GameData gameData = new GameData(nextGameId++, null, null, newGame, chessGame);
         gameDataList.add(gameData);
 
         return gameData.gameID();
