@@ -1,59 +1,43 @@
 package dataaccess;
 
-import chess.ChessGame;
-import model.AuthData;
+import dataaccess.*;
 import model.UserData;
+import java.util.HashMap;
 
-import java.util.List;
+public class MemoryUserDAO implements UserDAO {
+    private HashMap<String, UserData> users = new HashMap<>();
 
-public class MemoryUserDAO implements UserDAO{
     @Override
-    public void clear() {
+    public void createUser(UserData newUser) throws ResponseException {
+        if (newUser.username() == null || newUser.username().isEmpty()) {
+            throw new ResponseException(400, "Error: Username is required");
+        }
+        if(users.containsKey(newUser.username())) {
+            throw new ResponseException(403, "Error: username already exists");
+        }
+        try {
+            users.put(newUser.username(), newUser);
+        }catch (Exception e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
 
     }
 
     @Override
-    public void createUser(UserData user) {
-
+    public UserData getUser(String username) throws ResponseException {
+        try {
+            return users.get(username);
+        }catch(Exception e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override
-    public UserData getUser(String username) {
-        return null;
-    }
-
-    @Override
-    public void createGame(ChessGame game) {
-
-    }
-
-    @Override
-    public ChessGame getGame(String gameID) {
-        return null;
-    }
-
-    @Override
-    public List<ChessGame> listGames() {
-        return List.of();
-    }
-
-    @Override
-    public void updateGame(String gameID, ChessGame game) {
-
-    }
-
-    @Override
-    public void createAuth(AuthData auth) {
-
-    }
-
-    @Override
-    public AuthData getAuth(String authToken) {
-        return null;
-    }
-
-    @Override
-    public void deleteAuth(String authToken) {
-
+    public void clear() throws ResponseException {
+        try {
+            users.clear();
+        } catch (Exception e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 }
