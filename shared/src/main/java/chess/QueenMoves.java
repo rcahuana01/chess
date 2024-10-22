@@ -2,7 +2,7 @@ package chess;
 
 import java.util.*;
 
-public class QueenMoves implements PlaceMovesCalculator{
+public class QueenMoves implements PlaceMovesCalculator {
     private final int[][] queenMoves = {
             {1, 0},   // Down
             {-1, 0},  // Up
@@ -41,7 +41,7 @@ public class QueenMoves implements PlaceMovesCalculator{
 //        System.out.println("CurrentPos Rook = (" + curRow + "," + curCol + ")");
         printBoard(board, position);
 
-        for (int []moves : queenMoves) {
+        for (int[] moves : queenMoves) {
             int rowStep = moves[0];
             int colStep = moves[1];
             int newRow = curRow;
@@ -74,13 +74,14 @@ public class QueenMoves implements PlaceMovesCalculator{
 
     }
 
-    private boolean isWithinLimits(int row, int col){
+    private boolean isWithinLimits(int row, int col) {
         return (row > 0 && row <= 8) && (col > 0 && col <= 8);
     }
-    private void printBoard(ChessBoard board, ChessPosition kingPosition){
-        for (int row=7; row >= 0; row--){
-            for (int col=0; col < 8;col++){
-                if (row == kingPosition.getRow()-1 && col == kingPosition.getColumn()-1){
+
+    private void printBoard(ChessBoard board, ChessPosition kingPosition) {
+        for (int row = 7; row >= 0; row--) {
+            for (int col = 0; col < 8; col++) {
+                if (row == kingPosition.getRow() - 1 && col == kingPosition.getColumn() - 1) {
                     System.out.print('k');
                 } else {
                     System.out.print('.');

@@ -12,6 +12,7 @@ public class SystemService {
         this.authDAO = authDAO;
         this.gameDAO = gameDAO;
     }
+
     public void clear() throws ResponseException {
         try {
             userDAO.clear();

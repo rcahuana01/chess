@@ -1,6 +1,7 @@
 package dataaccess;
 
 import model.AuthData;
+
 import java.util.HashMap;
 import java.util.Map;
 import java.util.UUID;
@@ -8,7 +9,8 @@ import java.util.UUID;
 public class SQLAuthDAO implements AuthDAO {
     private final HashMap<String, AuthData> authDatabase = new HashMap<>();
 
-    public SQLAuthDAO() {}
+    public SQLAuthDAO() {
+    }
 
     @Override
     public AuthData createAuth(String username) throws ResponseException {

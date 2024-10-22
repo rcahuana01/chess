@@ -1,16 +1,18 @@
 package server;
+
 import com.google.gson.Gson;
 import dataaccess.ResponseException;
 import service.SystemService;
 import spark.Request;
 import spark.Response;
+
 import java.util.Map;
 
 public class SystemHandler {
 
     private SystemService systemService;
 
-    public SystemHandler(SystemService systemService){
+    public SystemHandler(SystemService systemService) {
         this.systemService = systemService;
     }
 

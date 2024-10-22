@@ -9,9 +9,9 @@ import org.junit.jupiter.api.BeforeEach;
 import org.junit.jupiter.api.Test;
 
 public class UserServiceTests {
-    private UserService userService;
     UserData validUserData = new UserData("rcahuana", "password", "rcahuana@gmail.com");
     UserData invalidUserData = new UserData(null, "password", null);
+    private UserService userService;
 
     @BeforeEach
     public void setUp() throws ResponseException {
@@ -22,37 +22,37 @@ public class UserServiceTests {
     }
 
     @Test
-    public void positiveRegisterTest() throws ResponseException{
+    public void positiveRegisterTest() throws ResponseException {
         userService.register(validUserData);
         Assertions.assertNotNull(validUserData);
     }
 
     @Test
-    public void negativeRegisterTest(){
+    public void negativeRegisterTest() {
         Assertions.assertThrows(ResponseException.class, () -> userService.register(invalidUserData));
     }
 
     @Test
-    public void positiveLoginTest() throws ResponseException{
+    public void positiveLoginTest() throws ResponseException {
         userService.register(validUserData);
         var authData = userService.login(validUserData);
         Assertions.assertNotNull(authData);
     }
 
     @Test
-    public void negativeLoginTest(){
+    public void negativeLoginTest() {
         Assertions.assertThrows(ResponseException.class, () -> userService.login(invalidUserData));
     }
 
     @Test
-    public void positiveLogoutTest() throws ResponseException{
+    public void positiveLogoutTest() throws ResponseException {
         AuthData authData = userService.register(validUserData);
         String authToken = authData.authToken();
         userService.logout(authToken);
     }
 
     @Test
-    public void negativeLogoutTest(){
+    public void negativeLogoutTest() {
         Assertions.assertThrows(ResponseException.class, () -> userService.logout(null));
     }
 }

@@ -21,7 +21,7 @@ public class PawnMoves implements PlaceMovesCalculator {
         printBoard(board, position);
 
         int direction, promotionRow;
-        if (pieceColor == ChessGame.TeamColor.WHITE){
+        if (pieceColor == ChessGame.TeamColor.WHITE) {
             direction = 1;
             promotionRow = 8;
         } else {

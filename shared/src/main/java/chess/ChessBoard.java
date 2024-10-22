@@ -11,8 +11,22 @@ import java.util.Objects;
  */
 public class ChessBoard {
     private ChessPiece[][] squares = new ChessPiece[8][8];
+
     public ChessBoard() {
 
+    }
+
+    public ChessBoard(ChessBoard board) {
+
+        squares = Arrays.copyOf(board.squares, board.squares.length);
+        for (int row = 0; row < 8; row++) {
+            for (int col = 0; col < 8; col++) {
+                ChessPiece piece = board.squares[row][col];
+                if (board.squares[row][col] != null) {
+                    squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
+                }
+            }
+        }
     }
 
     @Override
@@ -41,22 +55,6 @@ public class ChessBoard {
         return newBoard;
     }
 
-    public ChessBoard(ChessBoard board) {
-
-        squares = Arrays.copyOf(board.squares, board.squares.length);
-        for (int row = 0; row < 8; row++) {
-            for (int col = 0; col < 8; col++) {
-                ChessPiece piece = board.squares[row][col];
-                if (board.squares[row][col] != null) {
-                    squares[row][col] = new ChessPiece(piece.getTeamColor(), piece.getPieceType());
-                }
-            }
-        }
-    }
-
-
-
-
     /**
      * Adds a chess piece to the chessboard
      *
@@ -64,7 +62,7 @@ public class ChessBoard {
      * @param piece    the piece to add
      */
     public void addPiece(ChessPosition position, ChessPiece piece) {
-        squares[position.getRow()-1][position.getColumn()-1] = piece;
+        squares[position.getRow() - 1][position.getColumn() - 1] = piece;
     }
 
     /**
@@ -75,7 +73,7 @@ public class ChessBoard {
      * position
      */
     public ChessPiece getPiece(ChessPosition position) {
-        return squares[position.getRow()-1][position.getColumn()-1];
+        return squares[position.getRow() - 1][position.getColumn() - 1];
     }
 
     /**
@@ -126,12 +124,24 @@ public class ChessBoard {
                 } else {
                     char pieceChar = ' ';
                     switch (piece.getPieceType()) {
-                        case KING: pieceChar = 'K'; break;
-                        case QUEEN: pieceChar = 'Q'; break;
-                        case ROOK: pieceChar = 'R'; break;
-                        case BISHOP: pieceChar = 'B'; break;
-                        case KNIGHT: pieceChar = 'N'; break;
-                        case PAWN: pieceChar = 'P'; break;
+                        case KING:
+                            pieceChar = 'K';
+                            break;
+                        case QUEEN:
+                            pieceChar = 'Q';
+                            break;
+                        case ROOK:
+                            pieceChar = 'R';
+                            break;
+                        case BISHOP:
+                            pieceChar = 'B';
+                            break;
+                        case KNIGHT:
+                            pieceChar = 'N';
+                            break;
+                        case PAWN:
+                            pieceChar = 'P';
+                            break;
                     }
                     System.out.print("|" + pieceChar + (piece.getTeamColor() == ChessGame.TeamColor.WHITE ? "W" : "B") + "|");
                 }

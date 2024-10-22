@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
-public class BishopMoves implements PlaceMovesCalculator{
+public class BishopMoves implements PlaceMovesCalculator {
     private final int[][] bishopMoves = {
             {1, 1},   // Down-Right
             {1, -1},  // Down-Left
@@ -39,7 +39,7 @@ public class BishopMoves implements PlaceMovesCalculator{
         int curCol = position.getColumn();
 //        System.out.println("CurrentPos Bishop = (" + curRow + "," + curCol + ")");
         printBoard(board, position);
-        for (int[]moves : bishopMoves) {
+        for (int[] moves : bishopMoves) {
             int rowStep = moves[0];
             int colStep = moves[1];
             int newRow = curRow;
@@ -68,10 +68,10 @@ public class BishopMoves implements PlaceMovesCalculator{
         return validMoves;
     }
 
-    private void printBoard(ChessBoard board, ChessPosition kingPosition){
-        for (int row=7; row >= 0; row--){
-            for (int col=0; col < 8;col++){
-                if (row == kingPosition.getRow()-1 && col == kingPosition.getColumn()-1){
+    private void printBoard(ChessBoard board, ChessPosition kingPosition) {
+        for (int row = 7; row >= 0; row--) {
+            for (int col = 0; col < 8; col++) {
+                if (row == kingPosition.getRow() - 1 && col == kingPosition.getColumn() - 1) {
                     System.out.print('k');
                 } else {
                     System.out.print('.');
@@ -82,7 +82,8 @@ public class BishopMoves implements PlaceMovesCalculator{
         System.out.println();
 
     }
-    private boolean isWithinLimits (int row, int col){
+
+    private boolean isWithinLimits(int row, int col) {
         return (row >= 1 && row < 9) && (col >= 1 && col < 9);
     }
 

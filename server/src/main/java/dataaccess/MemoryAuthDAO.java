@@ -6,7 +6,7 @@ import model.AuthData;
 import java.util.HashMap;
 import java.util.UUID;
 
-public class MemoryAuthDAO implements AuthDAO{
+public class MemoryAuthDAO implements AuthDAO {
     private HashMap<String, AuthData> authTokens = new HashMap<>();
 
     @Override
@@ -23,7 +23,7 @@ public class MemoryAuthDAO implements AuthDAO{
     public AuthData getAuth(String authToken) throws ResponseException {
         try {
             return authTokens.get(authToken);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -35,7 +35,7 @@ public class MemoryAuthDAO implements AuthDAO{
         }
         try {
             authTokens.remove(authToken);
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -44,7 +44,7 @@ public class MemoryAuthDAO implements AuthDAO{
     public void clear() throws ResponseException {
         try {
             authTokens.clear();
-        } catch (Exception e){
+        } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }

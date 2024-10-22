@@ -1,4 +1,5 @@
 package server;
+
 import com.google.gson.Gson;
 
 import dataaccess.ResponseException;
@@ -12,7 +13,7 @@ import java.util.Map;
 public class UserHandler {
     private final UserService userService;
 
-    public UserHandler(UserService userService){
+    public UserHandler(UserService userService) {
         this.userService = userService;
     }
 
@@ -21,7 +22,7 @@ public class UserHandler {
             UserData user = new Gson().fromJson(req.body(), UserData.class);
             res.status(200);
             return new Gson().toJson(userService.register(user));
-        }catch (ResponseException e){
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
@@ -32,7 +33,7 @@ public class UserHandler {
             UserData user = new Gson().fromJson(req.body(), UserData.class);
             res.status(200);
             return new Gson().toJson(userService.login(user));
-        } catch (ResponseException e){
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
@@ -43,7 +44,7 @@ public class UserHandler {
             userService.logout(req.headers("Authorization"));
             res.status(200);
             return "";
-        }catch (ResponseException e){
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }

@@ -9,6 +9,14 @@ import java.util.Map;
 import java.util.Set;
 
 public class TestUtilities {
+    final static Map<Character, ChessPiece.PieceType> CHAR_TO_TYPE_MAP = Map.of(
+            'p', ChessPiece.PieceType.PAWN,
+            'n', ChessPiece.PieceType.KNIGHT,
+            'r', ChessPiece.PieceType.ROOK,
+            'q', ChessPiece.PieceType.QUEEN,
+            'k', ChessPiece.PieceType.KING,
+            'b', ChessPiece.PieceType.BISHOP);
+
     static public void validateMoves(String boardText, ChessPosition startPosition, int[][] endPositions) {
         var board = loadBoard(boardText);
         var testPiece = board.getPiece(startPosition);
@@ -25,14 +33,6 @@ public class TestUtilities {
         Assertions.assertEquals(new HashSet<>(first), new HashSet<>(second), message);
         Assertions.assertEquals(first.size(), second.size(), "Collections not the same size");
     }
-
-    final static Map<Character, ChessPiece.PieceType> CHAR_TO_TYPE_MAP = Map.of(
-            'p', ChessPiece.PieceType.PAWN,
-            'n', ChessPiece.PieceType.KNIGHT,
-            'r', ChessPiece.PieceType.ROOK,
-            'q', ChessPiece.PieceType.QUEEN,
-            'k', ChessPiece.PieceType.KING,
-            'b', ChessPiece.PieceType.BISHOP);
 
     public static ChessBoard loadBoard(String boardText) {
         var board = new ChessBoard();

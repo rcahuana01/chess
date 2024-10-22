@@ -3,6 +3,7 @@ package dataaccess;
 import dataaccess.ResponseException;
 import model.GameData;
 import org.junit.jupiter.api.*;
+
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -27,7 +28,7 @@ public class SQLGameDAOTest {
     }
 
     @Test
-    void negativeCreateGameTest(){
+    void negativeCreateGameTest() {
         ResponseException e = Assertions.assertThrows(ResponseException.class, () -> gameDAO.createGame(invalidGameData));
         Assertions.assertEquals(500, e.getStatusCode());
     }
@@ -52,7 +53,7 @@ public class SQLGameDAOTest {
 
     @Test
     void negativeListGamesTest() throws ResponseException {
-        Collection<GameData>games = gameDAO.listGames();
+        Collection<GameData> games = gameDAO.listGames();
         Assertions.assertEquals(games, new ArrayList<>());
     }
 

@@ -1,49 +1,50 @@
- package chess;
- import java.util.ArrayList;
- import java.util.Arrays;
- import java.util.Collection;
- import java.util.Objects;
+package chess;
 
- public class KingMoves implements PlaceMovesCalculator {
+import java.util.ArrayList;
+import java.util.Arrays;
+import java.util.Collection;
+import java.util.Objects;
 
-     private final int[][] kingMoves = {
-             {1, 0},   // Down
-             {-1, 0},  // Up
-             {0, 1},   // Right
-             {0, -1},  // Left
-             {1, 1},   // Down-Right
-             {1, -1},  // Down-Left
-             {-1, 1},  // Up-Right
-             {-1, -1}  // Up-Left
-     };
+public class KingMoves implements PlaceMovesCalculator {
 
-     @Override
-     public boolean equals(Object o) {
-         if (this == o) return true;
-         if (o == null || getClass() != o.getClass()) return false;
-         KingMoves kingMoves1 = (KingMoves) o;
-         return Objects.deepEquals(kingMoves, kingMoves1.kingMoves);
-     }
+    private final int[][] kingMoves = {
+            {1, 0},   // Down
+            {-1, 0},  // Up
+            {0, 1},   // Right
+            {0, -1},  // Left
+            {1, 1},   // Down-Right
+            {1, -1},  // Down-Left
+            {-1, 1},  // Up-Right
+            {-1, -1}  // Up-Left
+    };
 
-     @Override
-     public int hashCode() {
-         return Arrays.deepHashCode(kingMoves);
-     }
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        KingMoves kingMoves1 = (KingMoves) o;
+        return Objects.deepEquals(kingMoves, kingMoves1.kingMoves);
+    }
 
-     @Override
-     public String toString() {
-         return "KingMoves{" +
-                 "kingMoves=" + Arrays.toString(kingMoves) +
-                 '}';
-     }
+    @Override
+    public int hashCode() {
+        return Arrays.deepHashCode(kingMoves);
+    }
 
-     public Collection<ChessMove> calculate(ChessBoard board, ChessPosition position) {
-         Collection<ChessMove> validMoves = new ArrayList<>();
+    @Override
+    public String toString() {
+        return "KingMoves{" +
+                "kingMoves=" + Arrays.toString(kingMoves) +
+                '}';
+    }
+
+    public Collection<ChessMove> calculate(ChessBoard board, ChessPosition position) {
+        Collection<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();
         int curCol = position.getColumn();
         System.out.println("CurrentPos King = (" + curRow + "," + curCol + ")");
-        printBoard(board,position);
-        for (int []moves : kingMoves) {
+        printBoard(board, position);
+        for (int[] moves : kingMoves) {
             int newRow = curRow + moves[0];
             int newCol = curCol + moves[1];
             if (isWithinLimits(newRow, newCol)) {
@@ -67,27 +68,29 @@
         }
 
 
-         return validMoves;
+        return validMoves;
 
 
-     }
-    private void printBoard(ChessBoard board, ChessPosition kingPosition){
-         for (int row=7; row >= 0; row--){
-             for (int col=0; col < 8;col++){
-                 if (row == kingPosition.getRow()-1 && col == kingPosition.getColumn()-1){
-                     System.out.print('k');
-                 } else {
-                     System.out.print('.');
-                 }
-             }
-             System.out.println();
-         }
+    }
+
+    private void printBoard(ChessBoard board, ChessPosition kingPosition) {
+        for (int row = 7; row >= 0; row--) {
+            for (int col = 0; col < 8; col++) {
+                if (row == kingPosition.getRow() - 1 && col == kingPosition.getColumn() - 1) {
+                    System.out.print('k');
+                } else {
+                    System.out.print('.');
+                }
+            }
+            System.out.println();
+        }
         System.out.println();
 
     }
-     private boolean isWithinLimits (int row, int col){
-         return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
-     }
+
+    private boolean isWithinLimits(int row, int col) {
+        return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
+    }
 
 //     private int moveStraight (ChessBoard board, ChessPosition position,int rowStep, int colStep, int steps){
 //         Collection<ChessMove> validMoves = new ArrayList<>();
@@ -104,6 +107,6 @@
 //
 //
 //     }
- }
+}
 
 

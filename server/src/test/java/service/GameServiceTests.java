@@ -8,10 +8,10 @@ import org.junit.jupiter.api.*;
 import java.util.Collection;
 
 public class GameServiceTests {
-    private GameService gameService;
-    private UserService userService;
     UserData userData = new UserData("rcahuana", "password", "rcahuana@gmail.com");
     GameData validGameData = new GameData(1, null, null, "game0", new ChessGame());
+    private GameService gameService;
+    private UserService userService;
 
     @BeforeEach
     void setUp() {

@@ -12,15 +12,16 @@ public class GameService {
     private final GameDAO gameDAO;
     private final AuthDAO authDAO;
 
-    public GameService(GameDAO gameDAO , AuthDAO authDAO){
+    public GameService(GameDAO gameDAO, AuthDAO authDAO) {
         this.gameDAO = gameDAO;
         this.authDAO = authDAO;
     }
+
     public Collection<GameData> listGames(String authToken) throws ResponseException {
-        if (authToken == null || authToken.isEmpty() || authDAO.getAuth(authToken) == null ) {
+        if (authToken == null || authToken.isEmpty() || authDAO.getAuth(authToken) == null) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        try{
+        try {
             return gameDAO.listGames();
         } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
@@ -31,7 +32,7 @@ public class GameService {
         if (authToken == null || authToken.isEmpty() || authDAO.getAuth(authToken) == null) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        if (game == null || game.gameName() == null || game.gameName().isEmpty()){
+        if (game == null || game.gameName() == null || game.gameName().isEmpty()) {
             throw new ResponseException(400, "Error: bad request");
         }
         try {
@@ -48,14 +49,14 @@ public class GameService {
         if (authToken == null || authToken.isEmpty() || auth == null) {
             throw new ResponseException(401, "Error: unauthorized");
         }
-        if (playerColor == null || gameId < -1 || game == null){
+        if (playerColor == null || gameId < -1 || game == null) {
             throw new ResponseException(400, "Error: bad request");
         }
         if (!playerColor.isEmpty()) {
-            if ((playerColor.equals("WHITE")) && (game.whiteUsername() != null)){
+            if ((playerColor.equals("WHITE")) && (game.whiteUsername() != null)) {
                 throw new ResponseException(403, "Error: already taken");
             }
-            if((playerColor.equals("BLACK")) && (game.blackUsername() != null)){
+            if ((playerColor.equals("BLACK")) && (game.blackUsername() != null)) {
                 throw new ResponseException(403, "Error: already taken");
             }
             try {

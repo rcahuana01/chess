@@ -22,7 +22,7 @@ public class GameHandler {
             Collection<GameData> games = gameService.listGames(req.headers("Authorization"));
             res.status(200);
             return new Gson().toJson(Map.of("games", games));
-        } catch (ResponseException e){
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
@@ -33,7 +33,7 @@ public class GameHandler {
             GameData game = new Gson().fromJson(req.body(), GameData.class);
             res.status(200);
             return new Gson().toJson(Map.of("gameID", gameService.createGame(req.headers("Authorization"), game)));
-        } catch (ResponseException e){
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
@@ -45,7 +45,7 @@ public class GameHandler {
             gameService.joinGame(req.headers("Authorization"), joinGameData.playerColor(), joinGameData.gameID());
             res.status(200);
             return "";
-        }catch (ResponseException e) {
+        } catch (ResponseException e) {
             res.status(e.getStatusCode());
             return new Gson().toJson(Map.of("message", e.getMessage()));
         }
