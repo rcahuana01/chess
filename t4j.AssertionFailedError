@@ -1,0 +1,179 @@
+[33mcommit 65dfca8d922a99ae7c396d6ada49660df26788a6[m[33m ([m[1;36mHEAD[m[33m -> [m[1;32mmain[m[33m, [m[1;31morigin/main[m[33m, [m[1;31morigin/HEAD[m[33m)[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Mon Oct 21 21:56:49 2024 -0600
+
+    Added dataaccess unit tests
+
+[33mcommit 96a480e92ed72938d98dc951ed7a696bd508bf51[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Mon Oct 21 20:57:46 2024 -0600
+
+    Fixing dataaccess classes
+
+[33mcommit 6e70933638b7a3079bebc70ee36b486d5aa402a1[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Mon Oct 21 12:46:55 2024 -0600
+
+    Adding more methods for game services
+
+[33mcommit 7f3c8dd6e4c39c859f3214c5863e0592a0a4aa06[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Oct 20 19:19:37 2024 -0600
+
+    Updating UserHandler methods
+
+[33mcommit ffdd7392377596aa4ce9fa3721e9a5bd3a8ab859[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Oct 20 17:56:26 2024 -0600
+
+    Handling exceptions and creating services
+
+[33mcommit 8d75159f33fdfda18d02b75028692ba45f82796a[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sat Oct 19 01:34:58 2024 -0600
+
+    Finished setting the classes and record files
+
+[33mcommit f37a28420da2bbfb96e98d5e2fea64aebf29bc6a[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Oct 18 20:17:33 2024 -0600
+
+    Setting up the tests for the web api
+
+[33mcommit 8bf642b0c388a9c8c34bc9def9cbda2f5481e500[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Thu Oct 17 14:15:40 2024 -0600
+
+    Setting up the environment
+
+[33mcommit 9554b2b9fb3ed4c7826fde03ca9654e436c1a91d[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Oct 11 18:48:24 2024 -0600
+
+    Creating folders and classes for the server
+
+[33mcommit 9f70052555da2ade34686d80ac0684e2eef593f7[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Oct 4 11:49:05 2024 -0600
+
+    Finalized Phase 1
+
+[33mcommit b966698104beaf41e51f9aba0cf3bc4f7b9d132e[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Oct 4 11:05:10 2024 -0600
+
+    GameStatusTests passed
+
+[33mcommit e549e716c45909548cf1600a86b63340a31e21aa[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Oct 4 01:02:29 2024 -0600
+
+    MakeMoveTests Passed
+
+[33mcommit 43821181303eabfcc16619c4e7634acc2b72413c[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Oct 4 00:36:38 2024 -0600
+
+    Added more code to pass MakeMoveTests
+
+[33mcommit fb6a0aeaf8890cb7148c048fd2767b78f364cd71[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Thu Oct 3 23:59:38 2024 -0600
+
+    Working on makeMove method
+
+[33mcommit 3f092359fc776bcc92195638af58e50fcadee5c2[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Thu Oct 3 23:43:52 2024 -0600
+
+    I got stuck in isInSlatemate
+
+[33mcommit 699fefa92d7a450673507afb7d8acbf47f00b017[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Thu Oct 3 22:44:28 2024 -0600
+
+    isInCheck test passed
+
+[33mcommit 3cc37f46c9da8b8298cc1789ab180c751d87034a[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Thu Oct 3 22:21:08 2024 -0600
+
+    Working on isInCheck
+
+[33mcommit aa7369ea9ac48c80cf23448b55f1ec37f5ef7b06[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Wed Oct 2 17:49:25 2024 -0600
+
+    Testing simple functions
+
+[33mcommit ecf8f20ece6499c8f8570217b067e07a19c5dfaa[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Mon Sep 23 17:00:33 2024 -0600
+
+    Phase 0 finished without bugs
+
+[33mcommit 907403b34c2400ce3d78546d839d9dfc041ce585[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Mon Sep 23 16:15:38 2024 -0600
+
+    Phase 0 finished
+
+[33mcommit 24bce19b0675a903e4dd34e47a3d97b8d6f16196[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Sep 22 21:04:27 2024 -0600
+
+    Knight done
+
+[33mcommit d23e3b0f60a031dc5d2dbb7de559a05245fb3cff[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Sep 22 20:11:56 2024 -0600
+
+    Queen done
+
+[33mcommit 605d04e67549c9ef2f3177181e7d8b387fd136fb[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Sep 22 18:42:10 2024 -0600
+
+    Rook done
+
+[33mcommit 16fb8ef6c627a87fc99460cf3e6fc53c6b370a54[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Sep 22 14:13:49 2024 -0600
+
+    Making Progress with king
+
+[33mcommit c919139e05d503cdd7ae19c086fe3715f9703fca[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Sep 15 23:09:12 2024 -0600
+
+    Phase 0 chessBoardtests and chessBoardpositiontests passed
+
+[33mcommit 6e91932d03ae20434081b7f9113ec2488d9a4b24[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sun Sep 15 19:25:55 2024 -0600
+
+    Phase 0 Progress Chess Board
+
+[33mcommit 32a650b4759d69940821856f405293b6076471eb[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sat Sep 14 13:13:06 2024 -0600
+
+    Phase 0 Progress
+
+[33mcommit a8af5285a1f302de6134565aab72b0fb296c4ea3[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Sat Sep 7 13:02:52 2024 -0600
+
+    init(phase0)
+
+[33mcommit b98ff43d7e27fa8aff513a8e9b5abae97f3cb677[m
+Author: rcahuana987 <132010174+rcahuana987@users.noreply.github.com>
+Date:   Fri Sep 6 21:05:07 2024 -0600
+
+    initial(notes) creation
+
+[33mcommit ff40cef13631a3fda929ebb50b57b3b6c1d4169e[m
+Author: rcahuana01 <156860175+rcahuana01@users.noreply.github.com>
+Date:   Fri Sep 6 20:55:46 2024 -0600
+
+    Initial commit
