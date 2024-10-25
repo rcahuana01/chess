@@ -1,5 +1,7 @@
 package dataaccess;
 
+import model.AuthData;
+
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
@@ -83,5 +85,9 @@ public class DatabaseManager {
         } catch (Exception e) {
             throw new DataAccessException("Unable to configure database. " + e.getMessage());
         }
+    }
+
+    static void executeUpdate(String[] insertStatement, AuthData authdata){
+        try (var conn = DatabaseManager.getConnection()){
     }
 }

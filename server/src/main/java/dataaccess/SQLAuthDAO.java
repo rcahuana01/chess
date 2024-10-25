@@ -28,6 +28,11 @@ public class SQLAuthDAO implements AuthDAO {
         if (username == null || username.isEmpty()) {
             throw new ResponseException(500, "Error: Username cannot be empty");
         }
+        try {
+            String insertStatement = "INSERT INTO authData (username, authToken) VALUES (?,?)";
+            AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
+            DatabaseManager.
+        }
         String authToken = UUID.randomUUID().toString();
         AuthData authData = new AuthData(authToken, username);
         authDatabase.put(authToken, authData);
