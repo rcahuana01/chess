@@ -4,11 +4,23 @@ import model.AuthData;
 
 import java.util.HashMap;
 import java.util.UUID;
-
+import static dataaccess.DatabaseManager.configureDatabase;
 public class SQLAuthDAO implements AuthDAO {
-    private final HashMap<String, AuthData> authDatabase = new HashMap<>();
-
+//    private final HashMap<String, AuthData> authDatabase = new HashMap<>();
+    private static final String[] CREATE_TABLE_STMT = {
+        """
+        CREATE TABLE IF NOT EXISTS authDATA( 
+        'authToken' varchar(255) NOT NULL,
+        'username' varchar(255) NOT NULL,
+        PRIMARY KEY ('authToken')
+        )"""
+};
     public SQLAuthDAO() {
+        try {
+            configureDatabase(CREATE_TABLE_STMT);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Unable to create authentication table", e);
+        }
     }
 
     @Override
