@@ -31,5 +31,7 @@
     <orderEntry type="library" name="jbcrypt-0.4" level="project" />
     <orderEntry type="library" name="mysql.connector.java" level="project" />
     <orderEntry type="library" name="mindrot.jbcrypt" level="project" />
+    <orderEntry type="library" name="mysql.connector.java1" level="project" />
+    <orderEntry type="library" name="mindrot.jbcrypt1" level="project" />
   </component>
 </module>

@@ -2,11 +2,11 @@ package dataaccess;
 
 import model.AuthData;
 
-import java.util.HashMap;
+import java.sql.SQLException;
 import java.util.UUID;
 import static dataaccess.DatabaseManager.configureDatabase;
+
 public class SQLAuthDAO implements AuthDAO {
-//    private final HashMap<String, AuthData> authDatabase = new HashMap<>();
     private static final String[] CREATE_TABLE_STMT = {
         """
         CREATE TABLE IF NOT EXISTS authDATA( 
@@ -31,36 +31,44 @@ public class SQLAuthDAO implements AuthDAO {
         try {
             String insertStatement = "INSERT INTO authData (username, authToken) VALUES (?,?)";
             AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
-            DatabaseManager.
+            DatabaseManager.executeUpdate(insertStatement, authData);
+            return authData;
+        } catch (SQLException | DataAccessException e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
-        String authToken = UUID.randomUUID().toString();
-        AuthData authData = new AuthData(authToken, username);
-        authDatabase.put(authToken, authData);
-        return authData;
     }
 
     @Override
     public AuthData getAuth(String authToken) throws ResponseException {
-        if (authToken == null || authToken.isEmpty()) {
-            throw new ResponseException(400, "Error: Invalid auth token");
-        }
 
-        // Simulate retrieving AuthData from the mock database
-        return authDatabase.get(authToken); // return null if not found
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT * FROM authData WHERE authToken = ?")){
+            stmt.setString(1 , authToken);
+            var rs = stmt.executeQuery();
+            if (rs.next()){
+                return new AuthData(rs.getString("authToken"), rs.getString("username"));
+            } else {
+             return null;
+            }
+        } catch (SQLException | DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override
     public void deleteAuth(String authToken) throws ResponseException {
-        if (authToken == null || authToken.isEmpty()) {
-            return; // Don't throw exception on invalid token
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData WHERE authToken = ?")){
+            stmt.setString(1, authToken);
+            stmt.executeUpdate();
+            } catch (DataAccessException | SQLException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
-
-        // Simulate deleting the AuthData from the mock database
-        authDatabase.remove(authToken); // remove without throwing an exception if token not found
-    }
 
     @Override
     public void clear() throws ResponseException {
-        authDatabase.clear();
+        try(var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData")){
+            stmt.executeUpdate();
+        } catch (DataAccessException | SQLException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 }

@@ -5,6 +5,7 @@ import model.AuthData;
 import java.sql.Connection;
 import java.sql.DriverManager;
 import java.sql.SQLException;
+import java.sql.Statement;
 import java.util.Properties;
 
 public class DatabaseManager {
@@ -87,7 +88,15 @@ public class DatabaseManager {
         }
     }
 
-    static void executeUpdate(String[] insertStatement, AuthData authdata){
+    static void executeUpdate(String statement, Object param){
         try (var conn = DatabaseManager.getConnection()){
-    }
+            try(var ps = conn.prepareStatement(statement, Statement.RETURN_GENERATED_KEYS)){
+                for (var i =0; i < param.getClass(); i++){
+                    var param = params[i];
+                    if (param instanceof String p) ps.setString(i+1,p);
+                    else if (param instanceof Integer p) ps.setInt(i+1,p);
+                    else if ()
+                }
+            }
+        }
 }
