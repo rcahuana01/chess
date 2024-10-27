@@ -2,68 +2,82 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import model.AuthData;
 import model.GameData;
 
+import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
 import java.util.List;
+import java.util.UUID;
+
+import static dataaccess.DatabaseManager.configureDatabase;
 
 public class SQLGameDAO implements GameDAO {
-    private final List<GameData> gameDataList;
-    private int nextGameId;
+    private static final String[] CREATE_TABLE_STMT = {
+            """
+            CREATE TABLE IF NOT EXISTS gameData (
+            'gameId' int UNSIGNED NOT NULL AUTO_INCREMENT,
+            'whiteUsername' varchar(255) NULL,
+            'blackUsername' varchar(255) NULL,
+            'gameName' varchar(255) NOT NULL,
+            'game' TEST NULL,
+            PRIMARY KEY ('gameId')
+            )"""
+    };
 
     public SQLGameDAO() {
-        this.gameDataList = new ArrayList<>();
-        this.nextGameId = 1;
+        try {
+            configureDatabase(CREATE_TABLE_STMT);
+        } catch (DataAccessException e) {
+            throw new RuntimeException("Unable to create game's table", e);
+        }
     }
 
     @Override
-    public int createGame(String newGame) throws ResponseException {
-        if (newGame == null) {
-            throw new ResponseException(500, "Error: Bad request");
+    public AuthData createAuth(String username) throws ResponseException {
+        try {
+            String insertStatement = "INSERT INTO authData (username, authToken) VALUES (?, ?)";
+            AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
+            DatabaseManager.executeUpdate(insertStatement, authData.username(), authData.authToken());
+            return authData;
+        } catch (DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
 
-        ChessGame chessGame = new ChessGame();
-        String gameJson = new Gson().toJson(chessGame);
-        GameData gameData = new GameData(nextGameId++, null, null, newGame, chessGame);
-        gameDataList.add(gameData);
-
-        return gameData.gameID();
     }
 
     @Override
-    public GameData getGame(int gameId) throws ResponseException {
-        for (GameData game : gameDataList) {
-            if (game.gameID() == gameId) {
-                return game;
+    public AuthData getAuth(String authToken) throws ResponseException {
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM authData WHERE authToken = ?")){
+            stmt.setString(1, authToken);
+            var rs = stmt.executeQuery();
+            if(rs.next()){
+                return new AuthData(rs.getString("authToken"), rs.getString("username"));
+            } else {
+                return null;
             }
+        }catch (SQLException | DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
-        return null;
     }
 
     @Override
-    public Collection<GameData> listGames() throws ResponseException {
-        return new ArrayList<>(gameDataList);
-    }
-
-
-    @Override
-    public void updateGame(GameData game) throws ResponseException {
-        if (game == null) {
-            throw new ResponseException(500, "Error: Game data cannot be null");
+    public void deleteAuth(String authToken) throws ResponseException {
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData WHERE authToken = ?")) {
+            stmt.setString(1, authToken);
+            stmt.executeUpdate();
+        } catch (SQLException | DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
         }
-
-        for (int i = 0; i < gameDataList.size(); i++) {
-            if (gameDataList.get(i).gameID() == game.gameID()) {
-                gameDataList.set(i, game);
-                return;
-            }
-        }
-        throw new ResponseException(404, "Error: Game not found");
     }
 
     @Override
     public void clear() throws ResponseException {
-        gameDataList.clear();
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData")) {
+            stmt.executeUpdate();
+        } catch (SQLException | DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 }
