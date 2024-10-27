@@ -33,7 +33,7 @@ public class SQLAuthDAO implements AuthDAO {
             AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
             DatabaseManager.executeUpdate(insertStatement, authData);
             return authData;
-        } catch (SQLException | DataAccessException e) {
+        } catch (DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
