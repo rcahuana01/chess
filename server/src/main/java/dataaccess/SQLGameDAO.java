@@ -5,6 +5,7 @@ import com.google.gson.Gson;
 import model.AuthData;
 import model.GameData;
 
+import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
@@ -35,49 +36,38 @@ public class SQLGameDAO implements GameDAO {
     }
 
     @Override
-    public AuthData createAuth(String username) throws ResponseException {
+    public int createGame(String newGame) throws ResponseException {
         try {
-            String insertStatement = "INSERT INTO authData (username, authToken) VALUES (?, ?)";
-            AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
-            DatabaseManager.executeUpdate(insertStatement, authData.username(), authData.authToken());
-            return authData;
+            ChessGame game = new ChessGame();
+            String gameJSON = new Gson().toJson(game);
+            String insertStatement = "INSERT INTO (whiteUsername, blackUsername, gameName, name) VALUES (?, ?, ?, ?)";
+            return DatabaseManager.executeUpdate(insertStatement, null, null, "game", gameJSON);
         } catch (DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
-
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM authData WHERE authToken = ?")){
-            stmt.setString(1, authToken);
-            var rs = stmt.executeQuery();
-            if(rs.next()){
-                return new AuthData(rs.getString("authToken"), rs.getString("username"));
-            } else {
-                return null;
-            }
-        }catch (SQLException | DataAccessException e){
-            throw new ResponseException(500, "Error: " + e.getMessage());
-        }
+    public GameData getGame(int gameId) throws ResponseException {
+        try {
+            ChessGame game = new ChessGame();
+            String
+        };
     }
 
     @Override
-    public void deleteAuth(String authToken) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData WHERE authToken = ?")) {
-            stmt.setString(1, authToken);
-            stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
-            throw new ResponseException(500, "Error: " + e.getMessage());
-        }
+    public Collection<GameData> listGames() throws ResponseException {
+        return List.of();
+    }
+
+    @Override
+    public void updateGame(GameData game) throws ResponseException {
+
     }
 
     @Override
     public void clear() throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData")) {
-            stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
-            throw new ResponseException(500, "Error: " + e.getMessage());
-        }
+
     }
+
 }
