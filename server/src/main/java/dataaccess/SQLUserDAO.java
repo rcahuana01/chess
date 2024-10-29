@@ -2,12 +2,9 @@ package dataaccess;
 
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
-import java.util.ArrayList;
-import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 import static dataaccess.DatabaseManager.configureDatabase;
 
@@ -31,39 +28,26 @@ public class SQLUserDAO implements UserDAO {
     }
 
     @Override
-    public AuthData createAuth(String username) throws ResponseException {
+    public void createUser(UserData newUser) throws ResponseException {
         try {
-            String insertStatement = "INSERT INTO authData (username, authToken) VALUES (?, ?)";
-            AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
-            DatabaseManager.executeUpdate(insertStatement, authData.username(), authData.authToken());
-            return authData;
-        } catch (DataAccessException e){
+            String insertStatement = "INSERT INTO user (username, authToken) VALUES (?, ?)";
+            DatabaseManager.executeUpdate(insertStatement, newUser, encryptPassword(newUser.password()), newUser.email());
+        } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
-
     }
 
     @Override
-    public AuthData getAuth(String authToken) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM authData WHERE authToken = ?")){
-            stmt.setString(1, authToken);
+    public UserData getUser(String username) throws ResponseException {
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT username, password, email FROM userData WHERE username = ?")){
+            stmt.setString(1, username);
             var rs = stmt.executeQuery();
-            if(rs.next()){
-                return new AuthData(rs.getString("authToken"), rs.getString("username"));
+            if (rs.next()){
+                return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
             } else {
                 return null;
             }
-        }catch (SQLException | DataAccessException e){
-            throw new ResponseException(500, "Error: " + e.getMessage());
-        }
-    }
-
-    @Override
-    public void deleteAuth(String authToken) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData WHERE authToken = ?")) {
-            stmt.setString(1, authToken);
-            stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
+        } catch (DataAccessException | SQLException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -75,5 +59,9 @@ public class SQLUserDAO implements UserDAO {
         } catch (SQLException | DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
+    }
+
+    private String encryptPassword(String password){
+        return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

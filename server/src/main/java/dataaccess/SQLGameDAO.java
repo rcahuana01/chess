@@ -13,6 +13,7 @@ import java.util.List;
 import java.util.UUID;
 
 import static dataaccess.DatabaseManager.configureDatabase;
+import static dataaccess.DatabaseManager.executeUpdate;
 
 public class SQLGameDAO implements GameDAO {
     private static final String[] CREATE_TABLE_STMT = {
@@ -49,25 +50,53 @@ public class SQLGameDAO implements GameDAO {
 
     @Override
     public GameData getGame(int gameId) throws ResponseException {
-        try {
-            ChessGame game = new ChessGame();
-            String
-        };
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT * FROM gameData WHERE gameId = ?")){
+            stmt.setInt(1, gameId);
+            var rs = stmt.executeQuery();
+            if (rs.next()){
+                ChessGame newGame = new ChessGame();
+                return new GameData(gameId, null, null, "game", newGame);
+            } else {
+                return null;
+            }
+        } catch (DataAccessException | SQLException e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override
     public Collection<GameData> listGames() throws ResponseException {
-        return List.of();
+        Collection<GameData> games = new ArrayList<>();
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT * FROM gameData")){
+            var rs = stmt.executeQuery();
+            while (rs.next()){
+                ChessGame chessGame = new Gson().fromJson(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame);
+                games.add(new ChessGame()rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
+            }
+            return games;
+        } catch (DataAccessException | SQLException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override
     public void updateGame(GameData game) throws ResponseException {
-
+        try {
+            String gameJson = new Gson().toJson(game.game());
+            DatabaseManager.executeUpdate("UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?",
+                    null, null, "game", gameJson, "game132");
+        } catch (DataAccessException e){
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
     @Override
     public void clear() throws ResponseException {
-
+        try {
+            var conn = DatabaseManager.executeUpdate("DELETE gameData ALL");
+        } catch (DataAccessException e) {
+            throw new ResponseException(500, "Error: " + e.getMessage());
+        }
     }
 
 }
