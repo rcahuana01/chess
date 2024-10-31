@@ -79,15 +79,15 @@ public class DatabaseManager {
         }
     }
 
-    static void configureDatabase(String[] createStatements) throws DataAccessException{
+    static void configureDatabase(String[] createStatements) throws DataAccessException {
         createDatabase();
         try (var conn = DatabaseManager.getConnection()){
             for (var statement: createStatements){
-                try (var preparedStatement = conn.prepareStatement(statement)){
+                try (var preparedStatement = conn.prepareStatement(statement)) {
                     preparedStatement.executeUpdate();
                 }
             }
-        } catch (Exception e) {
+        }catch (SQLException e){
             throw new DataAccessException("Unable to configure database. " + e.getMessage());
         }
     }
@@ -103,10 +103,12 @@ public class DatabaseManager {
                     else if (param == null) ps.setNull(i + 1, NULL);
                 }
                 ps.executeUpdate();
+
                 var rs = ps.getGeneratedKeys();
                 if (rs.next()) {
                     return rs.getInt(1);
                 }
+
                 return 0;
             }
         } catch (SQLException e) {

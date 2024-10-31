@@ -1,5 +1,6 @@
 package dataaccess;
 
+
 import model.AuthData;
 
 import java.sql.SQLException;
@@ -35,6 +36,7 @@ public class SQLAuthDAO implements AuthDAO {
         } catch (DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
+
     }
 
     @Override

@@ -19,12 +19,12 @@ public class SQLGameDAO implements GameDAO {
     private static final String[] CREATE_TABLE_STMT = {
             """
             CREATE TABLE IF NOT EXISTS gameData (
-            'gameId' int UNSIGNED NOT NULL AUTO_INCREMENT,
-            'whiteUsername' varchar(255) NULL,
-            'blackUsername' varchar(255) NULL,
-            'gameName' varchar(255) NOT NULL,
-            'game' TEST NULL,
-            PRIMARY KEY ('gameId')
+            `gameId` int UNSIGNED NOT NULL AUTO_INCREMENT,
+            `whiteUsername` varchar(255) NULL,
+            `blackUsername` varchar(255) NULL,
+            `gameName` varchar(255) NOT NULL,
+            `game` TEXT NULL,
+            PRIMARY KEY (`gameId`)
             )"""
     };
 
@@ -70,8 +70,7 @@ public class SQLGameDAO implements GameDAO {
         try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT * FROM gameData")){
             var rs = stmt.executeQuery();
             while (rs.next()){
-                ChessGame chessGame = new Gson().fromJson(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame);
-                games.add(new ChessGame()rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
+                ChessGame chessGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
             }
             return games;
         } catch (DataAccessException | SQLException e){

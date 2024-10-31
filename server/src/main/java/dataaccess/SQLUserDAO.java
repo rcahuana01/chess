@@ -12,10 +12,10 @@ public class SQLUserDAO implements UserDAO {
     private static final String[] CREATE_TABLE_STMT = {
             """
             CREATE TABLE IF NOT EXISTS userData (
-            'username' varchar(255) NOT NULL,
-            'password' varchar(255) NOT NULL,
-            'email' varchar(255) NOT NULL,
-            PRIMARY KEY ('username')
+			`username` varchar(255) NOT NULL,
+            `password` varchar(255) NOT NULL,
+            `email` varchar(255) NOT NULL,
+            PRIMARY KEY (`username`)
             )"""
     };
 
