@@ -1,6 +1,5 @@
 package dataaccess;
 
-import model.AuthData;
 import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
@@ -22,7 +21,7 @@ public class SQLUserDAO implements UserDAO {
     public SQLUserDAO() {
         try {
             configureDatabase(CREATE_TABLE_STMT);
-        } catch (DataAccessException e){
+        } catch (DataAccessException e) {
             throw new RuntimeException("Unable to create user's table", e);
         }
     }
@@ -39,15 +38,16 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public UserData getUser(String username) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT username, password, email FROM userData WHERE username = ?")){
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement("SELECT username, password, email FROM userData WHERE username = ?")) {
             stmt.setString(1, username);
             var rs = stmt.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 return new UserData(rs.getString("username"), rs.getString("password"), rs.getString("email"));
             } else {
                 return null;
             }
-        } catch (DataAccessException | SQLException e){
+        } catch (DataAccessException | SQLException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -57,12 +57,12 @@ public class SQLUserDAO implements UserDAO {
         try (var conn = DatabaseManager.getConnection();
              var stmt = conn.prepareStatement("DELETE FROM userData")) {
             stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
+        } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
-    private String encryptPassword(String password){
+    private String encryptPassword(String password) {
         return BCrypt.hashpw(password, BCrypt.gensalt());
     }
 }

@@ -2,18 +2,13 @@ package dataaccess;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
-import model.AuthData;
 import model.GameData;
 
-import javax.xml.crypto.Data;
 import java.sql.SQLException;
 import java.util.ArrayList;
 import java.util.Collection;
-import java.util.List;
-import java.util.UUID;
 
 import static dataaccess.DatabaseManager.configureDatabase;
-import static dataaccess.DatabaseManager.executeUpdate;
 
 public class SQLGameDAO implements GameDAO {
     private static final String[] CREATE_TABLE_STMT = {
@@ -56,7 +51,8 @@ public class SQLGameDAO implements GameDAO {
             var rs = stmt.executeQuery();
             if (rs.next()) {
                 ChessGame newGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
-                return new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), newGame);
+                return new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"), rs.getString("gameName"), newGame);
             } else {
                 return null;
             }
@@ -69,15 +65,16 @@ public class SQLGameDAO implements GameDAO {
     public Collection<GameData> listGames() throws ResponseException {
         Collection<GameData> games = new ArrayList<>();
         try (var conn = DatabaseManager.getConnection();
-             var stmt = conn.prepareStatement("SELECT * FROM gameData")){
+             var stmt = conn.prepareStatement("SELECT * FROM gameData")) {
             var rs = stmt.executeQuery();
-            while (rs.next()){
+            while (rs.next()) {
                 String gameJson = rs.getString("game");
                 ChessGame chessGame = gameJson != null ? new Gson().fromJson(gameJson, ChessGame.class) : null;
-                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
+                games.add(new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"),
+                        rs.getString("blackUsername"), rs.getString("gameName"), chessGame));
             }
             return games;
-        } catch (DataAccessException | SQLException e){
+        } catch (DataAccessException | SQLException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -97,7 +94,7 @@ public class SQLGameDAO implements GameDAO {
     public void clear() throws ResponseException {
         try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM gameData")) {
             stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
+        } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }

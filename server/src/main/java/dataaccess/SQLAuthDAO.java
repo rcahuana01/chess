@@ -21,7 +21,7 @@ public class SQLAuthDAO implements AuthDAO {
     public SQLAuthDAO() {
         try {
             configureDatabase(CREATE_TABLE_STMT);
-        } catch (DataAccessException e){
+        } catch (DataAccessException e) {
             throw new RuntimeException("Unable to create auth's table", e);
         }
     }
@@ -33,7 +33,7 @@ public class SQLAuthDAO implements AuthDAO {
             AuthData authData = new AuthData(UUID.randomUUID().toString(), username);
             DatabaseManager.executeUpdate(insertStatement, authData.username(), authData.authToken());
             return authData;
-        } catch (DataAccessException e){
+        } catch (DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
 
@@ -41,15 +41,15 @@ public class SQLAuthDAO implements AuthDAO {
 
     @Override
     public AuthData getAuth(String authToken) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement( "SELECT * FROM authData WHERE authToken = ?")){
+        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT * FROM authData WHERE authToken = ?")) {
             stmt.setString(1, authToken);
             var rs = stmt.executeQuery();
-            if(rs.next()){
+            if (rs.next()) {
                 return new AuthData(rs.getString("authToken"), rs.getString("username"));
             } else {
                 return null;
             }
-        }catch (SQLException | DataAccessException e){
+        } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -59,7 +59,7 @@ public class SQLAuthDAO implements AuthDAO {
         try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData WHERE authToken = ?")) {
             stmt.setString(1, authToken);
             stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
+        } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
@@ -68,7 +68,7 @@ public class SQLAuthDAO implements AuthDAO {
     public void clear() throws ResponseException {
         try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData")) {
             stmt.executeUpdate();
-        } catch (SQLException | DataAccessException e){
+        } catch (SQLException | DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
