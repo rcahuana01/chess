@@ -5,6 +5,7 @@ import dataaccess.ResponseException;
 import dataaccess.UserDAO;
 import model.AuthData;
 import model.UserData;
+import org.mindrot.jbcrypt.BCrypt;
 
 public class UserService {
     private final UserDAO userDAO;
@@ -41,12 +42,10 @@ public class UserService {
 
         UserData currentUser = userDAO.getUser(user.username());
 
-        if (currentUser == null) {
+        if ((currentUser == null) || !(BCrypt.checkpw(user.password(), currentUser.password()))) {
             throw new ResponseException(401, "Error: unauthorized - User not found");
         }
-        if (!user.password().equals(currentUser.password())) {
-            throw new ResponseException(401, "Error: unauthorized - Invalid password");
-        }
+
 
         try {
             return authDAO.createAuth(user.username());
