@@ -30,8 +30,8 @@ public class SQLUserDAO implements UserDAO {
     @Override
     public void createUser(UserData newUser) throws ResponseException {
         try {
-            String insertStatement = "INSERT INTO user (username, authToken) VALUES (?, ?)";
-            DatabaseManager.executeUpdate(insertStatement, newUser, encryptPassword(newUser.password()), newUser.email());
+            String insertStatement = "INSERT INTO userData (username, password, email) VALUES (?, ?, ?)";
+            DatabaseManager.executeUpdate(insertStatement, newUser.username(), encryptPassword(newUser.password()), newUser.email());
         } catch (Exception e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
@@ -54,7 +54,8 @@ public class SQLUserDAO implements UserDAO {
 
     @Override
     public void clear() throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("DELETE FROM authData")) {
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement("DELETE FROM userData")) {
             stmt.executeUpdate();
         } catch (SQLException | DataAccessException e){
             throw new ResponseException(500, "Error: " + e.getMessage());

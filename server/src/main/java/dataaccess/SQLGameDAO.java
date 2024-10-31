@@ -41,19 +41,20 @@ public class SQLGameDAO implements GameDAO {
         try {
             ChessGame game = new ChessGame();
             String gameJSON = new Gson().toJson(game);
-            String insertStatement = "INSERT INTO gameData(whiteUsername, blackUsername, gameName, name) VALUES (?, ?, ?, ?)";
-            return DatabaseManager.executeUpdate(insertStatement, null, null, "game123", gameJSON);
-        } catch (DataAccessException e){
+            String insertStatement = "INSERT INTO gameData(whiteUsername, blackUsername, gameName, game) VALUES (?, ?, ?, ?)";
+            return DatabaseManager.executeUpdate(insertStatement, null, null, newGame, gameJSON);
+        } catch (DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
 
     @Override
     public GameData getGame(int gameId) throws ResponseException {
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT  FROM gameData WHERE gameId = ?")){
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement("SELECT * FROM gameData WHERE gameId = ?")) {
             stmt.setInt(1, gameId);
             var rs = stmt.executeQuery();
-            if (rs.next()){
+            if (rs.next()) {
                 ChessGame newGame = new Gson().fromJson(rs.getString("game"), ChessGame.class);
                 return new GameData(rs.getInt("gameId"), rs.getString("whiteUsername"), rs.getString("blackUsername"), rs.getString("gameName"), newGame);
             } else {
@@ -67,7 +68,8 @@ public class SQLGameDAO implements GameDAO {
     @Override
     public Collection<GameData> listGames() throws ResponseException {
         Collection<GameData> games = new ArrayList<>();
-        try (var conn = DatabaseManager.getConnection(); var stmt = conn.prepareStatement("SELECT * FROM gameData")){
+        try (var conn = DatabaseManager.getConnection();
+             var stmt = conn.prepareStatement("SELECT * FROM gameData")){
             var rs = stmt.executeQuery();
             while (rs.next()){
                 String gameJson = rs.getString("game");
@@ -85,8 +87,8 @@ public class SQLGameDAO implements GameDAO {
         try {
             String gameJson = new Gson().toJson(game.game());
             DatabaseManager.executeUpdate("UPDATE gameData SET whiteUsername = ?, blackUsername = ?, gameName = ?, game = ? WHERE gameId = ?",
-                    null, null, game.gameName(), gameJson, "game132");
-        } catch (DataAccessException e){
+                    game.whiteUsername(), game.blackUsername(), game.gameName(), gameJson, game.gameID());
+        } catch (DataAccessException e) {
             throw new ResponseException(500, "Error: " + e.getMessage());
         }
     }
