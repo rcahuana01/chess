@@ -6,10 +6,10 @@ import chess.ChessPosition;
 
 import java.io.PrintStream;
 
-public class ChessBoard {
-    private ChessBoard gameBoard;
+public class ChessBoardBuilder {
+    private ChessBoardBuilder gameBoard;
     private ChessGame chessGame;
-    public ChessBoard(ChessBoard board, ChessGame game){
+    public ChessBoardBuilder(ChessBoardBuilder board, ChessGame game){
         gameBoard = board;
         chessGame = game;
     }
