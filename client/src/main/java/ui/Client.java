@@ -207,8 +207,5 @@ public class Client {
             System.exit(0);
         }
 
-        public void notify(Notification notification) {
-            System.out.println("INFO: " + notification.message);
-        }
 }
 

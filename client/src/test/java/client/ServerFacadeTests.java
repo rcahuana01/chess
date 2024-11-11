@@ -1,5 +1,8 @@
 package client;
 
+import chess.ChessGame;
+import model.AuthData;
+import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.AfterAll;
 import org.junit.jupiter.api.Assertions;
@@ -15,6 +18,9 @@ public class ServerFacadeTests {
     private static ServerFacade serverFacade;
     UserData validUser = new UserData("player1", "password", "p1@email.com");
     UserData invalidUser = new UserData(null, "password", "p2@email.com");
+    GameData validGame = new GameData(1, "white", null, "game1", null);
+    GameData invalidGame = new GameData(-1, "white", "black", null, null);
+
     @BeforeAll
     public static void init() {
         server = new Server();
@@ -37,6 +43,49 @@ public class ServerFacadeTests {
     void negativeRegister() throws Exception {
         Assertions.assertThrows(Exception.class, () -> serverFacade.register(invalidUser));
     }
+
+    @Test
+    void positiveLogin() throws Exception {
+        var authData = serverFacade.login(validUser);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.login(invalidUser));
+    }
+
+    @Test
+    void negativeLogin() throws Exception {
+        Assertions.assertThrows(Exception.class, () -> serverFacade.login(invalidUser));
+    }
+
+    @Test
+    void positiveLogout() throws Exception {
+        AuthData authData = serverFacade.register(validUser);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.logout(invalidUser));
+    }
+
+    @Test
+    void negativeLogout() throws Exception {
+        Assertions.assertThrows(Exception.class, () -> serverFacade.logout(null));
+    }
+
+    @Test
+    void positiveCreateGame() throws Exception {
+        var authData = serverFacade.register(validUser);
+        var games = serverFacade.createGame(authData.authToken(), validGame)
+        Assertions.assertNotNull(gameData, "Creating a game should return valid GameData.");
+    }
+
+    @Test
+    void negativeCreateGame() throws Exception {
+        AuthData authToken = new AuthData(authToken, invalidUser);
+        ChessGame InvalidGame = null;
+        Assertions.assertThrows(Exception.class, () -> serverFacade.createGame(authToken, InvalidGame),
+                "Creating a game with invalid data should throw an exception.");
+    }
+
+    @Test
+    void negativeLogin() throws Exception {
+        Assertions.assertThrows(Exception.class, () -> serverFacade.login(invalidUser));
+    }
+
     @Test
     public void sampleTest() {
         Assertions.assertTrue(true);
