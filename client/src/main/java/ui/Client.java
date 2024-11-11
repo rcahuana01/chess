@@ -178,7 +178,36 @@ public class Client implements NotificationHandler {
                     System.out.println("Enter player color (WHITE/BLACK):");
                     String playerColor = scanner.nextLine().toUpperCase();
                     serverFacade.joinGame(authData.authToken(), currentGameId, playerColor);
+                    currentPlayerColor = playerColor;
+                    state = ClientState.IN_GAME;
+                } else {
+                    serverFacade.joinGame(authData.authToken(), currentGameId, "observer");
+                    currentPlayerColor = "";
+                    state = ClientState.OBSERVING;
                 }
+                System.out.println("Joined the game succesfully.");
+            } catch (Exception e) {
+                System.out.println("Unable to join with the information provided.");
+                System.out.println(e.getMessage());
+            }
+        }
+
+        private void logout() throws Exception {
+            serverFacade.logout(authData.authToken());
+            state = ClientState.PRE_LOGIN;
+        }
+
+        private void redraw() {
+            if (currentBoard != null) {
+                ChessBoardBuilder boardBuilder = new ChessBoardBuilder((currentBoard, currentGame));
+                boardBuilder.printBoard(currentPlayerColor, null);
+            }
+        }
+
+        private void makeMove() throws Exception {
+            try {
+                System.out.print(" ");
+
             }
         }
     @Override
