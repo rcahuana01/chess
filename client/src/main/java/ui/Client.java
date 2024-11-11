@@ -13,7 +13,6 @@ import java.util.HashMap;
 import java.util.Map;
 import java.util.Scanner;
 
-import static sun.java2d.windows.GDIBlitLoops.register;
 
 public class Client implements NotificationHandler {
 
@@ -215,6 +214,20 @@ public class Client implements NotificationHandler {
         return null;
     }
 }
+
+    private void register() throws Exception {
+        try {
+            System.out.println("Enter your username: ");
+            String username = scanner.nextLine();
+            System.out.println("Enter your password: ");
+            String password = scanner.nextLine();
+            System.out.println("Enter your email: ");
+            String email = scanner.nextLine();
+
+            UserData userData = new = UserData(username, password, email)
+        }
+    }
+    }
 
     private void displayPreloginCommands() {
     }

@@ -136,4 +136,8 @@ public class ChessBoard {
             System.out.println();
         }
     }
+
+    public ChessPiece[][] getBoard() {
+        return squares;
+    }
 }

@@ -7,7 +7,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Collection;
 import java.util.HashSet;
 
-import static ui.EscapeSequences.RESET_BG_COLOR;
+import static ui.EscapeSequences.*;
 
 public class ChessBoardBuilder {
     private static ChessBoard gameBoard;
@@ -19,7 +19,7 @@ public class ChessBoardBuilder {
 
     public void drawBoard(PrintStream out, boolean reversed, ChessPosition piecePosition) {
         ChessPiece[][] board = gameBoard.getBoard();
-        String[] labels = reversed ? new String[]{" h ", " g ", " f ", " e "," d "," c "," b "," a "} :
+        String[] topBottomBorder = reversed ? new String[]{" h ", " g ", " f ", " e "," d "," c "," b "," a "} :
                  new String[]{" a "," b "," c "," d "," e "," f "," g "," h " };
         String[] leftRightBorder = new String[]{" 1 "," 2 "," 3 "," 4 "," 5 "," 6 "," 7 "," 8 "};
 
@@ -27,9 +27,12 @@ public class ChessBoardBuilder {
 
         if (reversed) {
             for (int i = 0; i < 8; i++) {
-                fillBoard
+                fillBoard(out, leftRightBorder[i], board[i], i % 2 != 0, reversed, piecePosition, i);
+
+                }
             }
-    }
+
+        letterBorder(out, topBottomBorder);
     }
 
     public void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
@@ -43,8 +46,8 @@ public class ChessBoardBuilder {
         }
         numberBorder(out, rowLabel);
 
-        String currentColor = isEvenRow ? SET_BG_COLOR_BEIGE : SETBG_COLOR_BROWN;
-        String alternateColor = isEvenRow ? SET_BG_COLOR_BROWN : SET_BG_COLOR_BEIGE;
+        String currentColor = isEvenRow ? SET_BG_COLOR_YELLOW : SET_BG_COLOR_GREEN;
+        String alternateColor = isEvenRow ? SET_BG_COLOR_GREEN : SET_BG_COLOR_YELLOW;
         for (int i = 0; i < row.length; i++) {
             ChessPiece piece = row[reversed ? 7 - i : i];
             ChessPosition currentPosition = new ChessPosition(reversed ? 8 - ind : ind + 1, reversed ? 8 - i : i + 1);
@@ -82,10 +85,31 @@ public class ChessBoardBuilder {
         if (piece != null) {
             if (piece.getTeamColor().equals(ChessGame.TeamColor.WHITE)) {
                 out.print(SET_TEXT_COLOR_WHITE);
-                switch (piece.getPieceType())
+                switch (piece.getPieceType()) {
+                    case KING -> out.print(WHITE_KING);
+                    case QUEEN -> out.print(WHITE_QUEEN);
+                    case BISHOP -> out.print(WHITE_BISHOP);
+                    case ROOK -> out.print(WHITE_ROOK);
+                    case KNIGHT -> out.print(WHITE_KNIGHT);
+                    case PAWN -> out.print(WHITE_PAWN);
+                }
+            } else {
+                out.print(SET_TEXT_COLOR_BLACK);
+                switch(piece.getPieceType()) {
+                    case KING -> out.print(BLACK_KING);
+                    case QUEEN -> out.print(BLACK_QUEEN);
+                    case BISHOP -> out.print(BLACK_BISHOP);
+                    case ROOK -> out.print(BLACK_ROOK);
+                    case KNIGHT -> out.print(BLACK_KNIGHT);
+                    case PAWN -> out.print(BLACK_PAWN);
+                }
             }
+        } else {
+            out.print(EMPTY);
         }
     }
+
+
     
     public void printBoard(String playerColor, ChessPosition piecePosition) {
         var out = new PrintStream((System.out, true, StandardCharsets.UTF_8));
@@ -95,6 +119,6 @@ public class ChessBoardBuilder {
         } else {
             drawBoard(out, false, piecePosition);
         }
-        out.print(RESET_BG_COLOR + RESET_TEST_COLOR);
+        out.print(RESET_BG_COLOR + RESET_TEXT_COLOR);
     }
 }
