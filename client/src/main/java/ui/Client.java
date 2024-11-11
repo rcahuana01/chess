@@ -2,9 +2,6 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
-import com.sun.nio.sctp.HandlerResult;
-import com.sun.nio.sctp.Notification;
-import com.sun.nio.sctp.NotificationHandler;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -14,7 +11,7 @@ import java.util.Map;
 import java.util.Scanner;
 
 
-public class Client implements NotificationHandler {
+public class Client {
 
     private ClientState state = ClientState.PRE_LOGIN;
     private final ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
@@ -41,7 +38,13 @@ public class Client implements NotificationHandler {
         System.out.println("5. \"logout\"");
         System.out.println("6. \"quit\"");
         System.out.println("7. \"help\"");
+    }
 
+    public void helpPrelogin() {
+        System.out.println("register - to create a new account");
+        System.out.println("login - to play chess");
+        System.out.println("quit - exit the program");
+        System.out.println("help - repeat commands");
     }
 
     public void run() throws Exception{
@@ -50,10 +53,10 @@ public class Client implements NotificationHandler {
         do {
             System.out.println("Available commands: ");
 
-            if(state == ClientState.PRE_LOGIN) {
+            if (state == ClientState.PRE_LOGIN) {
                 displayPreloginCommands();
 
-                switch(scanner.nextLine()) {
+                switch (scanner.nextLine()) {
                     case "1":
                     case "register":
                         register();
@@ -76,7 +79,8 @@ public class Client implements NotificationHandler {
                 }
 
             }
-
+        }
+        while(true);
     }
 
     private void register() throws Exception {
@@ -116,11 +120,6 @@ public class Client implements NotificationHandler {
             }
         }
 
-        private void quit() {
-            System.out.println("See you soon!");
-            System.exit(0);
-        }
-
         private void createGame() throws Exception {
             try {
                 System.out.println("Enter the name of the game: ");
@@ -135,7 +134,7 @@ public class Client implements NotificationHandler {
             }
         }
 
-        private void listGames() throw Exception {
+        private void listGames() throws Exception {
             try {
                 var games = serverFacade.listGames(authData.authToken());
                 int gameIDIndex = 1;
@@ -164,7 +163,7 @@ public class Client implements NotificationHandler {
                 Map<Integer, Integer> gamesIDs = new HashMap<>();
                 int gameIDIndex = 1;
                 if (games != null && !(games.games().isEmpty())) {
-                    for (GameData game : games.games().isEmpty()) {
+                    for (GameData game : games.games()) {
                         gamesIDs.put(gameIDIndex, game.gameID());
                         gameIDIndex++;
                     }
@@ -198,37 +197,18 @@ public class Client implements NotificationHandler {
 
         private void redraw() {
             if (currentBoard != null) {
-                ChessBoardBuilder boardBuilder = new ChessBoardBuilder((currentBoard, currentGame));
+                ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, null);
             }
         }
 
-        private void makeMove() throws Exception {
-            try {
-                System.out.print(" ");
-
-            }
+        private void quit() {
+            System.out.println("See you soon!");
+            System.exit(0);
         }
-    @Override
-    public HandlerResult handleNotification(Notification notification, Object attachment) {
-        return null;
-    }
+
+        public void notify(Notification notification) {
+            System.out.println("INFO: " + notification.message);
+        }
 }
-
-    private void register() throws Exception {
-        try {
-            System.out.println("Enter your username: ");
-            String username = scanner.nextLine();
-            System.out.println("Enter your password: ");
-            String password = scanner.nextLine();
-            System.out.println("Enter your email: ");
-            String email = scanner.nextLine();
-
-            UserData userData = new = UserData(username, password, email)
-        }
-    }
-    }
-
-    private void displayPreloginCommands() {
-    }
 

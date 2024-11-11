@@ -112,7 +112,7 @@ public class ChessBoardBuilder {
 
     
     public void printBoard(String playerColor, ChessPosition piecePosition) {
-        var out = new PrintStream((System.out, true, StandardCharsets.UTF_8));
+        var out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         
         if (playerColor.equals("BLACK")) {
             drawBoard(out, true, piecePosition);
