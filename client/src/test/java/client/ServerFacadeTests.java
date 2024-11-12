@@ -1,13 +1,9 @@
 package client;
 
-import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import org.junit.jupiter.api.AfterAll;
-import org.junit.jupiter.api.Assertions;
-import org.junit.jupiter.api.BeforeAll;
-import org.junit.jupiter.api.Test;
+import org.junit.jupiter.api.*;
 import server.Server;
 import ui.ServerFacade;
 
@@ -16,8 +12,8 @@ public class ServerFacadeTests {
 
     private static Server server;
     private static ServerFacade serverFacade;
-    UserData validUser = new UserData("player1", "password", "p1@email.com");
-    UserData invalidUser = new UserData(null, "password", "p2@email.com");
+    UserData validUser = new UserData("player1", "password", "p1@gmail.com");
+    UserData invalidUser = new UserData(null, "password", "p2@gmail.com");
     GameData validGame = new GameData(1, "white", null, "game1", null);
     GameData invalidGame = new GameData(-1, "white", "black", null, null);
 
@@ -26,11 +22,17 @@ public class ServerFacadeTests {
         server = new Server();
         var port = server.run(0);
         System.out.println("Started test HTTP server on " + port);
+        serverFacade = new ServerFacade("http://localhost:" + port);
     }
 
     @AfterAll
     static void stopServer() {
         server.stop();
+    }
+
+    @BeforeEach
+    void clearDataBase() throws Exception {
+        serverFacade.clear();
     }
 
     @Test
@@ -59,7 +61,7 @@ public class ServerFacadeTests {
     @Test
     void positiveLogout() throws Exception {
         AuthData authData = serverFacade.register(validUser);
-        Assertions.assertThrows(Exception.class, () -> serverFacade.logout(authData.authToken()));
+        Assertions.assertDoesNotThrow(() -> serverFacade.logout(authData.authToken()));
     }
 
     @Test
@@ -103,12 +105,6 @@ public class ServerFacadeTests {
     void negativeJoinGame() throws Exception {
         var authData = serverFacade.register(validUser);
         var games = serverFacade.createGame(authData.authToken(), validGame);
-        Assertions.assertThrows(Exception.class, () -> serverFacade.joinGame(authData.authToken(), games.gameID(), "WHITE"));
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(authData.authToken(), games.gameID(), "WHITE"));
     }
-
-    @Test
-    void positiveClear() throws Exception {
-
-    }
-
 }

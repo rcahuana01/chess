@@ -1,4 +1,5 @@
-import chess.*;
+import chess.ChessGame;
+import chess.ChessPiece;
 import ui.Client;
 
 public class Main {
