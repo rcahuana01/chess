@@ -82,6 +82,10 @@ public class Client {
     }
 
     private void helpPrelogin() {
+        System.out.println("register - to create a new account");
+        System.out.println("login - to play chess");
+        System.out.println("quit -  exit the program");
+        System.out.println("help - repeat commands");
     }
 
     private void handlePostloginCommands() throws Exception {
@@ -112,6 +116,13 @@ public class Client {
     }
 
     private void helpPostlogin() {
+        System.out.println("create game - create a new game");
+        System.out.println("list games - list all existing games");
+        System.out.println("join game - join an existing game");
+        System.out.println("observe game - join a game as an observer");
+        System.out.println("logout - go back to previous menu");
+        System.out.println("quit - exit the program");
+        System.out.println("help - repeat commands");
     }
 
     private void handleObservingCommands() {
@@ -190,45 +201,46 @@ public class Client {
         }
     }
 
-    private void joinGame(boolean observer) throws Exception {
+    private void joinGame(boolean observer) {
         try {
             var games = serverFacade.listGames(authData.authToken());
-            Map<Integer, Integer> gamesIDs = new HashMap<>();
-            int gameIDIndex = 1;
-            if (games != null && !(games.games().isEmpty())) {
+            if (games != null && !games.games().isEmpty()) {
+                Map<Integer, Integer> gamesIDs = new HashMap<>();
+                int gameIDIndex = 1;
                 for (GameData game : games.games()) {
                     gamesIDs.put(gameIDIndex, game.gameID());
                     gameIDIndex++;
                 }
+
+                System.out.println("Enter the Game ID:");
+                int gameId = Integer.parseInt(scanner.nextLine());
+                currentGameId = gamesIDs.get(gameId);
+
+                if (!observer) {
+                    System.out.println("Enter player color (WHITE/BLACK):");
+                    String playerColor = scanner.nextLine().toUpperCase();
+                    serverFacade.joinGame(authData.authToken(), currentGameId, playerColor);
+                    currentPlayerColor = playerColor;
+                    state = ClientState.IN_GAME;
+                } else {
+                    serverFacade.joinGame(authData.authToken(), currentGameId, "observer");
+                    currentPlayerColor = "";
+                    state = ClientState.OBSERVING;
+                }
+
+                // Ensure currentBoard and currentGame are initialized here
+                currentBoard = new ChessBoard();
+                currentGame = new ChessGame();
+                System.out.println("Joined the game successfully.");
+            } else {
+                System.out.println("No games available to join.");
             }
-
-            System.out.println("Enter the Game ID:");
-            int gameId = scanner.nextInt();
-            scanner.nextLine();
-            currentGameId = gamesIDs.get(gameId);
-
-            if (!observer) {
-                System.out.println("Enter player color (WHITE/BLACK):");
-                String playerColor = scanner.nextLine().toUpperCase();
-                serverFacade.joinGame(authData.authToken(), currentGameId, playerColor);
-                currentPlayerColor = playerColor;
-                state = ClientState.IN_GAME;
-            }
-            else {
-                serverFacade.joinGame(authData.authToken(), currentGameId, "observer");
-                currentPlayerColor = "";
-                state = ClientState.OBSERVING;
-            }
-
-            System.out.println("Joined game successfully.");
-
-        }
-        catch (Exception e) {
-            //throw e;
-            System.out.println("Unable to join game with the information provided.");
+        } catch (Exception e) {
+            System.out.println("Unable to join with the information provided.");
             System.out.println(e.getMessage());
         }
     }
+
 
     private void logout() {
         try {
@@ -241,13 +253,25 @@ public class Client {
     }
 
     private void redraw() {
-        if (currentBoard != null) {
+        if (currentBoard != null && currentGame != null) {
             System.out.println("Redrawing the chess board...");
-            new ChessBoardBuilder(currentBoard, currentGame).printBoard(currentPlayerColor, null);
+
+            // Print from white's perspective
+            ChessBoardBuilder whitePerspectiveBoard = new ChessBoardBuilder(currentBoard, currentGame);
+            System.out.println("White's Perspective:");
+            whitePerspectiveBoard.printBoard("WHITE", null);
+
+            // Print from black's perspective
+            ChessBoardBuilder blackPerspectiveBoard = new ChessBoardBuilder(currentBoard, currentGame);
+            System.out.println("Black's Perspective:");
+            blackPerspectiveBoard.printBoard("BLACK", null);
+
         } else {
-            System.out.println("Current board is null. Unable to redraw.");
+            System.out.println("Current board or game is null. Unable to redraw.");
         }
     }
+
+
 
     private void quit() {
         System.out.println("See you soon!");
