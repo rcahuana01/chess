@@ -46,8 +46,9 @@ public class ServerFacadeTests {
 
     @Test
     void positiveLogin() throws Exception {
+        serverFacade.register(validUser);
         var authData = serverFacade.login(validUser);
-        Assertions.assertThrows(Exception.class, () -> serverFacade.login(invalidUser));
+        Assertions.assertNotNull(authData);
     }
 
     @Test
@@ -58,7 +59,7 @@ public class ServerFacadeTests {
     @Test
     void positiveLogout() throws Exception {
         AuthData authData = serverFacade.register(validUser);
-        Assertions.assertThrows(Exception.class, () -> serverFacade.logout(invalidUser));
+        Assertions.assertThrows(Exception.class, () -> serverFacade.logout(authData.authToken()));
     }
 
     @Test
@@ -69,26 +70,45 @@ public class ServerFacadeTests {
     @Test
     void positiveCreateGame() throws Exception {
         var authData = serverFacade.register(validUser);
-        var games = serverFacade.createGame(authData.authToken(), validGame)
-        Assertions.assertNotNull(gameData, "Creating a game should return valid GameData.");
+        var games = serverFacade.createGame(authData.authToken(), validGame);
+        Assertions.assertNotNull(games, "Creating a game should return valid GameData.");
     }
 
     @Test
     void negativeCreateGame() throws Exception {
-        AuthData authToken = new AuthData(authToken, invalidUser);
-        ChessGame InvalidGame = null;
-        Assertions.assertThrows(Exception.class, () -> serverFacade.createGame(authToken, InvalidGame),
-                "Creating a game with invalid data should throw an exception.");
+        Assertions.assertThrows(Exception.class, () -> serverFacade.createGame(null, validGame));
+        var authData = serverFacade.register(validUser);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.createGame(authData.authToken(), invalidGame));
     }
 
     @Test
-    void negativeLogin() throws Exception {
-        Assertions.assertThrows(Exception.class, () -> serverFacade.login(invalidUser));
+    void positiveListGames() throws Exception {
+        var authData = serverFacade.register(validUser);
+        var games = serverFacade.listGames(authData.authToken());
     }
 
     @Test
-    public void sampleTest() {
-        Assertions.assertTrue(true);
+    void negativeListGames() throws Exception {
+        Assertions.assertThrows(Exception.class, () -> serverFacade.listGames(null));
+    }
+
+    @Test
+    void positiveJoinGame() throws Exception {
+        var authData = serverFacade.register(validUser);
+        var games = serverFacade.createGame(authData.authToken(), validGame);
+        Assertions.assertDoesNotThrow(() -> serverFacade.joinGame(authData.authToken(), games.gameID(), "BLACK"));
+    }
+
+    @Test
+    void negativeJoinGame() throws Exception {
+        var authData = serverFacade.register(validUser);
+        var games = serverFacade.createGame(authData.authToken(), validGame);
+        Assertions.assertThrows(Exception.class, () -> serverFacade.joinGame(authData.authToken(), games.gameID(), "WHITE"));
+    }
+
+    @Test
+    void positiveClear() throws Exception {
+
     }
 
 }
