@@ -24,11 +24,12 @@ public class ServerFacade {
                 BodyPublishers.ofString(new Gson().toJson(user))).header("Content-Type", "application/json").build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
+        ErrorResponse errorResponse = new Gson().fromJson(httpResponse.body(), ErrorResponse.class);
 
         if (httpResponse.statusCode() == 200) {
             return new Gson().fromJson(httpResponse.body(), AuthData.class);
         } else {
-            throw new Exception("Error: " + httpResponse.statusCode() + " " + httpResponse.body());
+            throw new Exception(errorResponse.getMessage());
         }
     }
 
@@ -67,6 +68,15 @@ public class ServerFacade {
             throw new Exception("Error: " + httpResponse.statusCode() + " " + httpResponse.body());
         }
     }
+
+    public class ErrorResponse {
+        private String message;
+
+        public String getMessage() {
+            return message;
+        }
+    }
+
 
     public GameData createGame(String authToken, GameData game) throws Exception {
         HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).POST(HttpRequest. BodyPublishers.ofString(new
