@@ -56,8 +56,8 @@ public class ChessBoardBuilder {
 
         numberBorder(out, rowLabel);
 
-        String currentColor = isEvenRow ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
-        String alternateColor = isEvenRow ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
+        String currentColor = isEvenRow ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_DARK_GREY;
+        String alternateColor = isEvenRow ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_DARK_GREEN;
 
         for (int i = 0; i < row.length; i++) {
             ChessPiece piece = row[reversed ? 7 - i : i];

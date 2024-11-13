@@ -1,12 +1,10 @@
 package ui;
 
-import chess.*;
+import chess.ChessBoard;
+import chess.ChessGame;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
-import ui.ChessBoardBuilder;
-import ui.ClientState;
-import ui.ServerFacade;
 
 import java.util.HashMap;
 import java.util.Map;
@@ -49,7 +47,7 @@ public class Client {
         System.out.println("6. \"help\"");
     }
 
-    public void displayObservingCommands(){
+    public void displayObservingCommands() {
         System.out.println("1. \"redraw\"");
         System.out.println("2. \"leave\"");
         System.out.println("3. \"highlight legal moves\"");
@@ -98,7 +96,8 @@ public class Client {
             case "5", "logout" -> logout();
             case "6", "quit" -> quit();
             case "7", "help" -> helpPostlogin();
-            default -> System.out.println("Invalid command, please enter: create game, list games, join game, observe game, logout, quit, help");
+            default ->
+                    System.out.println("Invalid command, please enter: create game, list games, join game, observe game, logout, quit, help");
         }
     }
 
@@ -111,7 +110,8 @@ public class Client {
             case "4", "resign" -> state = ClientState.POST_LOGIN;
             case "5", "highlight legal moves" -> System.out.println("Feature to be implemented.");
             case "6", "help" -> helpPostlogin();
-            default -> System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
+            default ->
+                    System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
         }
     }
 
@@ -127,7 +127,7 @@ public class Client {
 
     private void handleObservingCommands() {
         displayObservingCommands();
-        switch(scanner.nextLine().trim().toLowerCase()) {
+        switch (scanner.nextLine().trim().toLowerCase()) {
             case "1", "redraw" -> redraw();
             case "2", "leave" -> state = ClientState.POST_LOGIN;
             case "3", "highlight legal moves" -> System.out.println("Feature to be implemented.");
@@ -228,8 +228,9 @@ public class Client {
                     state = ClientState.OBSERVING;
                 }
 
-                // Ensure currentBoard and currentGame are initialized here
+                // Initialize board with pieces in starting positions
                 currentBoard = new ChessBoard();
+                currentBoard.resetBoard();
                 currentGame = new ChessGame();
                 System.out.println("Joined the game successfully.");
             } else {
@@ -240,7 +241,6 @@ public class Client {
             System.out.println(e.getMessage());
         }
     }
-
 
     private void logout() {
         try {
@@ -270,8 +270,6 @@ public class Client {
             System.out.println("Current board or game is null. Unable to redraw.");
         }
     }
-
-
 
     private void quit() {
         System.out.println("See you soon!");
