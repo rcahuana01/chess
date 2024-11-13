@@ -179,7 +179,8 @@ public class Client {
                 System.out.println("List of current games:");
                 int gameIDIndex = 1;
                 for (GameData game : games.games()) {
-                    System.out.printf("Game ID: %d, Name: %s, White Player: %s, Black Player: %s%n", gameIDIndex++, game.gameName(), game.whiteUsername(), game.blackUsername());
+                    System.out.printf("Game ID: %d, Name: %s, White Player: %s, Black Player: %s%n",
+                            gameIDIndex++, game.gameName(), game.whiteUsername(), game.blackUsername());
                 }
             } else {
                 System.out.println("No games available.");

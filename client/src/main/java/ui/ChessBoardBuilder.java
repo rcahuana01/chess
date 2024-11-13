@@ -44,7 +44,8 @@ public class ChessBoardBuilder {
         letterBorder(out, topBottomBorder);
     }
 
-    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
+    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row,
+                                 boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
         Collection<ChessPosition> endPositions = new HashSet<>();
         endPositions.add(piecePosition);
         if (piecePosition != null) {

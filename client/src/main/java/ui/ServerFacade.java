@@ -20,7 +20,8 @@ public class ServerFacade {
     }
 
     public AuthData register(UserData user) throws Exception {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/user")).POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(user))).header("Content-Type", "application/json").build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/user")).POST(HttpRequest.
+                BodyPublishers.ofString(new Gson().toJson(user))).header("Content-Type", "application/json").build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -32,7 +33,8 @@ public class ServerFacade {
     }
 
     public AuthData login(UserData user) throws Exception {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(user))).header("Content-Type", "application/json").build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).POST(HttpRequest.
+                BodyPublishers.ofString(new Gson().toJson(user))).header("Content-Type", "application/json").build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -44,7 +46,8 @@ public class ServerFacade {
     }
 
     public void logout(String authToken) throws Exception {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).DELETE().header("Authorization", authToken).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/session")).DELETE().
+                header("Authorization", authToken).build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
         if (httpResponse.statusCode() != 200) {
@@ -53,7 +56,8 @@ public class ServerFacade {
     }
 
     public ListGameData listGames(String authToken) throws Exception {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).GET().header("Authorization", authToken).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).
+                GET().header("Authorization", authToken).build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -65,7 +69,8 @@ public class ServerFacade {
     }
 
     public GameData createGame(String authToken, GameData game) throws Exception {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).POST(HttpRequest.BodyPublishers.ofString(new Gson().toJson(game))).header("Content-Type", "application/json").header("Authorization", authToken).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).POST(HttpRequest. BodyPublishers.ofString(new
+                Gson().toJson(game))).header("Content-Type", "application/json").header("Authorization", authToken).build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
@@ -77,7 +82,9 @@ public class ServerFacade {
     }
 
     public void joinGame(String authToken, int gameId, String playerColor) throws Exception {
-        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).PUT(HttpRequest.BodyPublishers.ofString(new Gson().toJson(Map.of("playerColor", playerColor, "gameID", gameId)))).header("Content-Type", "application/json").header("Authorization", authToken).build();
+        HttpRequest httpRequest = HttpRequest.newBuilder().uri(URI.create(serverURL + "/game")).PUT(HttpRequest.
+                BodyPublishers.ofString(new Gson().toJson(Map.of("playerColor", playerColor, "gameID",
+                        gameId)))).header("Content-Type", "application/json").header("Authorization", authToken).build();
 
         HttpResponse<String> httpResponse = HttpClient.newHttpClient().send(httpRequest, HttpResponse.BodyHandlers.ofString());
 
