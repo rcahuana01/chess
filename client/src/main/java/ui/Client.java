@@ -39,19 +39,13 @@ public class Client {
     }
 
     public void displayIngameCommands() {
-        System.out.println("1. \"redraw\"");
+        System.out.println("1. \"draw\"");
         System.out.println("2. \"leave\"");
-        System.out.println("3. \"make move\"");
-        System.out.println("4. \"resign\"");
-        System.out.println("5. \"highlight legal moves\"");
-        System.out.println("6. \"help\"");
     }
 
     public void displayObservingCommands() {
-        System.out.println("1. \"redraw\"");
+        System.out.println("1. \"draw\"");
         System.out.println("2. \"leave\"");
-        System.out.println("3. \"highlight legal moves\"");
-        System.out.println("4. \"help\"");
     }
 
     public void run() throws Exception {
@@ -101,20 +95,6 @@ public class Client {
         }
     }
 
-    private void handleIngameCommands() {
-        displayIngameCommands();
-        switch (scanner.nextLine().trim().toLowerCase()) {
-            case "1", "redraw" -> redraw();
-            case "2", "leave" -> state = ClientState.POST_LOGIN;
-            case "3", "make move" -> System.out.println("Feature to be implemented in gameplay phase.");
-            case "4", "resign" -> state = ClientState.POST_LOGIN;
-            case "5", "highlight legal moves" -> System.out.println("Feature to be implemented.");
-            case "6", "help" -> helpPostlogin();
-            default ->
-                    System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
-        }
-    }
-
     private void helpPostlogin() {
         System.out.println("create game - create a new game");
         System.out.println("list games - list all existing games");
@@ -125,14 +105,22 @@ public class Client {
         System.out.println("help - repeat commands");
     }
 
+    private void handleIngameCommands() {
+        displayIngameCommands();
+        switch (scanner.nextLine().trim().toLowerCase()) {
+            case "1", "draw" -> draw();
+            case "2", "leave" -> state = ClientState.POST_LOGIN;
+            default ->
+                    System.out.println("Invalid command, please enter: draw, leave");
+        }
+    }
+
     private void handleObservingCommands() {
         displayObservingCommands();
         switch (scanner.nextLine().trim().toLowerCase()) {
-            case "1", "redraw" -> redraw();
+            case "1", "draw" -> draw();
             case "2", "leave" -> state = ClientState.POST_LOGIN;
-            case "3", "highlight legal moves" -> System.out.println("Feature to be implemented.");
-            case "4", "help" -> helpPostlogin();
-            default -> System.out.println("Invalid command, please enter: redraw, leave, highlight legal moves, help");
+            default -> System.out.println("Invalid command, please enter: draw, leave");
         }
     }
 
@@ -252,7 +240,7 @@ public class Client {
         }
     }
 
-    private void redraw() {
+    private void draw() {
         if (currentBoard != null && currentGame != null) {
             System.out.println("Redrawing the chess board...");
 
