@@ -8,6 +8,10 @@ import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.*;
+import websocket.messages.LoadGame;
+
+import javax.management.Notification;
+import java.util.Objects;
 
 
 @WebSocket
@@ -41,6 +45,21 @@ public class WebSocketHandler {
             }
 
             connections.add(connect.getAuthToken(), session, connect.getGameID());
+
+
+            connections.add(connect.getAuthToken(), session, connect.getGameID());
+
+            LoadGame loadGame = new LoadGame(gameData);
+            connections.connections.get(connect.getAuthToken()).send(loadGame.toString());
+            if (connect.observer){
+                Notification notification = new Notification(authData.username() + "joined the game as observer");
+                connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
+            } else {
+                String playerColor = Objects.equals(gameData.whiteUsername(), authData.username()) ? "white" : "black";
+                Notification notification = new Notification(authData.username() + "joined the game as " + playerColor);
+                connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
+            }
+
 
         } catch (Exception e) {
             session.getRemote().sendString(new Gson().toJson(new Error("Failed to join the game: " + e.getMessage())));
