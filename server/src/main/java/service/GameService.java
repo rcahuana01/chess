@@ -25,7 +25,7 @@ public class GameService {
         try {
             return gameDAO.listGames();
         } catch (Exception e) {
-            throw new ResponseException(500, "Error: " + e.getMessage());
+            throw new ResponseException(500 , "Error: " + e.getMessage());
         }
     }
 
