@@ -1,4 +1,4 @@
-package server;
+package server.websocket;
 
 import org.eclipse.jetty.websocket.api.RemoteEndpoint;
 import org.eclipse.jetty.websocket.api.Session;

@@ -1,21 +1,14 @@
-package server;
+package server.websocket;
 
-import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketClose;
-import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
-import server.ConnectionManager;
 import websocket.commands.*;
 
-import java.io.IOException;
-import java.util.Map;
-import java.util.concurrent.ConcurrentHashMap;
 
 @WebSocket
 public class WebSocketHandler {
@@ -35,11 +28,22 @@ public class WebSocketHandler {
 
     }
 
-    private void connect(Connect connect, Session session) {
+    private void connect(Connect connect, Session session) throws Exception, ResponseException {
         try {
-            AuthData authData = authDao.getAuth(connect.)
-            GameData gameData = gameDao.getGame(connect.gameId);
+            AuthData authData = authDao.getAuth(connect.getAuthToken());
+            GameData gameData = gameDao.getGame(connect.getGameID());
 
+            if (authData == null) {
+                throw new Exception("Invalid auth token");
+            }
+            if (gameData == null) {
+                throw new Exception("Invalid game ID");
+            }
+
+            connections.add(connect.getAuthToken(), session, connect.getGameID());
+
+        } catch (Exception e) {
+            session.getRemote().sendString(new Gson().toJson(new Error("Failed to join the game: " + e.getMessage())));
         }
     }
 
