@@ -7,7 +7,6 @@ import org.eclipse.jetty.websocket.api.annotations.OnWebSocketConnect;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
 import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.UserGameCommand;
-import websocket.messages.Notification;
 
 import java.io.IOException;
 import java.util.Map;
@@ -41,8 +40,6 @@ public class WebSocketHandler {
         }
     }
 
-    private String handleMessage(Session session, String message) {
 
-    }
 
 }
