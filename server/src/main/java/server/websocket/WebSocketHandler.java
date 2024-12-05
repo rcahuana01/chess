@@ -1,5 +1,6 @@
 package server.websocket;
 
+import chess.ChessGame;
 import com.google.gson.Gson; // Used for JSON serialization and deserialization.
 import dataaccess.*; // Data access objects for interacting with the database.
 import model.AuthData; // Represents authentication data for users.
@@ -12,6 +13,7 @@ import websocket.messages.LoadGame; // Message to load game data.
 import websocket.messages.Notification; // Notification message.
 import websocket.messages.ServerMessage;
 
+import javax.management.NotificationFilter;
 import java.io.IOException;
 import java.util.Objects;
 
@@ -105,9 +107,24 @@ public class WebSocketHandler {
             if (authData==null){
                 throw new Exception("Invalid auth token");
             }
-            gameData.game().makeMove(makeMove.);
+            gameData.game().makeMove(makeMove.move);
+            LoadGame loadGame = new LoadGame(gameData);
+            connections.broadcast(" ", loadGame, makeMove.getGameID());
+            // Server sends a Notification message to all other clients
+            Notification notification = new Notification(authData.username());
+            connections.broadcast(makeMove.getAuthToken(), notification, makeMove.getGameID());
+            if (gameDao.getGame(makeMove.getGameID()).game().isInCheckmate(ChessGame.TeamColor.WHITE) || gameDao.getGame(makeMove.getGameID()).game().isInCheck(ChessGame.TeamColor.WHITE)){
+                Notification notification2 = new Notification("Move will result in check/checkmate for" + gameData.whiteUsername());
+                connections.broadcast(" ",notification2, makeMove.getGameID());
+            }
+            if (gameDao.getGame(makeMove.getGameID()).game().isInCheckmate(ChessGame.TeamColor.BLACK) || gameDao.getGame(makeMove.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)){
+                Notification notification2 = new Notification("Move will result in check/checkmate for" + gameData.whiteUsername());
+                connections.broadcast(" ",notification2, makeMove.getGameID());
+            }
         }
-        var notification = new Notification(ServerMessage.ServerMessageType.MAKE)
+        catch (Exception e) {
+            session.getRemote().sendString(new Gson().toJson(new Error("Unable to make move: " + e.getMessage())));
+        }
     }
 
     private void leave(Leave leave, Session session) throws IOException {
@@ -120,8 +137,14 @@ public class WebSocketHandler {
             if (authData.username().equals(gameData.blackUsername())){
                 gameDao.updateGame(new GameData(leave.getGameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
             }
-        } catch (ResponseException e) {
-            throw new RuntimeException(e);
+            connections.remove(leave.getAuthToken());
+
+            Notification notification = new Notification(authData.username() + "left the game.");
+            connections.broadcast(leave.getAuthToken(), notification, leave.getGameID());
+        } catch (ResponseException | IOException e) {
+            session.getRemote().sendString(new Gson().toJson(new Error("Unable to leave. ")));
         }
     }
+
+    private
 }
