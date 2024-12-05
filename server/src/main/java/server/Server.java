@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.SQLAuthDAO;
 import dataaccess.SQLGameDAO;
 import dataaccess.SQLUserDAO;
+import server.websocket.WebSocketHandler;
 import service.GameService;
 import service.SystemService;
 import service.UserService;
@@ -35,6 +36,7 @@ public class Server {
             Spark.port(desiredPort);
 
             Spark.staticFiles.location("web");
+            Spark.webSocket("/ws", WebSocketHandler.class);
 
             Spark.post("/user", userHandler::register);
             Spark.post("/session", userHandler::login);
