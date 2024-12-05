@@ -51,6 +51,8 @@ public class WebSocketHandler {
             case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMove.class), session);
             case LEAVE -> leave(new Gson().fromJson(message, Leave.class), session);
             case RESIGN -> resign(new Gson().fromJson(message, Resign.class), session);
+            default -> session.getRemote().sendString(new Gson().toJson(new Error("Unknown command type")));
+
         }
     }
 
@@ -85,7 +87,10 @@ public class WebSocketHandler {
 
             // Create a LoadGame message and send it to the connected client.
             LoadGame loadGame = new LoadGame(gameData);
-            connections.connections.get(connect.getAuthToken()).send(loadGame.toString());            // Handle notifications based on the observer status.
+            // Serialize LoadGame into JSON
+            String jsonMessage = new Gson().toJson(loadGame);
+            System.out.println("Sending LoadGame message: " + jsonMessage);
+            connections.connections.get(connect.getAuthToken()).send(new Gson().toJson(loadGame));
             if (connect.observer) {
                 // Send a notification for an observer joining the game.
                 Notification notification = new Notification(authData.username() + " joined the game as observer");
@@ -121,7 +126,7 @@ public class WebSocketHandler {
                 connections.broadcast(" ",notification2, makeMove.getGameID());
             }
             if (gameDao.getGame(makeMove.getGameID()).game().isInCheckmate(ChessGame.TeamColor.BLACK) || gameDao.getGame(makeMove.getGameID()).game().isInCheck(ChessGame.TeamColor.BLACK)){
-                Notification notification2 = new Notification("Move will result in check/checkmate for" + gameData.whiteUsername());
+                Notification notification2 = new Notification("Move will result in check/checkmate for" + gameData.blackUsername());
                 connections.broadcast(" ",notification2, makeMove.getGameID());
             }
         }
@@ -160,7 +165,7 @@ public class WebSocketHandler {
             } else {
                 throw new Exception("Observer cannot resign. ");
             }
-
+            gameData.game().setEndGame();
             Notification notification = new Notification(authData.username() + "has resigned.");
             connections.broadcast("",notification, resign.getGameID());
             connections.remove(resign.getAuthToken());

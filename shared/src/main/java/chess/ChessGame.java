@@ -12,6 +12,7 @@ import java.util.Objects;
  */
 public class ChessGame {
     private TeamColor currentTurn;
+    private boolean endGame;
     private ChessBoard board;
 
     public ChessGame() {
@@ -254,6 +255,10 @@ public class ChessGame {
      */
     public void setBoard(ChessBoard board) {
         this.board = board;
+    }
+
+    public void setEndGame() {
+        endGame = true;
     }
 
     /**
