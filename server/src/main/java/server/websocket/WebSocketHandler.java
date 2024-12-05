@@ -48,6 +48,9 @@ public class WebSocketHandler {
         // Perform an action based on the command type.
         switch (action.getCommandType()) {
             case CONNECT -> connect(new Gson().fromJson(message, Connect.class), session);
+            case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMove.class), session);
+            case LEAVE -> leave(new Gson().fromJson(message, Leave.class), session);
+            case RESIGN -> resign(new Gson().fromJson(message, Resign.class), session);
         }
     }
 
@@ -141,10 +144,29 @@ public class WebSocketHandler {
 
             Notification notification = new Notification(authData.username() + "left the game.");
             connections.broadcast(leave.getAuthToken(), notification, leave.getGameID());
-        } catch (ResponseException | IOException e) {
+        } catch (Exception e) {
             session.getRemote().sendString(new Gson().toJson(new Error("Unable to leave. ")));
         }
     }
 
-    private
+    private void resign(Resign resign, Session session) throws IOException {
+        try {
+            AuthData authData = authDao.getAuth(resign.getAuthToken());
+            GameData gameData = gameDao.getGame(resign.getGameID());
+            if (authData.username().equals(gameData.whiteUsername())){
+                gameDao.updateGame(new GameData(resign.getGameID(),null,null, gameData.gameName(), gameData.game()));
+            } else if (authData.username().equals(gameData.blackUsername())){
+                gameDao.updateGame(new GameData(resign.getGameID(),null,null, gameData.gameName(),gameData.game()));
+            } else {
+                throw new Exception("Observer cannot resign. ");
+            }
+
+            Notification notification = new Notification(authData.username() + "has resigned.");
+            connections.broadcast("",notification, resign.getGameID());
+            connections.remove(resign.getAuthToken());
+        }
+        catch (Exception e){
+            session.getRemote().sendString(new Gson().toJson(new Error("Unable to resign: " + e.getMessage())));
+        }
+    }
 }
