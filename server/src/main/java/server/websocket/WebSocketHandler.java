@@ -10,6 +10,7 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket; // Marks this clas
 import websocket.commands.*; // Commands sent via WebSocket.
 import websocket.messages.LoadGame; // Message to load game data.
 import websocket.messages.Notification; // Notification message.
+import websocket.messages.ServerMessage;
 
 import java.io.IOException;
 import java.util.Objects;
@@ -96,6 +97,19 @@ public class WebSocketHandler {
             session.getRemote().sendString(new Gson().toJson(new Error("Failed to join the game: " + e.getMessage())));
         }
     }
+
+    private void makeMove(MakeMove makeMove, Session session) throws  IOException {
+        try {
+            AuthData authData = authDao.getAuth(makeMove.getAuthToken());
+            GameData gameData = gameDao.getGame(makeMove.getGameID());
+            if (authData==null){
+                throw new Exception("Invalid auth token");
+            }
+            gameData.game().makeMove(makeMove.);
+        }
+        var notification = new Notification(ServerMessage.ServerMessageType.MAKE)
+    }
+
     private void leave(Leave leave, Session session) throws IOException {
         try {
             AuthData authData = authDao.getAuth(leave.getAuthToken());
