@@ -46,7 +46,7 @@ public class Connection {
      * @param msg The error message to send.
      * @throws Exception If an error occurs while sending the error message.
      */
-    public void sendError(String msg) throws Exception {
+    private void sendError(String msg) throws Exception {
         sendError(session.getRemote(), msg);
     }
 
@@ -57,7 +57,7 @@ public class Connection {
      * @param msg The error message to send.
      * @throws Exception If an error occurs while sending the error message.
      */
-    public static void sendError(RemoteEndpoint endpoint, String msg) throws Exception {
+    private static void sendError(RemoteEndpoint endpoint, String msg) throws Exception {
         // Format the error message and print it to the console.
         var errorMsg = (new Error(String.format("ERROR: %s", msg))).toString();
         System.out.println(errorMsg);

@@ -99,6 +99,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
+        if (endGame){
+            throw new InvalidMoveException("Game is over :(");
+        }
+//        if( getTeamColor != getTeamTurn()) {
+//            throw new InvalidMoveException("It is the other team's turn");
+//        }
         ChessPosition startPos = move.getStartPosition();
         ChessPosition endPos = move.getEndPosition();
 

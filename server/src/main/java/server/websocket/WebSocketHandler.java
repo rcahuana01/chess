@@ -42,6 +42,8 @@ public class WebSocketHandler {
      */
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws ResponseException, Exception {
+        System.out.println("WebSocket message received: " + message);
+
         // Deserialize the message into a UserGameCommand object.
         UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
 
@@ -66,47 +68,73 @@ public class WebSocketHandler {
      */
     private void connect(Connect connect, Session session) throws Exception, ResponseException {
         try {
+            System.out.println("Received connect request: " + new Gson().toJson(connect));
+
             // Retrieve authentication data for the provided token.
             AuthData authData = authDao.getAuth(connect.getAuthToken());
+            System.out.println("Authentication data retrieved: " + (authData != null ? authData.toString() : "null"));
 
             // Retrieve game data for the provided game ID.
             GameData gameData = gameDao.getGame(connect.getGameID());
-
-            // Validate the authentication token.
-            if (authData == null) {
-                throw new Exception("Invalid auth token");
-            }
-
-            // Validate the game ID.
+            System.out.println("Game data retrieved: " + (gameData != null ? gameData.toString() : "null"));
             if (gameData == null) {
-                throw new Exception("Invalid game ID");
+                String errorResponse = new Gson().toJson(new Error("Invalid game ID: " + connect.getGameID()));
+                System.err.println("Sending error response: " + errorResponse);
+                session.getRemote().sendString(errorResponse);
+                return;
             }
 
-            // Add the connection to the ConnectionManager.
-            connections.add(connect.getAuthToken(), session, connect.getGameID());
-
-            // Create a LoadGame message and send it to the connected client.
-            LoadGame loadGame = new LoadGame(gameData);
-            // Serialize LoadGame into JSON
-            String jsonMessage = new Gson().toJson(loadGame);
-            System.out.println("Sending LoadGame message: " + jsonMessage);
-            connections.connections.get(connect.getAuthToken()).send(new Gson().toJson(loadGame));
-            if (connect.observer) {
-                // Send a notification for an observer joining the game.
-                Notification notification = new Notification(authData.username() + " joined the game as observer");
-                connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
-            } else {
-                // Determine the player's color and send a notification.
-                String playerColor = Objects.equals(gameData.whiteUsername(), authData.username()) ? "white" : "black";
-                Notification notification = new Notification(authData.username() + " joined the game as " + playerColor);
-                connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
-            }
+            // Other processing if gameData is valid
+            System.out.println("Valid game ID, proceeding with connection...");
+            //            if (gameData == null) {
+//                String errorMessage = new Gson().toJson(new Error("Invalid game ID: " + connect.getGameID()));
+//                System.err.println("Sending error message to client: " + errorMessage);
+//                session.getRemote().sendString(errorMessage);
+//                return; // Stop further processing
+//            }
+//
+//
+//
+//            // Validate the authentication token.
+//            if (authData == null) {
+//                System.err.println("Invalid auth token: " + connect.getAuthToken());
+//                throw new Exception("Invalid auth token");
+//            }
+//
+//            // Add the connection to the ConnectionManager.
+//            connections.add(connect.getAuthToken(), session, connect.getGameID());
+//            System.out.println("Connection added for token: " + connect.getAuthToken());
+//
+//            // Create a LoadGame message and send it to the connected client.
+//            LoadGame loadGame = new LoadGame(gameData);
+//            String jsonMessage = new Gson().toJson(loadGame);
+//            System.out.println("Sending LoadGame message to client: " + jsonMessage);
+//            connections.connections.get(connect.getAuthToken()).send(jsonMessage);
+//
+//            if (connect.observer) {
+//                // Send a notification for an observer joining the game.
+//                Notification notification = new Notification(authData.username() + " joined the game as observer");
+//                System.out.println("Broadcasting observer join notification: " + notification.getMessage());
+//                connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
+//            } else {
+//                // Determine the player's color and send a notification.
+//                String playerColor = Objects.equals(gameData.whiteUsername(), authData.username()) ? "white" : "black";
+//                Notification notification = new Notification(authData.username() + " joined the game as " + playerColor);
+//                System.out.println("Broadcasting player join notification: " + notification.getMessage());
+//                connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
+//            }
 
         } catch (Exception e) {
-            // Send an error message back to the client if an exception occurs.
-            session.getRemote().sendString(new Gson().toJson(new Error("Failed to join the game: " + e.getMessage())));
+            System.err.println("Exception caught in connect: " + e.getMessage());
+            e.printStackTrace();
+
+            String errorResponse = new Gson().toJson(new Error("Failed to join the game: " + e.getMessage()));
+            System.out.println("Sending error response: " + errorResponse);
+            session.getRemote().sendString(errorResponse);
         }
+
     }
+
 
     private void makeMove(MakeMove makeMove, Session session) throws  IOException {
         try {
