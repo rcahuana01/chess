@@ -2,15 +2,19 @@ package ui;
 
 import chess.ChessBoard;
 import chess.ChessGame;
+import chess.ChessMove;
+import chess.ChessPosition;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import websocket.commands.UserGameCommand;
 
 import java.util.HashMap;
+import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
-public class Client {
+public class Client implements NotificationHandler{
 
     private final ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
     private ClientState state = ClientState.PRE_LOGIN;
@@ -20,7 +24,7 @@ public class Client {
     private String currentPlayerColor = "";
     private ChessBoard currentBoard = null;
     private ChessGame currentGame = null;
-
+    private WebSocketFacade webSocket = new WebSocketFacade("http://localhost:8080/ws", this);
     public void displayPreloginCommands() {
         System.out.println("1. \"register\"");
         System.out.println("2. \"login\"");
@@ -108,20 +112,78 @@ public class Client {
     private void handleIngameCommands() {
         displayIngameCommands();
         switch (scanner.nextLine().trim().toLowerCase()) {
-            case "1", "draw" -> draw();
+            case "1", "redraw" -> draw();
             case "2", "leave" -> state = ClientState.POST_LOGIN;
+            case "3", "make move" -> makeMove();
+            case "4", "resign" -> resign();
+            case "5", "highlight legal moves" -> highlightMoves();
+            case "6", "help" -> helpInGame();
             default ->
                     System.out.println("Invalid command, please enter: draw, leave");
+        }
+    }
+
+    private void helpInGame() {
+        System.out.println("redraw - redraw the chess board");
+        System.out.println("leave - leave the current game");
+        System.out.println("make move - move one of your pieces");
+        System.out.println("resign - leave and end the game");
+        System.out.println("highlight legal moves - redraw board with valid moves for a piece");
+        System.out.println("help - repeat commands");
+    }
+
+    private void resign() throws Exception{
+    }
+
+    private void makeMove() throws Exception{
+        try {
+            System.out.print("Enter move to execute (e.g., a1-a5): ");
+            String moveInput = scanner.nextLine();
+            String[] movePositions = moveInput.split("-");
+            ChessPosition start = new ChessPosition(-1,1);
+            ChessPosition end = new ChessPosition(-1,-1);
+            // Move object
+            if (start !=null && end !=null){
+                ChessMove move = new ChessMove(start,end,null);
+                try {
+
+                }
+            }
         }
     }
 
     private void handleObservingCommands() {
         displayObservingCommands();
         switch (scanner.nextLine().trim().toLowerCase()) {
-            case "1", "draw" -> draw();
+            case "1", "redraw" -> draw();
             case "2", "leave" -> state = ClientState.POST_LOGIN;
+            case "3", "highlight legal moves" -> highlightMoves();
+            case "4", "help" -> helpObserving();
             default -> System.out.println("Invalid command, please enter: draw, leave");
         }
+    }
+
+    private void highlightMoves() {
+        try {
+            if (currentBoard != null && currentGame!=null){
+                System.out.println("Enter the position of the piece you want to move: ");
+                String positionInput = scanner.nextLine();
+                ChessPosition piecePosition = new ChessPosition(-1,-1);
+                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+                ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
+                boardBuilder.printBoard(currentPlayerColor, piecePosition);
+            }
+        } catch (Exception e) {
+            System.out.println("Unable to highlight valid moves.");
+            System.out.println(e.getMessage());
+        }
+    }
+
+    private void helpObserving() {
+        System.out.println("redraw - redraw the chess board");
+        System.out.println("leave - leave the current game");
+        System.out.println("highlight legal moves - redraw board with valid moves for a piece");
+        System.out.println("help - repeat commands");
     }
 
     private void register() {
