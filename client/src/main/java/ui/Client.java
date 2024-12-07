@@ -320,7 +320,8 @@ public class Client implements NotificationHandler{
                 currentBoard = new ChessBoard();
                 currentBoard.resetBoard();
                 currentGame = new ChessGame();
-                webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
+                webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase(
+                        "white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
                 System.out.println("Joined the game successfully.");
             } else {
                 System.out.println("No games available to join.");
