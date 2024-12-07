@@ -17,9 +17,6 @@ public class PawnMoves implements PlaceMovesCalculator {
         int curRow = position.getRow();
         int curCol = position.getColumn();
 
-        System.out.println("Calculating moves for: " + curPiece + " at (" + curRow + ", " + curCol + ")");
-        printBoard(board, position);
-
         int direction, promotionRow;
         if (pieceColor == ChessGame.TeamColor.WHITE) {
             direction = 1;
@@ -34,7 +31,6 @@ public class PawnMoves implements PlaceMovesCalculator {
             addPromotionMoves(validMoves, position, forwardPosition);
         } else if (isWithinLimits(forwardPosition) && board.getPiece(forwardPosition) == null) {
             validMoves.add(new ChessMove(position, forwardPosition, null));
-            System.out.println("Added forward move to: (" + forwardPosition.getRow() + ", " + forwardPosition.getColumn() + ")");
         }
 
         int[][] diagonalMoves = {{1, -1}, {1, 1}};
@@ -50,7 +46,6 @@ public class PawnMoves implements PlaceMovesCalculator {
                     } else {
                         validMoves.add(new ChessMove(position, diagonalPosition, null));
                     }
-                    System.out.println("Added diagonal capture move to: (" + diagonalPosition.getRow() + ", " + diagonalPosition.getColumn() + ")");
                 }
             }
         }
@@ -60,7 +55,6 @@ public class PawnMoves implements PlaceMovesCalculator {
             ChessPosition intermediatePosition = new ChessPosition(curRow + direction, curCol);
             if (board.getPiece(intermediatePosition) == null && board.getPiece(doubleForwardPosition) == null) {
                 validMoves.add(new ChessMove(position, doubleForwardPosition, null));
-                System.out.println("Added double move to: (" + doubleForwardPosition.getRow() + ", " + doubleForwardPosition.getColumn() + ")");
             }
         }
 
@@ -72,7 +66,6 @@ public class PawnMoves implements PlaceMovesCalculator {
         validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.ROOK));
         validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.BISHOP));
         validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.KNIGHT));
-        System.out.println("Added promotion moves to: (" + endPosition.getRow() + ", " + endPosition.getColumn() + ")");
     }
 
     private boolean isWithinLimit(int row, int col) {
@@ -83,18 +76,4 @@ public class PawnMoves implements PlaceMovesCalculator {
         return isWithinLimit(position.getRow(), position.getColumn());
     }
 
-    // Helper method to print the chess board for debugging purposes
-    private void printBoard(ChessBoard board, ChessPosition pawnPosition) {
-        for (int row = 7; row >= 0; row--) {
-            for (int col = 0; col < 8; col++) {
-                if (row == pawnPosition.getRow() - 1 && col == pawnPosition.getColumn() - 1) {
-                    System.out.print('P');
-                } else {
-                    System.out.print('.');
-                }
-            }
-            System.out.println();
-        }
-        System.out.println();
-    }
 }

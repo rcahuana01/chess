@@ -102,41 +102,6 @@ public class ChessBoard {
         }
     }
 
-    public void printBoard() {
-        for (int i = 0; i < 8; i++) {
-            for (int j = 0; j < 8; j++) {
-                ChessPiece piece = squares[i][j];
-                if (piece == null) {
-                    System.out.print("| |");
-                } else {
-                    char pieceChar = ' ';
-                    switch (piece.getPieceType()) {
-                        case KING:
-                            pieceChar = 'K';
-                            break;
-                        case QUEEN:
-                            pieceChar = 'Q';
-                            break;
-                        case ROOK:
-                            pieceChar = 'R';
-                            break;
-                        case BISHOP:
-                            pieceChar = 'B';
-                            break;
-                        case KNIGHT:
-                            pieceChar = 'N';
-                            break;
-                        case PAWN:
-                            pieceChar = 'P';
-                            break;
-                    }
-                    System.out.print("|" + pieceChar + (piece.getTeamColor() == ChessGame.TeamColor.WHITE ? "W" : "B") + "|");
-                }
-            }
-            System.out.println();
-        }
-    }
-
     public ChessPiece[][] getBoard() {
         return squares;
     }

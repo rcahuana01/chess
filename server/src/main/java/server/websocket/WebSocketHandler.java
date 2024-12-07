@@ -199,7 +199,7 @@ public class WebSocketHandler {
                 throw new Exception("Observer cannot resign. ");
             }
             gameData.game().setEndGame();
-            Notification notification = new Notification(authData.username() + "has resigned.");
+            Notification notification = new Notification(authData.username() + " has resigned.");
             connections.broadcast("",notification, resign.getGameID());
             connections.remove(resign.getAuthToken());
         }

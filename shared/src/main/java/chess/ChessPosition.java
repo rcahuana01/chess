@@ -56,7 +56,7 @@ public class ChessPosition {
         return col;
     }
 
-    public ChessPosition getPositionFromString(String s, boolean blackAtBottom) {
+    public static ChessPosition getPositionFromString(String s, boolean blackAtBottom) {
         if(!Pattern.compile("[a-h][1-8]").matcher(s).matches()) {
             return null;
         }
