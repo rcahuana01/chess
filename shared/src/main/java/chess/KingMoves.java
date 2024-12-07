@@ -5,7 +5,7 @@ import java.util.Arrays;
 import java.util.Collection;
 import java.util.Objects;
 
-public class KingMoves implements PlaceMovesCalculator {
+public class KingMoves extends AbstractPieceMovesKing {
 
     private final int[][] kingMoves = {
             {1, 0},   // Down
@@ -19,51 +19,10 @@ public class KingMoves implements PlaceMovesCalculator {
     };
 
     @Override
-    public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (o == null || getClass() != o.getClass()) {return false;}
-        KingMoves kingMoves1 = (KingMoves) o;
-        return Objects.deepEquals(kingMoves, kingMoves1.kingMoves);
-    }
-
-    @Override
-    public int hashCode() {
-        return Arrays.deepHashCode(kingMoves);
-    }
-
-    @Override
-    public String toString() {
-        return "KingMoves{" +
-                "kingMoves=" + Arrays.toString(kingMoves) +
-                '}';
-    }
-
     public Collection<ChessMove> calculate(ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        int curRow = position.getRow();
-        int curCol = position.getColumn();
-        for (int[] moves : kingMoves) {
-            int newRow = curRow + moves[0];
-            int newCol = curCol + moves[1];
-            if (isWithinLimits(newRow, newCol)) {
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece pieceNewPos = board.getPiece(newPosition);
-                ChessPiece curPos = board.getPiece(position);
-                if (pieceNewPos == null) {
-                    validMoves.add(new ChessMove(position, newPosition, null));
-                } else if (curPos.getTeamColor() != pieceNewPos.getTeamColor()) {
-                    validMoves.add(new ChessMove(position, newPosition, null));
-                } else {
-                }
-            } else {
-            }
-        }
-        return validMoves;
+        return calculate(board, position, kingMoves);
     }
 
-    private boolean isWithinLimits(int row, int col) {
-        return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
-    }
 
 }
 

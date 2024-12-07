@@ -3,7 +3,7 @@ package chess;
 import java.util.ArrayList;
 import java.util.Collection;
 
-public class KnightMoves implements PlaceMovesCalculator {
+public class KnightMoves extends AbstractPieceMovesKing {
     private final int[][] knightMoves = {
             {2, 1},   // Down
             {1, 2},  // Up
@@ -14,34 +14,8 @@ public class KnightMoves implements PlaceMovesCalculator {
             {2, -1},  // Up-Right
             {1, -2}  // Up-Left
     };
-
+    @Override
     public Collection<ChessMove> calculate(ChessBoard board, ChessPosition position) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        int curRow = position.getRow();
-        int curCol = position.getColumn();
-        for (int[] moves : knightMoves) {
-            int newRow = curRow + moves[0];
-            int newCol = curCol + moves[1];
-            if (isWithinLimits(newRow, newCol)) {
-                ChessPosition newPosition = new ChessPosition(newRow, newCol);
-                ChessPiece pieceNewPos = board.getPiece(newPosition);
-                ChessPiece curPos = board.getPiece(position);
-                if (pieceNewPos == null) {
-                    validMoves.add(new ChessMove(position, newPosition, null));
-                } else if (curPos.getTeamColor() != pieceNewPos.getTeamColor()) {
-                    validMoves.add(new ChessMove(position, newPosition, null));
-                } else {
-                }
-
-            } else {
-            }
-        }
-        return validMoves;
-
-
-    }
-
-    private boolean isWithinLimits(int row, int col) {
-        return (row > 0 && row <= 8) && (col > 0 && col <= 8);
+        return calculate(board, position, knightMoves);
     }
 }
