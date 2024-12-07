@@ -7,8 +7,16 @@ import chess.ChessPosition;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import websocket.commands.*;
+import websocket.commands.MakeMove;
+import websocket.commands.Resign;
 import websocket.commands.UserGameCommand;
+import websocket.messages.ErrorMessage;
+import websocket.messages.LoadGame;
+import websocket.messages.Notification;
 
+import javax.websocket.DeploymentException;
+import java.io.IOException;
 import java.util.HashMap;
 import java.util.Locale;
 import java.util.Map;
@@ -24,7 +32,11 @@ public class Client implements NotificationHandler{
     private String currentPlayerColor = "";
     private ChessBoard currentBoard = null;
     private ChessGame currentGame = null;
-    private WebSocketFacade webSocket = new WebSocketFacade("http://localhost:8080/ws", this);
+    private ui.websocket.WebSocketFacade webSocket = new ui.websocket.WebSocketFacade("ws://localhost:8080/ws", this);
+
+    public Client() throws DeploymentException, IOException {
+    }
+
     public void displayPreloginCommands() {
         System.out.println("1. \"register\"");
         System.out.println("2. \"login\"");
@@ -109,17 +121,27 @@ public class Client implements NotificationHandler{
         System.out.println("help - repeat commands");
     }
 
-    private void handleIngameCommands() {
+    private void handleIngameCommands() throws Exception {
         displayIngameCommands();
         switch (scanner.nextLine().trim().toLowerCase()) {
             case "1", "redraw" -> draw();
-            case "2", "leave" -> state = ClientState.POST_LOGIN;
+            case "2", "leave" -> leave();
             case "3", "make move" -> makeMove();
             case "4", "resign" -> resign();
             case "5", "highlight legal moves" -> highlightMoves();
             case "6", "help" -> helpInGame();
             default ->
                     System.out.println("Invalid command, please enter: draw, leave");
+        }
+    }
+
+    private void leave() throws Exception{
+        try {
+            webSocket.sendCommand(new Leave(authData.authToken(), currentGameId));
+            state = ClientState.POST_LOGIN;
+        } catch(Exception e){
+            System.out.println("Unable to leave the game. ");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -133,6 +155,16 @@ public class Client implements NotificationHandler{
     }
 
     private void resign() throws Exception{
+        try {
+            System.out.print("Are you sure you want to resign? [y/n]: ");
+            String confirmation = scanner.nextLine();
+            if (confirmation.equals("y")){
+                webSocket.sendCommand(new Resign(authData.authToken(), currentGameId));
+                System.out.println("Game is over!");
+            }
+        } catch (Exception e){
+            System.out.println("Unable to resign the game ");
+        }
     }
 
     private void makeMove() throws Exception{
@@ -146,9 +178,14 @@ public class Client implements NotificationHandler{
             if (start !=null && end !=null){
                 ChessMove move = new ChessMove(start,end,null);
                 try {
-
+                    webSocket.sendCommand(new MakeMove(authData.authToken(),currentGameId, move));
+                } catch (Exception e) {
+                    System.out.println("Error making move");
                 }
             }
+        } catch (Exception e){
+            System.out.println("Unable to make move with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -283,6 +320,7 @@ public class Client implements NotificationHandler{
                 currentBoard = new ChessBoard();
                 currentBoard.resetBoard();
                 currentGame = new ChessGame();
+                webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
                 System.out.println("Joined the game successfully.");
             } else {
                 System.out.println("No games available to join.");
@@ -325,5 +363,21 @@ public class Client implements NotificationHandler{
     private void quit() {
         System.out.println("See you soon!");
         System.exit(0);
+    }
+
+    @Override
+    public void notify(Notification notification) {
+        System.out.println("ERROR: " + notification.message);
+    }
+
+    @Override
+    public void warn(ErrorMessage errorMessage) {
+        System.out.println("ERROR: " + errorMessage.errorMessage);
+    }
+
+    @Override
+    public void loadGame(LoadGame loadGame) {
+        this.currentGame = loadGame.game.game();
+        this.currentBoard = loadGame.game.game().getBoard();
     }
 }

@@ -1,11 +1,11 @@
 package ui;
 
 import websocket.messages.*;
-import websocket.messages.Error;
+import websocket.messages.ErrorMessage;
 
 public interface NotificationHandler {
     void notify(Notification notification);
-    void warn(Error errorMessage);
+    void warn(ErrorMessage errorMessage);
     void loadGame(LoadGame loadGame);
 
 }

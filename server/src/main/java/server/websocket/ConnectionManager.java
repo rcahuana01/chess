@@ -72,4 +72,5 @@ public class ConnectionManager {
             connections.remove(c.visitorName);
         }
     }
+
 }
