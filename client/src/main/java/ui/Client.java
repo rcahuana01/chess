@@ -341,8 +341,8 @@ public class Client implements NotificationHandler {
             String[] movePositions = moveInput.split("-");
             ChessPosition start = new ChessPosition(-1,-1);
             ChessPosition end = new ChessPosition(-1,-1);
-            start = start.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
-            end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+            start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+            end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
             if (start != null && end != null) {
                 ChessMove move = new ChessMove(start, end, null);
                 try {
