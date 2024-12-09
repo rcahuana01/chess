@@ -105,4 +105,8 @@ public class ChessBoard {
     public ChessPiece[][] getBoard() {
         return squares;
     }
+
+    public void removePiece(ChessPosition position){
+        this.squares[position.getRow() -1 ][position.getColumn() - 1] = null;
+    }
 }

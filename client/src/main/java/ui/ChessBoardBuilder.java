@@ -44,8 +44,7 @@ public class ChessBoardBuilder {
         letterBorder(out, topBottomBorder);
     }
 
-    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row,
-                                 boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
+    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
         Collection<ChessPosition> endPositions = new HashSet<>();
         endPositions.add(piecePosition);
         if (piecePosition != null) {
@@ -57,8 +56,8 @@ public class ChessBoardBuilder {
 
         numberBorder(out, rowLabel);
 
-        String currentColor = isEvenRow ? SET_BG_COLOR_DARK_GREEN : SET_BG_COLOR_DARK_GREY;
-        String alternateColor = isEvenRow ? SET_BG_COLOR_DARK_GREY : SET_BG_COLOR_DARK_GREEN;
+        String currentColor = isEvenRow ? SET_BG_COLOR_DARK_GREEN: SET_BG_COLOR_LIGHT_GREY;
+        String alternateColor = isEvenRow ? SET_BG_COLOR_LIGHT_GREY : SET_BG_COLOR_DARK_GREEN;
 
         for (int i = 0; i < row.length; i++) {
             ChessPiece piece = row[reversed ? 7 - i : i];
