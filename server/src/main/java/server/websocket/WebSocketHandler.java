@@ -134,7 +134,6 @@ public class WebSocketHandler {
 
             // Check if the player is attempting to move an opponent's piece
             if (movingPiece.getTeamColor() != playerColor) {
-                // Return an error message if the player tries to move an opponent's piece
                 throw new InvalidMoveException("You cannot move your opponent's piece.");
             }
 
@@ -150,22 +149,44 @@ public class WebSocketHandler {
             gameDao.updateGame(new GameData(makeMove.getGameID(), gameData.whiteUsername(), gameData.blackUsername(),
                     gameData.gameName(), gameData.game()));
 
+            // Check for in-check or checkmate states
+            ChessGame.TeamColor opponentColor = (playerColor == ChessGame.TeamColor.WHITE)
+                    ? ChessGame.TeamColor.BLACK
+                    : ChessGame.TeamColor.WHITE;
+
+            // Check if the opponent is in checkmate
+            if (gameData.game().isInCheckmate(opponentColor)) {
+                Notification checkmateNotification = new Notification("Checkmate! " +
+                        (playerColor == ChessGame.TeamColor.WHITE ? "White" : "Black") + " wins!");
+                connections.broadcast("", checkmateNotification, makeMove.getGameID());
+            } else if (gameData.game().isInCheck(opponentColor)) {
+                // Check if the opponent is in check
+                Notification checkNotification = new Notification("Check! " +
+                        (playerColor == ChessGame.TeamColor.WHITE ? "Black" : "White") + " is in check.");
+                connections.broadcast("", checkNotification, makeMove.getGameID());
+            }
+
+
             // Send the updated game state (LOAD_GAME) to all players
             LoadGame loadGame = new LoadGame(gameData);
             connections.broadcast("", loadGame, makeMove.getGameID());
 
             // Send a notification to other players (excluding the player who made the move)
-            Notification notification = new Notification(authData.username() + " made a move: " + makeMove.move);
+            Notification notification = new Notification(authData.username() + " made a move from " + "(" +
+                    makeMove.move.getStartPosition().getRow() + "," + makeMove.move.getStartPosition().getColumn() + ")" +
+                    " to " + "(" + makeMove.move.getEndPosition().getRow() + "," + makeMove.move.getEndPosition().getColumn() + ")");
+
             connections.broadcast(makeMove.getAuthToken(), notification, makeMove.getGameID());
 
         } catch (InvalidMoveException e) {
             // Send an error notification for invalid moves
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid move: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid move: " )));
         } catch (Exception e) {
             // Send a generic error message for other exceptions
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Unable to make move: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Unable to make move: ")));
         }
     }
+
 
 
     private void leave(Leave leave, Session session) throws IOException {
