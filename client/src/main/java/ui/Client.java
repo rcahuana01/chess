@@ -244,7 +244,6 @@ public class Client implements NotificationHandler {
                     ChessGame.TeamColor.BLACK, observer));
 
             System.out.println("Joined game successfully.");
-            redraw();
         }
         catch (Exception e) {
             //throw e;
