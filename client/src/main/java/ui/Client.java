@@ -355,7 +355,6 @@ public class Client implements NotificationHandler {
         catch (Exception e) {
             //throw e;
             System.out.println("Unable to make a move with the information provided.");
-            System.out.println(e.getMessage());
         }
     }
 
@@ -401,7 +400,6 @@ public class Client implements NotificationHandler {
         catch (Exception e) {
             //throw e;
             System.out.println("Unable to highlight valid moves.");
-            System.out.println(e.getMessage());
         }
     }
 
