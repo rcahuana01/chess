@@ -191,8 +191,8 @@ public class ChessGame {
         Collection<ChessMove> opponentMoves = getMoves(teamColor, true);
         ChessPosition kingPosition = kingPosition(teamColor);
         for (ChessMove move : opponentMoves){
-            if (move.getEndPosition().equals(kingPosition))
-                return true;
+            if (move.getEndPosition().equals(kingPosition)) {
+                return true;}
         }
         return false;
     }

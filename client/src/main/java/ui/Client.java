@@ -312,8 +312,9 @@ public class Client implements NotificationHandler {
                 state = ClientState.OBSERVING;
             }
 
-            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase(
-                    "white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
+            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.
+                    equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE :
+                    ChessGame.TeamColor.BLACK, observer));
 
             System.out.println("Joined game successfully.");
 
