@@ -194,8 +194,8 @@ public class ChessGame {
         Collection<ChessMove> opponentMoves = getMoves(teamColor, true);
         ChessPosition kingPosition = kingPosition(teamColor);
         for (ChessMove move : opponentMoves){
-            if (move.getEndPosition().equals(kingPosition))
-                return true;
+            if (move.getEndPosition().equals(kingPosition)){
+                return true;}
         }
         return false;
     }
@@ -269,8 +269,8 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o) {return true;}
+        if (o == null || getClass() != o.getClass()){ return false;}
         ChessGame chessGame = (ChessGame) o;
         return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
     }
