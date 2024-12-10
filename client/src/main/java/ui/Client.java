@@ -104,7 +104,8 @@ public class Client implements NotificationHandler {
                         case "4", "resign" -> resign();
                         case "5", "highlight legal moves" -> highlightMoves();
                         case "6", "help" -> helpIngame();
-                        default -> System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
+                        default -> System.out.println("Invalid command, please enter: redraw, leave, " +
+                                "make move, resign, highlight legal moves, help");
                     }
                 }
                 case OBSERVING -> {
@@ -114,7 +115,8 @@ public class Client implements NotificationHandler {
                         case "2", "leave" -> leave();
                         case "3", "highlight legal moves" -> highlightMoves();
                         case "4", "help" -> helpObserving();
-                        default -> System.out.println("Invalid command, please enter: redraw, leave, highlight legal moves, help");
+                        default -> System.out.println("Invalid command, please enter: redraw, leave, highlight " +
+                                "legal moves, help");
                     }
                 }
             }
@@ -322,7 +324,8 @@ public class Client implements NotificationHandler {
                 System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
                 String positionInput = scanner.nextLine();
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
-                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.
+                        toLowerCase(Locale.ROOT).equals("black"));
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, piecePosition);
             }

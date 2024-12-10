@@ -2,6 +2,7 @@ package server.websocket;
 
 import chess.ChessGame;
 import com.google.gson.Gson;
+import com.google.gson.JsonSyntaxException;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
@@ -27,16 +28,38 @@ public class WebSocketHandler {
 
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws ResponseException, IOException {
-        UserGameCommand action = new Gson().fromJson(message, UserGameCommand.class);
+    public void onMessage(Session session, String message) throws IOException {
+        System.out.println("Raw message received: " + message); // Log raw message for debugging
 
-        switch (action.getCommandType()) {
-            case CONNECT -> connect(new Gson().fromJson(message, Connect.class), session);
-            case MAKE_MOVE -> makeMove(new Gson().fromJson(message, MakeMove.class), session);
-            case LEAVE -> leave(new Gson().fromJson(message, Leave.class), session);
-            case RESIGN -> resign(new Gson().fromJson(message, Resign.class),session);
+        try {
+            // Parse the incoming message into a generic JSON object
+            Gson gson = new Gson();
+            UserGameCommand baseCommand = gson.fromJson(message, UserGameCommand.class);
+
+            if (baseCommand.getCommandType() == null || baseCommand.getAuthToken() == null || baseCommand.getGameID() == null) {
+                throw new IllegalArgumentException("Message is missing required fields (commandType, authToken, or gameID)");
+            }
+
+            // Handle the command type
+            switch (baseCommand.getCommandType()) {
+                case CONNECT -> connect(gson.fromJson(message, Connect.class), session);
+                case MAKE_MOVE -> makeMove(gson.fromJson(message, MakeMove.class), session);
+                case LEAVE -> leave(gson.fromJson(message, Leave.class), session);
+                case RESIGN -> resign(gson.fromJson(message, Resign.class), session);
+                default -> throw new IllegalArgumentException("Unsupported command type: " + baseCommand.getCommandType());
+            }
+        } catch (JsonSyntaxException e) {
+            System.err.println("JSON syntax error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid JSON format: " + e.getMessage())));
+        } catch (IllegalArgumentException e) {
+            System.err.println("Validation error: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Invalid command structure: " + e.getMessage())));
+        } catch (Exception e) {
+            System.err.println("Error processing message: " + e.getMessage());
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Error processing command: " + e.getMessage())));
         }
     }
+
 
 
     private void connect(Connect connect, Session session) throws IOException, ResponseException {
@@ -54,7 +77,8 @@ public class WebSocketHandler {
             connections.add(connect.getAuthToken(), session, connect.getGameID());
             //Server sends a LOAD_GAME message back to the root client
             LoadGame loadGame = new LoadGame(gameData);
-            connections.connections.get(connect.getAuthToken()).send(loadGame.toString());
+            String loadGameJson = new Gson().toJson(loadGame); // Serialize LoadGame to JSON
+            connections.connections.get(connect.getAuthToken()).send(loadGameJson); // Send JSON response
             //Server sends a Notification message to all other clients in that game informing them the root client connected
             if (connect.observer){
                 Notification notification = new Notification(authData.username() + " joined the game as observer");
@@ -65,9 +89,8 @@ public class WebSocketHandler {
                 connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
             }
         }
-        //catch (ResponseException | IOException e){
         catch (Exception e) {
-            session.getRemote().sendString(new Gson().toJson(new Error("Failed to join the game: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Failed to join the game: " + e.getMessage())));
         }
     }
 
@@ -104,9 +127,8 @@ public class WebSocketHandler {
             }
 
         }
-        //catch (ResponseException | InvalidMoveException | IOException e){
         catch(Exception e) {
-            session.getRemote().sendString(new Gson().toJson(new Error("Unable to make the move: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Unable to make the move: " + e.getMessage())));
         }
     }
 
@@ -127,7 +149,7 @@ public class WebSocketHandler {
             Notification notification = new Notification(authData.username() + " has left the game.");
             connections.broadcast(leave.getAuthToken(), notification, leave.getGameID());
         } catch (ResponseException | IOException e){
-            session.getRemote().sendString(new Gson().toJson(new Error("Unable to leave")));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Unable to leave")));
         }
     }
 
@@ -154,7 +176,6 @@ public class WebSocketHandler {
             connections.remove(resign.getAuthToken());
         }
         catch(Exception e) {
-            //catch (ResponseException | IOException e){
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Unable to resign: " + e.getMessage())));
         }
     }
