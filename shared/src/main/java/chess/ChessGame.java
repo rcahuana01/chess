@@ -74,9 +74,6 @@ public class ChessGame {
 
         boolean isValidMove = !isInCheck(currentPiece.getTeamColor());
 
-//        board.removePiece(possibleMove.getEndPosition());
-//        board.addPiece(startPosition, currentPiece);
-
         board = starterBoard;
 
         return isValidMove;
@@ -267,8 +264,8 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o) return true;
-        if (o == null || getClass() != o.getClass()) return false;
+        if (this == o){ return true;}
+        if (o == null || getClass() != o.getClass()){ return false;}
         ChessGame chessGame = (ChessGame) o;
         return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
     }
