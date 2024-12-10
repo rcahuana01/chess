@@ -128,7 +128,8 @@ public class Client implements NotificationHandler {
                         helpPostlogin();
                         break;
                     default:
-                        System.out.println("Invalid command, please enter: create game, list games, join game, observe game, logout, quit, help");
+                        System.out.println("Invalid command, please enter: create game, list g" +
+                                "ames, join game, observe game, logout, quit, help");
                         break;
                 }
             }
@@ -160,7 +161,8 @@ public class Client implements NotificationHandler {
                         helpIngame();
                         break;
                     default:
-                        System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
+                        System.out.println("Invalid command, please enter: redraw, leave, make" +
+                                " move, resign, highlight legal moves, help");
                         break;
                 }
             }
@@ -310,7 +312,8 @@ public class Client implements NotificationHandler {
                 state = ClientState.OBSERVING;
             }
 
-            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
+            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase(
+                    "white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
 
             System.out.println("Joined game successfully.");
 
@@ -341,8 +344,10 @@ public class Client implements NotificationHandler {
             String[] movePositions = moveInput.split("-");
             ChessPosition start = new ChessPosition(-1,-1);
             ChessPosition end = new ChessPosition(-1,-1);
-            start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
-            end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+            start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.
+                    toLowerCase(Locale.ROOT).equals("black"));
+            end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.
+                    toLowerCase(Locale.ROOT).equals("black"));
             if (start != null && end != null) {
                 ChessMove move = new ChessMove(start, end, null);
                 try {
@@ -392,7 +397,8 @@ public class Client implements NotificationHandler {
                 System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
                 String positionInput = scanner.nextLine();
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
-                piecePosition = ChessPosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+                piecePosition = ChessPosition.getPositionFromString(positionInput, currentPlayerColor
+                        .toLowerCase(Locale.ROOT).equals("black"));
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, piecePosition);
             }

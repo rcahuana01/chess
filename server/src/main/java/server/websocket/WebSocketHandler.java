@@ -95,9 +95,8 @@ public class WebSocketHandler {
                 connections.broadcast(connect.getAuthToken(), notification, connect.getGameID());
             }
         }
-        //catch (ResponseException | IOException e){
         catch (Exception e) {
-            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Failed to join the game: " + e.getMessage())));
+            session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Failed to join the game: ")));
         }
     }
 
@@ -194,10 +193,12 @@ public class WebSocketHandler {
             AuthData authData = authDao.getAuth(leave.getAuthToken());
             GameData gameData = gameDao.getGame(leave.getGameID());
             if (authData.username().equals(gameData.whiteUsername())){
-                gameDao.updateGame(new GameData(leave.getGameID(),null, gameData.blackUsername(), gameData.gameName(),gameData.game()));
+                gameDao.updateGame(new GameData(leave.getGameID(),null, gameData.blackUsername(),
+                        gameData.gameName(),gameData.game()));
             }
             if (authData.username().equals(gameData.blackUsername())){
-                gameDao.updateGame(new GameData(leave.getGameID(), gameData.whiteUsername(), null, gameData.gameName(), gameData.game()));
+                gameDao.updateGame(new GameData(leave.getGameID(), gameData.whiteUsername(), null,
+                        gameData.gameName(), gameData.game()));
             }
             connections.remove(leave.getAuthToken());
 
@@ -213,9 +214,11 @@ public class WebSocketHandler {
             AuthData authData = authDao.getAuth(resign.getAuthToken());
             GameData gameData = gameDao.getGame(resign.getGameID());
             if (authData.username().equals(gameData.whiteUsername())){
-                gameDao.updateGame(new GameData(resign.getGameID(),null,null, gameData.gameName(), gameData.game()));
+                gameDao.updateGame(new GameData(resign.getGameID(),null,null, gameData.gameName(),
+                        gameData.game()));
             } else if (authData.username().equals(gameData.blackUsername())){
-                gameDao.updateGame(new GameData(resign.getGameID(),null,null, gameData.gameName(),gameData.game()));
+                gameDao.updateGame(new GameData(resign.getGameID(),null,null, gameData.gameName(),
+                        gameData.game()));
             } else {
                 throw new Exception("Observer cannot resign. ");
             }
