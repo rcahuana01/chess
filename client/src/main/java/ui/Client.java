@@ -91,7 +91,8 @@ public class Client implements NotificationHandler {
                         case "5", "logout" -> logout();
                         case "6", "quit" -> quit();
                         case "7", "help" -> helpPostlogin();
-                        default -> System.out.println("Invalid command, please enter: create game, list games, join game, observe game, logout, quit, help");
+                        default -> System.out.println("Invalid command, please enter: create game, list" +
+                                " games, join game, observe game, logout, quit, help");
                     }
                 }
                 case IN_GAME -> {
