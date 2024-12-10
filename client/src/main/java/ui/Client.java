@@ -270,8 +270,10 @@ public class Client implements NotificationHandler {
             System.out.print("Enter move to execute (e.g., a1-a5): ");
             String moveInput = scanner.nextLine();
             String[] movePositions = moveInput.split("-");
-            ChessPosition start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(), currentPlayerColor.equalsIgnoreCase("BLACK"));
-            ChessPosition end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.equalsIgnoreCase("BLACK"));
+            ChessPosition start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(),
+                    currentPlayerColor.equalsIgnoreCase("BLACK"));
+            ChessPosition end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(),
+                    currentPlayerColor.equalsIgnoreCase("BLACK"));
 
             if (start == null || end == null) {
                 System.out.println("Invalid move format. Use notation like a1-a5.");
@@ -282,7 +284,8 @@ public class Client implements NotificationHandler {
 
             // Handle promotion input
             if (currentGame != null && currentGame.validMoves(start).stream()
-                    .anyMatch(validMove -> validMove.getEndPosition().equals(end) && end.getRow() == (currentPlayerColor.equals("WHITE") ? 8 : 1))) {
+                    .anyMatch(validMove -> validMove.getEndPosition().equals(end) && end.getRow() ==
+                            (currentPlayerColor.equals("WHITE") ? 8 : 1))) {
                 System.out.print("Promotion! Choose a piece (QUEEN, ROOK, BISHOP, KNIGHT): ");
                 String promotionPiece = scanner.nextLine().toUpperCase();
                 move = new ChessMove(start, end, ChessPiece.PieceType.valueOf(promotionPiece));
