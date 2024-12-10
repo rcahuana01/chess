@@ -63,8 +63,8 @@ public class ChessGame {
         for (int i = 0; i < 8; i++){
             for (int j = 0; j < 8; j++){
                 if (board.getPiece(new ChessPosition(j+1, i+1)) != null){
-                    starterBoard.addPiece(new ChessPosition(j+1, i+1),
-                            board.getPiece(new ChessPosition(j+1, i+1)));
+                    starterBoard.addPiece(new ChessPosition(j+1, i+1), board.getPiece(new
+                            ChessPosition(j+1, i+1)));
                 }
             }
         }
@@ -74,6 +74,9 @@ public class ChessGame {
         board.addPiece(possibleMove.getEndPosition(), currentPiece);
 
         boolean isValidMove = !isInCheck(currentPiece.getTeamColor());
+
+//        board.removePiece(possibleMove.getEndPosition());
+//        board.addPiece(startPosition, currentPiece);
 
         board = starterBoard;
 
@@ -191,8 +194,8 @@ public class ChessGame {
         Collection<ChessMove> opponentMoves = getMoves(teamColor, true);
         ChessPosition kingPosition = kingPosition(teamColor);
         for (ChessMove move : opponentMoves){
-            if (move.getEndPosition().equals(kingPosition)) {
-                return true;}
+            if (move.getEndPosition().equals(kingPosition))
+                return true;
         }
         return false;
     }
@@ -266,8 +269,8 @@ public class ChessGame {
 
     @Override
     public boolean equals(Object o) {
-        if (this == o){ return true;}
-        if (o == null || getClass() != o.getClass()){ return false;}
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
         ChessGame chessGame = (ChessGame) o;
         return teamTurn == chessGame.teamTurn && Objects.equals(board, chessGame.board);
     }

@@ -19,19 +19,6 @@ public class ChessPosition {
         this.col = col;
     }
 
-    @Override
-    public boolean equals(Object o) {
-        if (this == o) {return true;}
-        if (o == null || getClass() != o.getClass()) {return false;}
-        ChessPosition that = (ChessPosition) o;
-        return row == that.row && col == that.col;
-    }
-
-    @Override
-    public int hashCode() {
-        return Objects.hash(row, col);
-    }
-
     /**
      * @return which row this position is in
      * 1 codes for the bottom row
@@ -48,14 +35,6 @@ public class ChessPosition {
         return col;
     }
 
-    @Override
-    public String toString() {
-        char column = (char) ('a' + this.col);
-        int row = this.row + 1; // Chess rows are 1-indexed
-        return "" + column + row;
-    }
-
-
     public static ChessPosition getPositionFromString(String s, boolean blackAtBottom) {
         if(!Pattern.compile("[a-h][1-8]").matcher(s).matches()) {
             return null;
@@ -68,11 +47,32 @@ public class ChessPosition {
         // Check if the row and column values are within the valid range
         if (col >= 1 && col <= 8 && row >= 1 && row <= 8) {
             if (blackAtBottom) {
-//                row = 9 - row; // Invert the row if black is at the bottom
+                //row = 9 - row; // Invert the row if black is at the bottom
             }
             return new ChessPosition(row, col);
         } else {
             return null;
         }
+    }
+
+    @Override
+    public String toString() {
+        return "ChessPosition{" +
+                "row=" + row +
+                ", col=" + col +
+                '}';
+    }
+
+    @Override
+    public boolean equals(Object o) {
+        if (this == o) return true;
+        if (o == null || getClass() != o.getClass()) return false;
+        ChessPosition that = (ChessPosition) o;
+        return row == that.row && col == that.col;
+    }
+
+    @Override
+    public int hashCode() {
+        return Objects.hash(row, col);
     }
 }

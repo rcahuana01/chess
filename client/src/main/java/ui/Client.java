@@ -99,7 +99,7 @@ public class Client implements NotificationHandler {
                     displayIngameCommands();
                     switch (scanner.nextLine()) {
                         case "1", "redraw" -> redraw();
-                        case "2", "leave" -> leave();
+                        case "2", "leave" -> state = ClientState.POST_LOGIN;
                         case "3", "make move" -> makeMove();
                         case "4", "resign" -> resign();
                         case "5", "highlight legal moves" -> highlightMoves();
@@ -111,7 +111,7 @@ public class Client implements NotificationHandler {
                     displayObservingCommands();
                     switch (scanner.nextLine()) {
                         case "1", "redraw" -> redraw();
-                        case "2", "leave" -> state = ClientState.POST_LOGIN;
+                        case "2", "leave" -> leave();
                         case "3", "highlight legal moves" -> highlightMoves();
                         case "4", "help" -> helpObserving();
                         default -> System.out.println("Invalid command, please enter: redraw, leave, highlight legal moves, help");
@@ -138,8 +138,7 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to register with the information provided.");
-            System.out.println(e.getMessage());
+            System.out.println("Unable to register with the information provided." + e.getMessage());
         }
     }
 
@@ -159,7 +158,6 @@ public class Client implements NotificationHandler {
         catch (Exception e) {
             //throw e;
             System.out.println("Unable to login with the information provided.");
-            System.out.println(e.getMessage());
         }
     }
 
@@ -248,8 +246,7 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to join game with the information provided.");
-            System.out.println(e.getMessage());
+            System.out.println("Unable to join game with the information provided. Username already taken.");
         }
     }
 
@@ -281,7 +278,7 @@ public class Client implements NotificationHandler {
                 try {
                     webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
                 } catch (Exception e) {
-                    System.out.println("Error making move");
+                    System.out.println("Error making move. It is not your turn.");
                 }
             }
         }
@@ -325,8 +322,7 @@ public class Client implements NotificationHandler {
                 System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
                 String positionInput = scanner.nextLine();
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
-                piecePosition = ChessPosition.getPositionFromString(positionInput, currentPlayerColor
-                        .toLowerCase(Locale.ROOT).equals("black"));
+                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, piecePosition);
             }
