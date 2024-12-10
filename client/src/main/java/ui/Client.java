@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
-;
+
 public class Client implements NotificationHandler {
     private ClientState state = ClientState.PRE_LOGIN;
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
@@ -257,37 +257,45 @@ public class Client implements NotificationHandler {
     }
 
     private void redraw() {
-        if(currentBoard != null) {
+        if (currentBoard != null) {
             ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
+            boolean reversed = currentPlayerColor.equals("BLACK");
             boardBuilder.printBoard(currentPlayerColor, null);
         }
     }
+
 
     private void makeMove() throws Exception {
         try {
             System.out.print("Enter move to execute (e.g., a1-a5): ");
             String moveInput = scanner.nextLine();
             String[] movePositions = moveInput.split("-");
-            ChessPosition start = new ChessPosition(-1,-1);
-            ChessPosition end = new ChessPosition(-1,-1);
-            start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.
-                    toLowerCase(Locale.ROOT).equals("black"));
-            end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.
-                    toLowerCase(Locale.ROOT).equals("black"));
-            if (start != null && end != null) {
-                ChessMove move = new ChessMove(start, end, null);
-                try {
-                    webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
-                } catch (Exception e) {
-                    System.out.println("Error making move. It is not your turn.");
-                }
+            ChessPosition start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(), currentPlayerColor.equalsIgnoreCase("BLACK"));
+            ChessPosition end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.equalsIgnoreCase("BLACK"));
+
+            if (start == null || end == null) {
+                System.out.println("Invalid move format. Use notation like a1-a5.");
+                return;
             }
-        }
-        catch (Exception e) {
-            //throw e;
-            System.out.println("Unable to make a move with the information provided.");
+
+            ChessMove move = new ChessMove(start, end, null);
+
+            // Handle promotion input
+            if (currentGame != null && currentGame.validMoves(start).stream()
+                    .anyMatch(validMove -> validMove.getEndPosition().equals(end) && end.getRow() == (currentPlayerColor.equals("WHITE") ? 8 : 1))) {
+                System.out.print("Promotion! Choose a piece (QUEEN, ROOK, BISHOP, KNIGHT): ");
+                String promotionPiece = scanner.nextLine().toUpperCase();
+                move = new ChessMove(start, end, ChessPiece.PieceType.valueOf(promotionPiece));
+            }
+
+            // Send move to server
+            webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
+        } catch (Exception e) {
+            System.out.println("Error making move: " + e.getMessage());
         }
     }
+
+
 
     private void resign() throws Exception {
         try {

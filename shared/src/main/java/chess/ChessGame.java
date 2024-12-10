@@ -28,6 +28,9 @@ public class ChessGame {
     public TeamColor getTeamTurn() {
         return teamTurn;
     }
+    public boolean isGameOver() {
+        return endGame;
+    }
 
     /**
      * Set's which teams turn it is
@@ -45,6 +48,28 @@ public class ChessGame {
     public void setEndGame(){
         endGame = true;
     }
+
+    public void promotePiece(ChessMove move, ChessPiece.PieceType promotionPiece) throws InvalidMoveException {
+        // Validate that the move involves a pawn reaching the promotion rank
+        ChessPosition startPosition = move.getStartPosition();
+        ChessPosition endPosition = move.getEndPosition();
+        ChessPiece piece = board.getPiece(startPosition);
+
+        if (piece == null || piece.getPieceType() != ChessPiece.PieceType.PAWN) {
+            throw new InvalidMoveException("Only pawns can be promoted.");
+        }
+
+        int promotionRow = piece.getTeamColor() == TeamColor.WHITE ? 8 : 1;
+        if (endPosition.getRow() != promotionRow) {
+            throw new InvalidMoveException("Pawn must reach the last rank for promotion.");
+        }
+
+        // Perform the promotion
+        ChessPiece promotedPiece = new ChessPiece(piece.getTeamColor(), promotionPiece);
+        board.removePiece(startPosition);
+        board.addPiece(endPosition, promotedPiece);
+    }
+
 
     /**
      * Enum identifying the 2 possible teams in a chess game
