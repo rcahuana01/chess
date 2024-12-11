@@ -88,7 +88,7 @@ public class WebSocketHandler {
             LoadGame loadGame = new LoadGame(gameData);
             connections.broadcast(" ", loadGame, makeMove.getGameID());
             //Server sends a Notification message to all other clients in that game about the move
-            Notification Movenotification = new Notification(
+            Notification moveNotification = new Notification(
                     authData.username() + " made the following move: (" +
                             makeMove.move.getStartPosition().getRow() + "," +
                             makeMove.move.getStartPosition().getColumn() + ") - (" +
@@ -96,7 +96,7 @@ public class WebSocketHandler {
                             makeMove.move.getEndPosition().getColumn() + ")"
             );
 
-            connections.broadcast(makeMove.getAuthToken(), Movenotification, makeMove.getGameID());
+            connections.broadcast(makeMove.getAuthToken(), moveNotification, makeMove.getGameID());
             //If the move results in check or checkmate the server sends a Notification message to all clients.
             // Retrieve the current game once to avoid multiple DAO calls
             ChessGame game = gameDao.getGame(makeMove.getGameID()).game();
