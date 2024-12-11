@@ -44,16 +44,15 @@ public class ChessBoardBuilder {
         letterBorder(out, topBottomBorder);
     }
 
-    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean
-            reversed, ChessPosition piecePosition, int ind) {
+    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
         Collection<ChessPosition> endPositions = new HashSet<>();
         endPositions.add(piecePosition);
-        if (piecePosition != null) {
-            Collection<ChessMove> validMoves = chessGame.validMoves(piecePosition);
-            for (ChessMove move : validMoves) {
-                endPositions.add(move.getEndPosition());
-            }
-        }
+//        if (piecePosition != null) {
+//            Collection<ChessMove> validMoves = chessGame.validMoves(piecePosition);
+//            for (ChessMove move : validMoves) {
+//                endPositions.add(move.getEndPosition());
+//            }
+//        }
 
         numberBorder(out, rowLabel);
 
@@ -62,7 +61,7 @@ public class ChessBoardBuilder {
 
         for (int i = 0; i < row.length; i++) {
             ChessPiece piece = row[reversed ? 7 - i : i];
-            ChessPosition currentPosition = new ChessPosition(reversed ? 8 - ind : ind + 1, reversed ? 8 - i : i + 1);
+            ChessPosition currentPosition = new ChessPosition(ind+1, reversed ? 8 - i : i + 1);
 
             if (endPositions.contains(currentPosition)) {
                 out.print(SET_BG_COLOR_YELLOW);

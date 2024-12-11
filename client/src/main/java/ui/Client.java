@@ -18,7 +18,7 @@ import java.util.Locale;
 import java.util.Map;
 import java.util.Scanner;
 
-
+;
 public class Client implements NotificationHandler {
     private ClientState state = ClientState.PRE_LOGIN;
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
@@ -65,62 +65,131 @@ public class Client implements NotificationHandler {
     }
 
     public void run() throws Exception {
-        System.out.println("Welcome to 240 Chess!\n");
+        System.out.println("Welcome to 240 Chess!");
+        System.out.println();
 
-        while (true) {
+        do {
             System.out.println("Available commands: ");
 
-            switch (state) {
-                case PRE_LOGIN -> {
-                    displayPreloginCommands();
-                    switch (scanner.nextLine()) {
-                        case "1", "register" -> register();
-                        case "2", "login" -> login();
-                        case "3", "quit" -> quit();
-                        case "4", "help" -> helpPrelogin();
-                        default -> System.out.println("Invalid command, please enter: register, login, quit, help");
-                    }
+            if(state == ClientState.PRE_LOGIN) {
+                displayPreloginCommands();
+
+                switch(scanner.nextLine()) {
+                    case "1":
+                    case "register":
+                        register();
+                        break;
+                    case "2":
+                    case "login":
+                        login();
+                        break;
+                    case "3":
+                    case "quit":
+                        quit();
+                        break;
+                    case "4":
+                    case "help":
+                        helpPrelogin();
+                        break;
+                    default:
+                        System.out.println("Invalid command, please enter: register, login, quit, help");
+                        break;
                 }
-                case POST_LOGIN -> {
-                    displayPostloginCommands();
-                    switch (scanner.nextLine()) {
-                        case "1", "create game" -> createGame();
-                        case "2", "list games" -> listGames();
-                        case "3", "join game" -> joinGame(false);
-                        case "4", "observe game" -> joinGame(true);
-                        case "5", "logout" -> logout();
-                        case "6", "quit" -> quit();
-                        case "7", "help" -> helpPostlogin();
-                        default -> System.out.println("Invalid command, please enter: create game, list" +
-                                " games, join game, observe game, logout, quit, help");
-                    }
+            }
+            else if(state == ClientState.POST_LOGIN) {
+                displayPostloginCommands();
+                switch(scanner.nextLine()) {
+                    case "1":
+                    case "create game":
+                        createGame();
+                        break;
+                    case "2":
+                    case "list games":
+                        listGames();
+                        break;
+                    case "3":
+                    case "join game":
+                        joinGame(false);
+                        break;
+                    case "4":
+                    case "observe game":
+                        joinGame(true);
+                        break;
+                    case "5":
+                    case "logout":
+                        logout();
+                        break;
+                    case "6":
+                    case "quit":
+                        quit();
+                        break;
+                    case "7":
+                    case "help":
+                        helpPostlogin();
+                        break;
+                    default:
+                        System.out.println("Invalid command, please enter: create game, list games, join game, observe game, logout, quit, help");
+                        break;
                 }
-                case IN_GAME -> {
-                    displayIngameCommands();
-                    switch (scanner.nextLine()) {
-                        case "1", "redraw" -> redraw();
-                        case "2", "leave" -> state = ClientState.POST_LOGIN;
-                        case "3", "make move" -> makeMove();
-                        case "4", "resign" -> resign();
-                        case "5", "highlight legal moves" -> highlightMoves();
-                        case "6", "help" -> helpIngame();
-                        default -> System.out.println("Invalid command, please enter: redraw, leave, " +
-                                "make move, resign, highlight legal moves, help");
-                    }
+            }
+            if(state == ClientState.IN_GAME){
+                displayIngameCommands();
+                switch(scanner.nextLine()) {
+                    case "1":
+                    case "redraw":
+                        redraw();
+                        break;
+                    case "2":
+                    case "leave":
+                        leave();
+                        break;
+                    case "3":
+                    case "make move":
+                        makeMove();
+                        break;
+                    case "4":
+                    case "resign":
+                        resign();
+                        break;
+                    case "5":
+                    case "highlight legal moves":
+                        highlightMoves();
+                        break;
+                    case "6":
+                    case "help":
+                        helpIngame();
+                        break;
+                    default:
+                        System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
+                        break;
                 }
-                case OBSERVING -> {
-                    displayObservingCommands();
-                    switch (scanner.nextLine()) {
-                        case "1", "redraw" -> redraw();
-                        case "2", "leave" -> leave();
-                        case "3", "highlight legal moves" -> highlightMoves();
-                        case "4", "help" -> helpObserving();
-                        default -> System.out.println("Invalid command, please enter: redraw, leave, highlight " +
-                                "legal moves, help");
-                    }
+            }
+            else if (state == ClientState.OBSERVING){
+                displayObservingCommands();
+                switch(scanner.nextLine()) {
+                    case "1":
+                    case "redraw":
+                        redraw();
+                        break;
+                    case "2":
+                    case "leave":
+                        state = ClientState.POST_LOGIN;
+                        break;
+                    case "3":
+                    case "highlight legal moves":
+                        highlightMoves();
+                        break;
+                    case "4":
+                    case "help":
+                        helpObserving();
+                        break;
+                    default:
+                        System.out.println("Invalid command, please enter: redraw, leave, help");
+                        break;
                 }
             }
         }
+        while(true);
     }
 
     private void register() throws Exception {
@@ -140,7 +209,8 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to register with the information provided." + e.getMessage());
+            System.out.println("Unable to register with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -160,6 +230,7 @@ public class Client implements NotificationHandler {
         catch (Exception e) {
             //throw e;
             System.out.println("Unable to login with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -239,15 +310,15 @@ public class Client implements NotificationHandler {
                 state = ClientState.OBSERVING;
             }
 
-            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.
-                    equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE :
-                    ChessGame.TeamColor.BLACK, observer));
+            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
 
             System.out.println("Joined game successfully.");
+
         }
         catch (Exception e) {
             //throw e;
-            System.out.println("Unable to join game with the information provided. Username already taken.");
+            System.out.println("Unable to join game with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
 
@@ -257,48 +328,36 @@ public class Client implements NotificationHandler {
     }
 
     private void redraw() {
-        if (currentBoard != null) {
+        if(currentBoard != null) {
             ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
-            boolean reversed = currentPlayerColor.equals("BLACK");
             boardBuilder.printBoard(currentPlayerColor, null);
         }
     }
-
 
     private void makeMove() throws Exception {
         try {
             System.out.print("Enter move to execute (e.g., a1-a5): ");
             String moveInput = scanner.nextLine();
             String[] movePositions = moveInput.split("-");
-            ChessPosition start = ChessPosition.getPositionFromString(movePositions[0].trim().toLowerCase(),
-                    currentPlayerColor.equalsIgnoreCase("BLACK"));
-            ChessPosition end = ChessPosition.getPositionFromString(movePositions[1].trim().toLowerCase(),
-                    currentPlayerColor.equalsIgnoreCase("BLACK"));
-
-            if (start == null || end == null) {
-                System.out.println("Invalid move format. Use notation like a1-a5.");
-                return;
+            ChessPosition start = new ChessPosition(-1,-1);
+            ChessPosition end = new ChessPosition(-1,-1);
+            start = start.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+            end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+            if (start != null && end != null) {
+                ChessMove move = new ChessMove(start, end, null);
+                try {
+                    webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
+                } catch (Exception e) {
+                    System.out.println("Error making move");
+                }
             }
-
-            ChessMove move = new ChessMove(start, end, null);
-
-            // Handle promotion input
-            if (currentGame != null && currentGame.validMoves(start).stream()
-                    .anyMatch(validMove -> validMove.getEndPosition().equals(end) && end.getRow() ==
-                            (currentPlayerColor.equals("WHITE") ? 8 : 1))) {
-                System.out.print("Promotion! Choose a piece (QUEEN, ROOK, BISHOP, KNIGHT): ");
-                String promotionPiece = scanner.nextLine().toUpperCase();
-                move = new ChessMove(start, end, ChessPiece.PieceType.valueOf(promotionPiece));
-            }
-
-            // Send move to server
-            webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
-        } catch (Exception e) {
-            System.out.println("Error making move: " + e.getMessage());
+        }
+        catch (Exception e) {
+            //throw e;
+            System.out.println("Unable to make a move with the information provided.");
+            System.out.println(e.getMessage());
         }
     }
-
-
 
     private void resign() throws Exception {
         try {
@@ -320,6 +379,8 @@ public class Client implements NotificationHandler {
         try {
             webSocket.sendCommand(new Leave(authData.authToken(), currentGameId));
             state = ClientState.POST_LOGIN;
+            System.out.println(authData.username() + "has left the game. ");
+
         }
         catch (Exception e) {
             //throw e;
@@ -330,12 +391,11 @@ public class Client implements NotificationHandler {
 
     private void highlightMoves() throws Exception {
         try {
-            if(currentBoard != null && currentGame!= null) {
+            if(currentBoard != null && currentGame != null) {
                 System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
                 String positionInput = scanner.nextLine();
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
-                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.
-                        toLowerCase(Locale.ROOT).equals("black"));
+                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, piecePosition);
             }
@@ -343,6 +403,7 @@ public class Client implements NotificationHandler {
         catch (Exception e) {
             //throw e;
             System.out.println("Unable to highlight valid moves.");
+            System.out.println(e.getMessage());
         }
     }
 
