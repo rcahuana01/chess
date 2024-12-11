@@ -144,7 +144,7 @@ public class Client implements NotificationHandler {
                 displayObservingCommands();
                 switch (scanner.nextLine()) {
                     case "1", "redraw" -> redraw();
-                    case "2", "leave" -> state = ClientState.POST_LOGIN;
+                    case "2", "leave" -> leaveAsObserver();
                     case "3", "highlight legal moves" -> highlightMoves();
                     case "4", "help" -> helpObserving();
                     default -> System.out.println("Invalid command, please enter: redraw, leave, highlight " +
@@ -153,6 +153,22 @@ public class Client implements NotificationHandler {
         }
             }
         while(true);
+    }
+
+    private void leaveAsObserver() throws Exception {
+        try {
+            // Send the leave command to the server
+            webSocket.sendCommand(new Leave(authData.authToken(), currentGameId));
+
+            // Notify that the observer is leaving
+            System.out.println(authData.username() + " has left observing the game.");
+
+            // Reset state to post-login
+            state = ClientState.POST_LOGIN;
+        } catch (Exception e) {
+            System.out.println("Unable to leave the game as an observer.");
+            System.out.println(e.getMessage());
+        }
     }
 
     private void register() throws Exception {
