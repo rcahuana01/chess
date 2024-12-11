@@ -44,15 +44,16 @@ public class ChessBoardBuilder {
         letterBorder(out, topBottomBorder);
     }
 
-    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow, boolean reversed, ChessPosition piecePosition, int ind) {
+    public static void fillBoard(PrintStream out, String rowLabel, ChessPiece[] row, boolean isEvenRow,
+                                 boolean reversed, ChessPosition piecePosition, int ind) {
         Collection<ChessPosition> endPositions = new HashSet<>();
         endPositions.add(piecePosition);
-//        if (piecePosition != null) {
-//            Collection<ChessMove> validMoves = chessGame.validMoves(piecePosition);
-//            for (ChessMove move : validMoves) {
-//                endPositions.add(move.getEndPosition());
-//            }
-//        }
+        if (piecePosition != null) {
+            Collection<ChessMove> validMoves = chessGame.validMoves(piecePosition);
+            for (ChessMove move : validMoves) {
+                endPositions.add(move.getEndPosition());
+            }
+        }
 
         numberBorder(out, rowLabel);
 

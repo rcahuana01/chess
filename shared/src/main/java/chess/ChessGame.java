@@ -100,8 +100,8 @@ public class ChessGame {
 
         boolean isValidMove = !isInCheck(currentPiece.getTeamColor());
 
-//        board.removePiece(possibleMove.getEndPosition());
-//        board.addPiece(startPosition, currentPiece);
+        board.removePiece(possibleMove.getEndPosition());
+        board.addPiece(startPosition, currentPiece);
 
         board = starterBoard;
 

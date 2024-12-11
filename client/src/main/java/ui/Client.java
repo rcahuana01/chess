@@ -13,16 +13,13 @@ import websocket.messages.ErrorMessage;
 import websocket.messages.LoadGame;
 import websocket.messages.Notification;
 
-import java.util.HashMap;
-import java.util.Locale;
-import java.util.Map;
-import java.util.Scanner;
+import java.util.*;
 
-;
 public class Client implements NotificationHandler {
     private ClientState state = ClientState.PRE_LOGIN;
     private ServerFacade serverFacade = new ServerFacade("http://localhost:8080");
-    private WebSocketFacade webSocket = new WebSocketFacade("ws://localhost:8080/ws", this);
+    private WebSocketFacade webSocket = new WebSocketFacade("ws://localhost:8080/ws",
+            this);
     private Scanner scanner = new Scanner(System.in);
 
     private AuthData authData = null;
@@ -128,7 +125,8 @@ public class Client implements NotificationHandler {
                         helpPostlogin();
                         break;
                     default:
-                        System.out.println("Invalid command, please enter: create game, list games, join game, observe game, logout, quit, help");
+                        System.out.println("Invalid command, please enter: create game, " +
+                                "list games, join game, observe game, logout, quit, help");
                         break;
                 }
             }
@@ -160,7 +158,8 @@ public class Client implements NotificationHandler {
                         helpIngame();
                         break;
                     default:
-                        System.out.println("Invalid command, please enter: redraw, leave, make move, resign, highlight legal moves, help");
+                        System.out.println("Invalid command, please enter: redraw, leave, " +
+                                "make move, resign, highlight legal moves, help");
                         break;
                 }
             }
@@ -244,7 +243,8 @@ public class Client implements NotificationHandler {
             System.out.println("Enter the name of the game: ");
             String gameName = scanner.nextLine();
 
-            GameData gameData = new GameData(0, null, null, gameName, null);
+            GameData gameData = new GameData(0, null, null,
+                    gameName, null);
             serverFacade.createGame(authData.authToken(), gameData);
             System.out.println("Game created successfully!");
         }
@@ -310,7 +310,8 @@ public class Client implements NotificationHandler {
                 state = ClientState.OBSERVING;
             }
 
-            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
+            webSocket.sendCommand(new Connect(authData.authToken(), currentGameId, currentPlayerColor.
+                    equalsIgnoreCase("white") ? ChessGame.TeamColor.WHITE : ChessGame.TeamColor.BLACK, observer));
 
             System.out.println("Joined game successfully.");
 
@@ -339,18 +340,78 @@ public class Client implements NotificationHandler {
             System.out.print("Enter move to execute (e.g., a1-a5): ");
             String moveInput = scanner.nextLine();
             String[] movePositions = moveInput.split("-");
+
+            if (movePositions.length != 2) {
+                System.out.println("Invalid move format. Please use the format 'e2-e4'.");
+                return;
+            }
+
             ChessPosition start = new ChessPosition(-1,-1);
             ChessPosition end = new ChessPosition(-1,-1);
-            start = start.getPositionFromString(movePositions[0].trim().toLowerCase(),currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
-            end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
-            if (start != null && end != null) {
-                ChessMove move = new ChessMove(start, end, null);
-                try {
-                    webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
-                } catch (Exception e) {
-                    System.out.println("Error making move");
+            start = start.getPositionFromString(movePositions[0].trim().toLowerCase(), currentPlayerColor.
+                    toLowerCase(Locale.ROOT).equals("black"));
+            end = end.getPositionFromString(movePositions[1].trim().toLowerCase(), currentPlayerColor.
+                    toLowerCase(Locale.ROOT).equals("black"));
+
+            if (start == null || end == null) {
+                System.out.println("Invalid positions entered.");
+                return;
+            }
+
+            ChessPiece movingPiece = currentBoard.getPiece(start);
+            if (movingPiece == null) {
+                System.out.println("No piece at the starting position.");
+                return;
+            }
+
+            // Check if the move is a promotion
+            boolean isPromotion = false;
+            ChessPiece.PieceType promotionPieceType = null;
+            if (movingPiece.getPieceType() == ChessPiece.PieceType.PAWN) {
+                int promotionRow = movingPiece.getTeamColor() == ChessGame.TeamColor.WHITE ? 8 : 1;
+                if (end.getRow() == promotionRow) {
+                    isPromotion = true;
                 }
             }
+
+            if (isPromotion) {
+                System.out.println("Pawn promotion detected.");
+                System.out.println("Choose a piece to promote to (Q, R, B, N): ");
+                String promotionInput = scanner.nextLine().toUpperCase();
+
+                switch (promotionInput) {
+                    case "Q":
+                        promotionPieceType = ChessPiece.PieceType.QUEEN;
+                        break;
+                    case "R":
+                        promotionPieceType = ChessPiece.PieceType.ROOK;
+                        break;
+                    case "B":
+                        promotionPieceType = ChessPiece.PieceType.BISHOP;
+                        break;
+                    case "N":
+                        promotionPieceType = ChessPiece.PieceType.KNIGHT;
+                        break;
+                    default:
+                        System.out.println("Invalid promotion piece type. Defaulting to Queen.");
+                        promotionPieceType = ChessPiece.PieceType.QUEEN;
+                        break;
+                }
+            }
+
+            ChessMove move = new ChessMove(start, end, promotionPieceType);
+
+            // Optionally, validate the move locally before sending
+            Collection<ChessMove> validMoves = currentGame.validMoves(start);
+            if (!validMoves.contains(move)) {
+                System.out.println("Invalid move. Please try again.");
+                return;
+            }
+
+            // Send the move to the server
+            webSocket.sendCommand(new MakeMove(authData.authToken(), currentGameId, move));
+            System.out.println("Move sent successfully.");
+
         }
         catch (Exception e) {
             //throw e;
@@ -363,7 +424,7 @@ public class Client implements NotificationHandler {
         try {
             System.out.print("Are you sure you want to resign? [y/n]: ");
             String confirmation = scanner.nextLine();
-            if (confirmation.equals("y")) {
+            if (confirmation.equalsIgnoreCase("y")) {
                 webSocket.sendCommand(new Resign(authData.authToken(), currentGameId));
                 System.out.println("Game is over!");
             }
@@ -379,8 +440,7 @@ public class Client implements NotificationHandler {
         try {
             webSocket.sendCommand(new Leave(authData.authToken(), currentGameId));
             state = ClientState.POST_LOGIN;
-            System.out.println(authData.username() + "has left the game. ");
-
+            System.out.println(authData.username() + " has left the game.");
         }
         catch (Exception e) {
             //throw e;
@@ -395,7 +455,12 @@ public class Client implements NotificationHandler {
                 System.out.println("Enter the position of the piece you want to move: (e.g., a1) ");
                 String positionInput = scanner.nextLine();
                 ChessPosition piecePosition = new ChessPosition(-1,-1);
-                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.toLowerCase(Locale.ROOT).equals("black"));
+                piecePosition = piecePosition.getPositionFromString(positionInput, currentPlayerColor.
+                        toLowerCase(Locale.ROOT).equals("black"));
+                if (piecePosition == null) {
+                    System.out.println("Invalid position entered.");
+                    return;
+                }
                 ChessBoardBuilder boardBuilder = new ChessBoardBuilder(currentBoard, currentGame);
                 boardBuilder.printBoard(currentPlayerColor, piecePosition);
             }
