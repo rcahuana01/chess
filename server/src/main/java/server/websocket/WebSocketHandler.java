@@ -141,8 +141,9 @@ public class WebSocketHandler {
             }
             connections.remove(leave.getAuthToken());
             //Server sends a Notification message to all other clients  in that game
-            Notification notification = new Notification(authData.username() + " has left the game.");
-            connections.broadcast(leave.getAuthToken(), notification, leave.getGameID());
+            Notification leaveNotification = new Notification(authData.username() + " has left the game.");
+            connections.broadcast(leave.getAuthToken(), leaveNotification, leave.getGameID());
+
         } catch (ResponseException | IOException e){
             session.getRemote().sendString(new Gson().toJson(new ErrorMessage("Unable to leave")));
         }

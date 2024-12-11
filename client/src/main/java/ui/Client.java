@@ -131,7 +131,7 @@ public class Client implements NotificationHandler {
                 displayIngameCommands();
                 switch (scanner.nextLine()) {
                     case "1", "redraw" -> redraw();
-                    case "2", "leave" -> state = ClientState.POST_LOGIN;
+                    case "2", "leave" -> leave();
                     case "3", "make move" -> makeMove();
                     case "4", "resign" -> resign();
                     case "5", "highlight legal moves" -> highlightMoves();
@@ -144,7 +144,7 @@ public class Client implements NotificationHandler {
                 displayObservingCommands();
                 switch (scanner.nextLine()) {
                     case "1", "redraw" -> redraw();
-                    case "2", "leave" -> leave();
+                    case "2", "leave" -> state = ClientState.POST_LOGIN;
                     case "3", "highlight legal moves" -> highlightMoves();
                     case "4", "help" -> helpObserving();
                     default -> System.out.println("Invalid command, please enter: redraw, leave, highlight " +
@@ -280,7 +280,6 @@ public class Client implements NotificationHandler {
         }
         catch (Exception e) {
             System.out.println("Unable to join game with the information provided.");
-            System.out.println(e.getMessage());
         }
     }
 
