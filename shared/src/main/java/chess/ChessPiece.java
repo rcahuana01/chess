@@ -71,8 +71,7 @@ public class ChessPiece {
         switch(type){
             case KING:
                 KingRuleMoves kingMoves = new KingRuleMoves();
-                kingMoves.KingRuleMoves(myPosition, board.getPiece(myPosition));
-                break;
+                return kingMoves.KingRuleMoves(myPosition, board.getPiece(myPosition), board);
 
         }
         return null;
