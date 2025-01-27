@@ -9,30 +9,44 @@ public class PawnRuleMoves {
     public List<ChessMove> PawnRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         List<ChessMove> validMoves = new ArrayList<>();
         int direction = (piece.getTeamColor() == TeamColor.WHITE) ? -1 : 1;
-        int promotionRow = (piece.getTeamColor() == TeamColor.WHITE) ? 7 : 2;
+        int startRow = (piece.getTeamColor() == TeamColor.WHITE) ? 6 : 1;
+        int promotionRow = (piece.getTeamColor() == TeamColor.WHITE) ? 0 : 7;
         int curRow = position.getRow();
         int curCol = position.getColumn();
 
-        for (int i=0;i<8;i++){
-            ChessPosition endPosition = new ChessPosition(curRow+direction, curCol);
-            ChessPosition endPosition2 = new ChessPosition(curRow*2, curCol);
-            if (isWithinLimits(curRow+direction, curCol)){
-                ChessMove newMove = new ChessMove(position, endPosition, null);
-                ChessMove newMove2 = new ChessMove(position, endPosition2, null);
-                validMoves.add(newMove);
-                validMoves.add(newMove2);
+        ChessPosition oneStep = new ChessPosition(curRow+direction, curCol);
+        if (isWithinLimits(curRow+direction, curCol) && board.getPiece(oneStep)==null) {
+            validMoves.add(new ChessMove(position, oneStep, null));
+            if (curRow==startRow){
+                ChessPosition twoStep = new ChessPosition(curRow+2*direction,curCol);
+                if(board.getPiece(twoStep)==null){
+                    validMoves.add((new ChessMove(position,twoStep,null)));
+                }
             }
         }
 
-
-        ChessPosition promotion = new ChessPosition(position.getRow(), position.getColumn());
-        ChessMove promotionMove = new ChessMove(position, promotion, ChessPiece.PieceType.QUEEN);
-        ChessMove promotionMove = new ChessMove(position, promotion, ChessPiece.PieceType.ROOK);
-        ChessMove promotionMove = new ChessMove(position, promotion, ChessPiece.PieceType.BISHOP);
-        ChessMove promotionMove = new ChessMove(position, promotion, ChessPiece.PieceType.KNIGHT);
-
-        ChessMove newMove3 = new ChessMove(position, endPosition3, promotionMove);
-        validMoves.add(newMove3);
+        if (piece.getTeamColor()==TeamColor.WHITE){
+            int newCol = curCol + 1;
+            ChessPosition diagPos = new ChessPosition(curRow+direction,newCol);
+            if (isWithinLimits(diagPos.getRow(), diagPos.getColumn()) && board.getPiece(diagPos)!=null &&
+                    board.getPiece(diagPos).getTeamColor() != piece.getTeamColor()) {
+                validMoves.add(new ChessMove(position, diagPos,null));
+                }
+        }
+        else {
+            int newCol = curCol - 1;
+            ChessPosition diagPos = new ChessPosition(curRow+direction,newCol);
+            if (isWithinLimits(diagPos.getRow(), diagPos.getColumn()) && board.getPiece(diagPos)!=null &&
+                    board.getPiece(diagPos).getTeamColor() != piece.getTeamColor()) {
+                validMoves.add(new ChessMove(position, diagPos,null));
+            }
+        }
+        if (curRow+direction==promotionRow){
+            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.ROOK));
+            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.QUEEN));
+            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.BISHOP));
+            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.KNIGHT));
+        }
 
 
         return validMoves;
