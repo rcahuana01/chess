@@ -72,6 +72,21 @@ public class ChessPiece {
             case KING:
                 KingRuleMoves kingMoves = new KingRuleMoves();
                 return kingMoves.KingRuleMoves(myPosition, board.getPiece(myPosition), board);
+            case KNIGHT:
+                KnightRuleMoves knightMoves = new KnightRuleMoves();
+                return knightMoves.KnightRuleMoves(myPosition, board.getPiece(myPosition), board);
+            case BISHOP:
+                BishopRuleMoves bishopMoves = new BishopRuleMoves();
+                return bishopMoves.BishopRuleMoves(myPosition, board.getPiece(myPosition), board);
+            case ROOK:
+                RookRuleMoves rookMoves = new RookRuleMoves();
+                return rookMoves.RookRuleMoves(myPosition, board.getPiece(myPosition), board);
+            case QUEEN:
+                QueenRuleMoves queenMoves = new QueenRuleMoves();
+                return queenMoves.QueenRuleMoves(myPosition, board.getPiece(myPosition), board);
+            case PAWN:
+                PawnRuleMoves pawnMoves = new PawnRuleMoves();
+                return pawnMoves.PawnRuleMoves(myPosition, board.getPiece(myPosition), board);
 
         }
         return null;
