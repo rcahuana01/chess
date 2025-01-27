@@ -5,7 +5,7 @@ import java.util.List;
 
 public class RookRuleMoves {
     public List<ChessMove> RookRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
-        int[][] rookDirections = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
+        int[][] rookDirections = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         List<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();
         int curCol = position.getColumn();
@@ -19,11 +19,18 @@ public class RookRuleMoves {
                 tempCol += stepCol;
                 ChessPosition endPosition = new ChessPosition(tempRow, tempCol);
                 ChessPiece endPiece = board.getPiece(endPosition);
-                if (endPiece == null || piece.getTeamColor() != endPiece.getTeamColor()) {
+                if (endPiece==null){
                     validMoves.add(new ChessMove(position, endPosition, null));
+                }
+                else if (piece.getTeamColor() != endPiece.getTeamColor()) {
+                    validMoves.add(new ChessMove(position, endPosition, null));
+                    break;
+                } else if (piece.getTeamColor() == endPiece.getTeamColor()){
+                    break;
                 }
             }
         }
+
 
 
         return validMoves;
@@ -31,6 +38,6 @@ public class RookRuleMoves {
     }
 
     boolean isWithinLimits(int row, int col) {
-        return row >= 0 && row < 8 && col >= 0 && col < 8;
+        return row >= 1 && row < 9 && col >= 1 && col < 9;
     }
 }

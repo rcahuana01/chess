@@ -19,8 +19,14 @@ public class BishopRuleMoves {
                 tempCol += stepCol;
                 ChessPosition endPosition = new ChessPosition(tempRow, tempCol);
                 ChessPiece endPiece = board.getPiece(endPosition);
-                if (endPiece == null || piece.getTeamColor() != endPiece.getTeamColor()) {
+                if (endPiece==null){
                     validMoves.add(new ChessMove(position, endPosition, null));
+                }
+                else if (piece.getTeamColor() != endPiece.getTeamColor()) {
+                    validMoves.add(new ChessMove(position, endPosition, null));
+                    break;
+                } else if (piece.getTeamColor() == endPiece.getTeamColor()){
+                    break;
                 }
             }
         }
@@ -31,6 +37,6 @@ public class BishopRuleMoves {
     }
 
     boolean isWithinLimits(int row, int col) {
-        return row >= 0 && row < 8 && col >= 0 && col < 8;
+        return row >= 1 && row < 9 && col >= 1 && col < 9;
     }
 }
