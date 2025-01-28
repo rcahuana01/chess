@@ -87,7 +87,7 @@ public class ChessPiece {
             case PAWN:
                 PawnRuleMoves pawnMoves = new PawnRuleMoves();
                 return pawnMoves.PawnRuleMoves(myPosition, board.getPiece(myPosition), board);
-
+            default:
         }
         return null;
     }
