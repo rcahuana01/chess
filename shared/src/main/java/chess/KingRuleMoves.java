@@ -26,4 +26,5 @@ public class KingRuleMoves {
     boolean isWithinLimits(int row, int col) {
         return row >= 1 && row < 9 && col >= 1 && col < 9;
     }
+
 }
