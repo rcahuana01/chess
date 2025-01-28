@@ -9,8 +9,8 @@ public class PawnRuleMoves {
     public List<ChessMove> PawnRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         List<ChessMove> validMoves = new ArrayList<>();
         int direction = (piece.getTeamColor() == TeamColor.BLACK) ? -1 : 1;
-        int startRow = (piece.getTeamColor() == TeamColor.BLACK) ? 6 : 1;
-        int promotionRow = (piece.getTeamColor() == TeamColor.BLACK) ? 0 : 7;
+        int startRow = (piece.getTeamColor() == TeamColor.BLACK) ? 7 : 2;
+        int promotionRow = (piece.getTeamColor() == TeamColor.BLACK) ? 1 : 8;
         int curRow = position.getRow();
         int curCol = position.getColumn();
 
@@ -32,8 +32,7 @@ public class PawnRuleMoves {
                 validMoves.add(new ChessMove(position, diagPos, null));
             }
         }
-
-        if ((curRow+direction)==promotionRow && board.getPiece(oneStep) == null){
+        if (((curRow+direction)==promotionRow && board.getPiece(oneStep) == null)){
             validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.ROOK));
             validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.QUEEN));
             validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.BISHOP));
