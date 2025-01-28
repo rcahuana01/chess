@@ -35,10 +35,11 @@ public class PawnRuleMoves {
             int diagRow = curRow + direction * move[0];
             int diagCol = curCol + move[1];
             ChessPosition diagonalPosition = new ChessPosition(diagRow, diagCol);
-            ChessPiece pieceDiagPos = board.getPiece(diagonalPosition);
 
-            if (isWithinLimits(diagonalPosition) && pieceDiagPos != null) {
-                if (pieceDiagPos.getTeamColor() != piece.getTeamColor()) {
+            if (isWithinLimits(diagonalPosition)) {
+                ChessPiece pieceDiagPos = board.getPiece(diagonalPosition);
+
+                if (pieceDiagPos != null && pieceDiagPos.getTeamColor() != piece.getTeamColor()) {
                     if (diagonalPosition.getRow() == promotionRow) {
                         addPromotionMoves(validMoves, position, diagonalPosition);
                     } else {
@@ -47,6 +48,7 @@ public class PawnRuleMoves {
                 }
             }
         }
+
 
         return validMoves;
     }
@@ -61,7 +63,7 @@ public class PawnRuleMoves {
     private boolean isWithinLimits(ChessPosition position) {
         int row = position.getRow();
         int col = position.getColumn();
-        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+        return (row >= 1 && row <= 8) && (col >= 1 && col <= 8);
     }
 
 }
