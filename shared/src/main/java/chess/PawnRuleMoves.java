@@ -1,11 +1,11 @@
 package chess;
 
 import chess.ChessGame.TeamColor;
-
 import java.util.ArrayList;
 import java.util.List;
 
 public class PawnRuleMoves {
+
     public List<ChessMove> PawnRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         List<ChessMove> validMoves = new ArrayList<>();
         int direction = (piece.getTeamColor() == TeamColor.BLACK) ? -1 : 1;
@@ -15,35 +15,53 @@ public class PawnRuleMoves {
         int curCol = position.getColumn();
 
         ChessPosition oneStep = new ChessPosition(curRow + direction, curCol);
-        if (isWithinLimits(curRow + direction, curCol) && board.getPiece(oneStep) == null) {
-            validMoves.add(new ChessMove(position, oneStep, null));
+        if (isWithinLimits(oneStep) && board.getPiece(oneStep) == null) {
+            if (oneStep.getRow() == promotionRow) {
+                addPromotionMoves(validMoves, position, oneStep);
+            } else {
+                validMoves.add(new ChessMove(position, oneStep, null));
+            }
+
             if (curRow == startRow) {
                 ChessPosition twoStep = new ChessPosition(curRow + 2 * direction, curCol);
-                if(isWithinLimits(twoStep.getRow(), twoStep.getColumn()) && board.getPiece(twoStep) == null && board.getPiece(oneStep) == null){
+                if (isWithinLimits(twoStep) && board.getPiece(twoStep) == null) {
                     validMoves.add(new ChessMove(position, twoStep, null));
                 }
             }
         }
 
-        for (int newCol : new int[]{curCol - 1, curCol + 1}) {
-            ChessPosition diagPos = new ChessPosition(curRow + direction, newCol);
-            if (isWithinLimits(diagPos.getRow(), diagPos.getColumn()) && board.getPiece(diagPos) != null &&
-                    board.getPiece(diagPos).getTeamColor() != piece.getTeamColor()) {
-                validMoves.add(new ChessMove(position, diagPos, null));
+        int[][] diagonalMoves = {{1, -1}, {1, 1}};
+        for (int[] move : diagonalMoves) {
+            int diagRow = curRow + direction * move[0];
+            int diagCol = curCol + move[1];
+            ChessPosition diagonalPosition = new ChessPosition(diagRow, diagCol);
+            ChessPiece pieceDiagPos = board.getPiece(diagonalPosition);
+
+            if (isWithinLimits(diagonalPosition) && pieceDiagPos != null) {
+                if (pieceDiagPos.getTeamColor() != piece.getTeamColor()) {
+                    if (diagonalPosition.getRow() == promotionRow) {
+                        addPromotionMoves(validMoves, position, diagonalPosition);
+                    } else {
+                        validMoves.add(new ChessMove(position, diagonalPosition, null));
+                    }
+                }
             }
         }
-        if (((curRow+direction)==promotionRow && board.getPiece(oneStep) == null)){
-            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.ROOK));
-            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.QUEEN));
-            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.BISHOP));
-            validMoves.add(new ChessMove(position, oneStep, ChessPiece.PieceType.KNIGHT));
-        }
-
 
         return validMoves;
     }
 
-    boolean isWithinLimits(int row, int col) {
-        return row >= 1 && row < 9 && col >= 1 && col < 9;
+    private void addPromotionMoves(List<ChessMove> validMoves, ChessPosition startPosition, ChessPosition endPosition) {
+        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.QUEEN));
+        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.ROOK));
+        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.BISHOP));
+        validMoves.add(new ChessMove(startPosition, endPosition, ChessPiece.PieceType.KNIGHT));
     }
+
+    private boolean isWithinLimits(ChessPosition position) {
+        int row = position.getRow();
+        int col = position.getColumn();
+        return row >= 1 && row <= 8 && col >= 1 && col <= 8;
+    }
+
 }
