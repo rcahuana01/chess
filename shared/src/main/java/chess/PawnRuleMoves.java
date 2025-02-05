@@ -6,7 +6,7 @@ import java.util.List;
 
 public class PawnRuleMoves {
 
-    public List<ChessMove> PawnRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
+    public List<ChessMove> getPawnMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         List<ChessMove> validMoves = new ArrayList<>();
         int direction = (piece.getTeamColor() == TeamColor.BLACK) ? -1 : 1;
         int startRow = (piece.getTeamColor() == TeamColor.BLACK) ? 7 : 2;
@@ -16,18 +16,17 @@ public class PawnRuleMoves {
 
         ChessPosition oneStep = new ChessPosition(curRow + direction, curCol);
         if (isWithinLimits(oneStep) && board.getPiece(oneStep) == null) {
+            ChessPosition twoStep = new ChessPosition(curRow + 2 * direction, curCol);
+            if (curRow == startRow && board.getPiece(twoStep) == null) {
+                    validMoves.add(new ChessMove(position, twoStep, null));
+            }
             if (oneStep.getRow() == promotionRow) {
                 addPromotionMoves(validMoves, position, oneStep);
             } else {
                 validMoves.add(new ChessMove(position, oneStep, null));
             }
 
-            if (curRow == startRow) {
-                ChessPosition twoStep = new ChessPosition(curRow + 2 * direction, curCol);
-                if (isWithinLimits(twoStep) && board.getPiece(twoStep) == null) {
-                    validMoves.add(new ChessMove(position, twoStep, null));
-                }
-            }
+
         }
 
         int[][] diagonalMoves = {{1, -1}, {1, 1}};
@@ -38,7 +37,6 @@ public class PawnRuleMoves {
 
             if (isWithinLimits(diagonalPosition)) {
                 ChessPiece pieceDiagPos = board.getPiece(diagonalPosition);
-
                 if (pieceDiagPos != null && pieceDiagPos.getTeamColor() != piece.getTeamColor()) {
                     if (diagonalPosition.getRow() == promotionRow) {
                         addPromotionMoves(validMoves, position, diagonalPosition);

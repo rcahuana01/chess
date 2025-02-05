@@ -71,7 +71,7 @@ public class ChessPiece {
         switch(type){
             case KING:
                 KingRuleMoves kingMoves = new KingRuleMoves();
-                return kingMoves.KingRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return kingMoves.getKingMoves(myPosition, board.getPiece(myPosition), board);
             case KNIGHT:
                 KnightRuleMoves knightMoves = new KnightRuleMoves();
                 return knightMoves.KnightRuleMoves(myPosition, board.getPiece(myPosition), board);
@@ -82,11 +82,9 @@ public class ChessPiece {
                 RookRuleMoves rookMoves = new RookRuleMoves();
                 return rookMoves.RookRuleMoves(myPosition, board.getPiece(myPosition), board);
             case QUEEN:
-                QueenRuleMoves queenMoves = new QueenRuleMoves();
-                return queenMoves.QueenRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return new QueenRuleMoves().QueenRuleMoves(myPosition, board.getPiece(myPosition), board);
             case PAWN:
-                PawnRuleMoves pawnMoves = new PawnRuleMoves();
-                return pawnMoves.PawnRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return new PawnRuleMoves().getPawnMoves(myPosition, board.getPiece(myPosition), board);
             default:
         }
         return null;
