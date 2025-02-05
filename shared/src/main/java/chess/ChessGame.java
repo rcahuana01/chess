@@ -1,5 +1,6 @@
 package chess;
 
+import javax.swing.text.Position;
 import java.util.ArrayList;
 import java.util.Collection;
 
@@ -50,17 +51,17 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-//        Collection<ChessMove> validMoves = new ArrayList<>();
-//        ChessPiece piece = new ChessPiece(board.getPiece(startPosition).getTeamColor(),
-//                board.
-//                getPiece(startPosition).getPieceType());
-//        if (board.getPiece(startPosition)==null){
-//            return null;
-//        }
-//        if (piece.pieceMoves(board, startPosition) && isInStalemate(board.getPiece(startPosition))){
-//            return validMoves;
-//        }
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece piece = new ChessPiece(board.getPiece(startPosition).getTeamColor(),
+                board.
+                getPiece(startPosition).getPieceType());
+        if (board.getPiece(startPosition)==null){
+            return null;
+        }
+
+        if (piece.pieceMoves(board, startPosition) && isInStalemate(board.getPiece(startPosition))){
+            return validMoves;
+        }
 
     }
 
@@ -71,11 +72,13 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-        try {
-            if (makeMove();)
-        } catch (Exception e) {
-            throw new InvalidMoveException(e);
-        }
+//        try {
+//            if (makeMove();)
+//        } catch (Exception e) {
+//            throw new InvalidMoveException(e);
+//        }
+        throw new RuntimeException("Not implemented");
+
     }
 
     /**
@@ -85,9 +88,28 @@ public class ChessGame {
      * @return True if the specified team is in check
      */
     public boolean isInCheck(TeamColor teamColor) {
-//        if (teamColor.g)
-        throw new RuntimeException("Not implemented");
+        Collection<ChessMove> probableMoves = new ArrayList<>();
+        Collection<ChessMove> checkMoves = new ArrayList<>();
 
+        if (teamColor == TeamColor.BLACK) {
+            for (int i = 0; i < 9; i++) {
+                for (int j = 0; j < 9; j++) {
+                    ChessPosition position = new ChessPosition(i, j);
+                    ChessPiece piece = board.getPiece(position);
+                    if (piece == board.getPiece(position).getPieceType().equals(ChessPiece.PieceType.KING)){
+                        int [][]kingPos = position;
+                    }
+                    if (board.getPiece(position).equals(piece.getTeamColor())) {
+                        probableMoves = piece.pieceMoves(board, position);
+
+                        if (probableMoves == kingPos){
+                            return true;
+                        }
+                        return false;
+                    }
+                }
+            }
+        }
     }
 
     /**
