@@ -11,18 +11,24 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private TeamColor currentTurn;
+    private TeamColor color;
     private ChessBoard board;
+    public ChessPiece(ChessPiece other){
+        this.color = other.color;
+        this.board = other.board;
+    }
+
     public ChessGame() {
         this.board = new ChessBoard();
-        this.currentTurn = TeamColor.WHITE;
+        this.color = TeamColor.WHITE;
     }
+
 
     /**
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return currentTurn==TeamColor.BLACK ? TeamColor.BLACK : TeamColor.WHITE;
+        return color==TeamColor.BLACK ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
@@ -31,7 +37,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        currentTurn = team;
+        color = team;
 
     }
 
@@ -51,17 +57,18 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-        Collection<ChessMove> validMoves = new ArrayList<>();
-        ChessPiece piece = new ChessPiece(board.getPiece(startPosition).getTeamColor(),
-                board.
-                getPiece(startPosition).getPieceType());
-        if (board.getPiece(startPosition)==null){
-            return null;
-        }
-
-        if (piece.pieceMoves(board, startPosition) && isInStalemate(board.getPiece(startPosition))){
-            return validMoves;
-        }
+//        Collection<ChessMove> validMoves = new ArrayList<>();
+//        ChessPiece piece = new ChessPiece(board.getPiece(startPosition).getTeamColor(),
+//                board.
+//                getPiece(startPosition).getPieceType());
+//        if (board.getPiece(startPosition)==null){
+//            return null;
+//        }
+//
+//        if (piece.pieceMoves(board, startPosition) && isInStalemate(board.getPiece(startPosition))){
+//            return validMoves;
+//        }
+        throw new RuntimeException("Not implemented");
 
     }
 
@@ -91,18 +98,18 @@ public class ChessGame {
         Collection<ChessMove> probableMoves = new ArrayList<>();
         Collection<ChessMove> checkMoves = new ArrayList<>();
 
-        if (teamColor == TeamColor.BLACK) {
-            for (int i = 0; i < 9; i++) {
-                for (int j = 0; j < 9; j++) {
-                    ChessPosition position = new ChessPosition(i, j);
-                    ChessPiece piece = board.getPiece(position);
-                    if (piece == board.getPiece(position).getPieceType().equals(ChessPiece.PieceType.KING)){
-                        int [][]kingPos = position;
-                    }
-                    if (board.getPiece(position).equals(piece.getTeamColor())) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                if (teamColor == TeamColor.BLACK) {
+                    // Save that piece location and apply moves in that location
+                    ArrayList<ChessPiece> piece = new ArrayList<>();
+                    piece.add(board[i][j]);
+                    if (piece.getTeamColor() == teamColor) {
+                        ChessPosition position = new ChessPosition(i, j);
                         probableMoves = piece.pieceMoves(board, position);
+                        ChessPosition KingPosition = findKing(TeamColor.WHITE);
 
-                        if (probableMoves == kingPos){
+                        if (KingPosition == position) {
                             return true;
                         }
                         return false;
@@ -112,6 +119,22 @@ public class ChessGame {
         }
     }
 
+    public boardCopy(ChessBoard copyBoard) {
+        board = Arrays.copyOf(copyBoard.board, copyBoard.board.length);
+    }
+
+    private ChessPosition findKing(TeamColor teamColor) {
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                ChessPiece piece = board[i][j];
+                if (piece.getTeamColor() == teamColor && piece.getPieceType() == ChessPiece.PieceType.KING) {
+                    return new ChessPosition(i, j);
+                }
+
+            }
+        }
+        return null;
+    }
     /**
      * Determines if the given team is in checkmate
      *
