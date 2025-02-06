@@ -12,11 +12,28 @@ import java.util.Objects;
 public class ChessPiece {
     private ChessGame.TeamColor pieceColor;
     private PieceType type;
+    private ChessBoard board;
     public ChessPiece(ChessGame.TeamColor pieceColor, ChessPiece.PieceType type) {
         this.pieceColor = pieceColor;
         this.type = type;
+
     }
 
+    public void boardCopy(ChessBoard copyBoard) {
+        ChessBoard newBoard = new ChessBoard();
+        for (int i=0;i<9;i++){
+            for (int j=0;j<9;j++){
+                ChessPiece piece = this.board[i][j];
+                if (piece == null){
+                    newBoard.addPiece(i,j,null);
+                } else {
+                    newBoard.addPiece(i,j,null);
+
+                }
+            }
+        }
+        return newBoard;
+    }
     /**
      * The various different chess piece options
      */

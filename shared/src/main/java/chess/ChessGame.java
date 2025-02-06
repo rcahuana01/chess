@@ -11,16 +11,11 @@ import java.util.Collection;
  * signature of the existing methods.
  */
 public class ChessGame {
-    private TeamColor color;
+    private TeamColor currentTurn;
     private ChessBoard board;
-    public ChessPiece(ChessPiece other){
-        this.color = other.color;
-        this.board = other.board;
-    }
-
     public ChessGame() {
         this.board = new ChessBoard();
-        this.color = TeamColor.WHITE;
+        this.currentTurn = TeamColor.WHITE;
     }
 
 
@@ -28,7 +23,7 @@ public class ChessGame {
      * @return Which team's turn it is
      */
     public TeamColor getTeamTurn() {
-        return color==TeamColor.BLACK ? TeamColor.BLACK : TeamColor.WHITE;
+        return currentTurn==TeamColor.BLACK ? TeamColor.BLACK : TeamColor.WHITE;
     }
 
     /**
@@ -37,7 +32,7 @@ public class ChessGame {
      * @param team the team whose turn it is
      */
     public void setTeamTurn(TeamColor team) {
-        color = team;
+        currentTurn = team;
 
     }
 
