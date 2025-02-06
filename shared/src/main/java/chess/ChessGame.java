@@ -130,7 +130,32 @@ public class ChessGame {
      * @return True if the specified team is in checkmate
      */
     public boolean isInCheckmate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // Is the king in Check?
+        if (isInCheck(teamColor)){
+            return true;
+        }
+        // Can the King move safe?
+        Collection<ChessMove> legalMoves = piece.pieceMoves(board, position);
+
+        ChessPosition KingPosition = findKing(teamColor);
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                // Save that piece location and apply moves in that location
+                ChessPiece piece = board.getPiece(new ChessPosition(i,j));
+                if (piece.getTeamColor() != teamColor) {
+                    ChessPosition position = new ChessPosition(i, j);
+                    Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
+                    for (ChessMove move : possibleMoves){
+                        if (move.getEndPosition().equals(KingPosition)){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
+
+        // Can any piece block the attack?
+        // Can any piece capture the attacking piece?
     }
 
     /**
@@ -141,9 +166,49 @@ public class ChessGame {
      * @return True if the specified team is in stalemate, otherwise false
      */
     public boolean isInStalemate(TeamColor teamColor) {
-        throw new RuntimeException("Not implemented");
+        // The player is not in check but has no legal moves available
+        if (isInCheck(teamColor)){
+            return false;
+        }
+        // Check if the player has any legal moves
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
+                ChessPiece piece = board.getPiece(new ChessPosition(i,j));
+                if (piece.getTeamColor() != teamColor) {
+                    ChessPosition position = new ChessPosition(i, j);
+                    Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
+                    for (ChessMove move : possibleMoves){
+                        if (!possibleMoves.contains(move)){
+                            return true;
+                        }
+                    }
+                }
+            }
+        }
     }
 
+    boolean public isLegalMove(ChessMove move,ChessPosition startPosition){
+        if(startPosition == null){
+            return true;
+        }
+        ChessPiece piece = board.getPiece(startPosition);
+        if (currentTurn.equals(getTeamTurn())){
+            return true;
+        }
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(this.move.getStartPosition());
+        if (!possibleMoves.contains(move)){
+            return false;
+        }
+        ChessPiece endPiece = board.getPiece(move.getEndPosition());
+        if (endPiece != null && endPiece.getTeamColor()!=piece.getTeamColor()){
+            return false;
+        }
+        ChessBoard newBoard = new ChessBoard(board);
+        if (newBoard.isInCheck(teamColor)){
+            return false;
+        }
+        return true;
+    }
     /**
      * Sets this game's chessboard with a given board
      *
