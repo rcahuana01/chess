@@ -12,6 +12,19 @@ import java.util.Objects;
 public class ChessBoard {
     private ChessPiece[][] board = new ChessPiece[8][8];
     private ChessPiece piece;
+
+    public ChessBoard boardCopy() {
+        ChessBoard newBoard = new ChessBoard();
+        for (int i = 0; i < 9; i++) {
+            for (int j = 0; j < 9; j++) {
+                ChessPiece piece = this.board[i][j];
+                if (piece != null) {
+                    newBoard.board[i][j] = piece.copy();
+                }
+            }
+        }
+        return newBoard;
+    }
     public ChessBoard() {
     }
 
