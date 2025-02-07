@@ -52,19 +52,16 @@ public class ChessGame {
      * startPosition
      */
     public Collection<ChessMove> validMoves(ChessPosition startPosition) {
-//        Collection<ChessMove> validMoves = new ArrayList<>();
-//        ChessPiece piece = new ChessPiece(board.getPiece(startPosition).getTeamColor(),
-//                board.
-//                getPiece(startPosition).getPieceType());
-//        if (board.getPiece(startPosition)==null){
-//            return null;
-//        }
-//
-//        if (piece.pieceMoves(board, startPosition) && isInStalemate(board.getPiece(startPosition))){
-//            return validMoves;
-//        }
-        throw new RuntimeException("Not implemented");
-
+        Collection<ChessMove> validMoves = new ArrayList<>();
+        ChessPiece piece = board.getPiece(startPosition);
+        if (piece==null){
+            return validMoves;
+        }
+        Collection<ChessMove> moves = piece.pieceMoves(board, startPosition);
+        if (moves != null){
+            validMoves.addAll(moves);
+        }
+        return validMoves;
     }
 
     /**
@@ -74,13 +71,12 @@ public class ChessGame {
      * @throws InvalidMoveException if move is invalid
      */
     public void makeMove(ChessMove move) throws InvalidMoveException {
-//        try {
-//            if (makeMove();)
-//        } catch (Exception e) {
-//            throw new InvalidMoveException(e);
-//        }
-        throw new RuntimeException("Not implemented");
-
+        ChessPosition position = new ChessPosition()
+        try {
+            if (isLegalMove(move, ))
+        } catch (Exception e) {
+            throw new InvalidMoveException(e);
+        }
     }
 
     /**
@@ -135,24 +131,23 @@ public class ChessGame {
             return true;
         }
         // Can the King move safe?
-        Collection<ChessMove> legalMoves = piece.pieceMoves(board, position);
-
         ChessPosition KingPosition = findKing(teamColor);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
+                ChessPosition position = new ChessPosition(i,j);
                 ChessPiece piece = board.getPiece(new ChessPosition(i,j));
-                if (piece.getTeamColor() != teamColor) {
-                    ChessPosition position = new ChessPosition(i, j);
+                if (piece != null && piece.getTeamColor() != teamColor) {
                     Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
                     for (ChessMove move : possibleMoves){
-                        if (move.getEndPosition().equals(KingPosition)){
+                        ChessBoard newBoard = new ChessBoard(board);
+                        if (move.getEndPosition().equals(isInCheck(teamColor))){
                             return true;
                         }
                     }
                 }
             }
         }
-
+        return false;
         // Can any piece block the attack?
 
         // Can any piece capture the attacking piece?
@@ -186,11 +181,12 @@ public class ChessGame {
                     }
                 }
             }
-            return true;
         }
+        return true;
+
     }
 
-    boolean public isLegalMove(ChessMove move,ChessPosition startPosition){
+    public boolean isLegalMove(ChessMove move,ChessPosition startPosition){
         if(startPosition == null){
             return true;
         }
@@ -198,7 +194,7 @@ public class ChessGame {
         if (currentTurn.equals(getTeamTurn())){
             return true;
         }
-        Collection<ChessMove> possibleMoves = piece.pieceMoves(this.move.getStartPosition());
+        Collection<ChessMove> possibleMoves = piece.pieceMoves(board, startPosition);
         if (!possibleMoves.contains(move)){
             return false;
         }
@@ -207,7 +203,7 @@ public class ChessGame {
             return false;
         }
         ChessBoard newBoard = new ChessBoard(board);
-        if (newBoard.isInCheck(teamColor)){
+        if (newBoard.equals(isInCheck(piece.getTeamColor()))){
             return false;
         }
         return true;
