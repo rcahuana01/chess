@@ -15,8 +15,9 @@ public class ChessBoard {
 
     public ChessBoard boardCopy() {
         ChessBoard newBoard = new ChessBoard();
-        for (int i = 0; i < 9; i++) {
-            for (int j = 0; j < 9; j++) {
+        newBoard.board = new ChessPiece[8][8];
+        for (int i = 0; i < 8; i++) {
+            for (int j = 0; j < 8; j++) {
                 ChessPiece piece = this.board[i][j];
                 if (piece != null) {
                     newBoard.board[i][j] = piece.copy();
@@ -58,9 +59,9 @@ public class ChessBoard {
      * (How the game of chess normally starts)
      */
     public void resetBoard() {
-        for (int i=2; i<6;i++){
-            for (int j=0;j<8;j++){
-                board[i][j] = null;
+        for (int j=2; j<6;j++){
+            for (int k=0;k<8;k++){
+                board[j][k] = null;
             }
         }
 
