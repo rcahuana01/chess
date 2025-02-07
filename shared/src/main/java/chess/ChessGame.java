@@ -140,7 +140,6 @@ public class ChessGame {
         ChessPosition KingPosition = findKing(teamColor);
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
-                // Save that piece location and apply moves in that location
                 ChessPiece piece = board.getPiece(new ChessPosition(i,j));
                 if (piece.getTeamColor() != teamColor) {
                     ChessPosition position = new ChessPosition(i, j);
@@ -155,6 +154,7 @@ public class ChessGame {
         }
 
         // Can any piece block the attack?
+
         // Can any piece capture the attacking piece?
     }
 
@@ -174,16 +174,19 @@ public class ChessGame {
         for (int i = 0; i < 8; i++) {
             for (int j = 0; j < 8; j++) {
                 ChessPiece piece = board.getPiece(new ChessPosition(i,j));
-                if (piece.getTeamColor() != teamColor) {
+                if (piece != null && piece.getTeamColor() != teamColor) {
                     ChessPosition position = new ChessPosition(i, j);
                     Collection<ChessMove> possibleMoves = piece.pieceMoves(board, position);
                     for (ChessMove move : possibleMoves){
-                        if (!possibleMoves.contains(move)){
+                        ChessBoard newBoard = new ChessBoard(board);
+                        newBoard.addPiece(move);
+                        if (newBoard.equals(isInCheck(teamColor))){
                             return true;
                         }
                     }
                 }
             }
+            return true;
         }
     }
 
