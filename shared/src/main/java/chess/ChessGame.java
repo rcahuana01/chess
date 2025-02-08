@@ -74,16 +74,30 @@ public class ChessGame {
         try {
             ChessPosition position = move.getStartPosition();
             ChessPosition endPosition = move.getEndPosition();
-            if (!isLegalMove(move, position)){
+            ChessPiece piece = board.getPiece(position);
+            if (piece == null || piece.getTeamColor() != currentTurn){
                 throw new InvalidMoveException();
             }
 
-            ChessPiece piece = board.getPiece(position);
-            ChessBoard newBoard = board.boardCopy();
-            newBoard.addPiece(endPosition, piece);
-            newBoard.removePiece(position);
-            if (isInCheck(piece.getTeamColor())){
+            Collection<ChessMove> validMoves = validMoves(position);
+            if (!validMoves.contains(move)){
                 throw new InvalidMoveException();
+            }
+            ChessBoard newBoard = board.boardCopy();
+            newBoard.removePiece(position);
+            newBoard.addPiece(endPosition, piece);
+
+            ChessGame newGame = new ChessGame();
+            newGame.setBoard(newBoard);
+            if (newGame.isInCheck(currentTurn)){
+                throw new InvalidMoveException();
+            }
+            board.removePiece(position);
+            board.addPiece(endPosition, piece);
+
+            if (piece.getPieceType() == ChessPiece.PieceType.PAWN && (endPosition.getRow()==0 || endPosition.getRow()==7)){
+                piece = new ChessPiece(currentTurn, move.getPromotionPiece());
+                board.addPiece(endPosition,piece);
             }
             if (currentTurn==TeamColor.WHITE) {
                 currentTurn = TeamColor.BLACK;
