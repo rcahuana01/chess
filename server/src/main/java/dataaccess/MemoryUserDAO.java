@@ -1,19 +1,24 @@
 package dataaccess;
 
 import model.UserData;
+import org.eclipse.jetty.server.Authentication;
+
+import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO{
-    void createUser() throws DataAccessException {
+    final private HashMap<String, UserData> users = new HashMap<>();
+
+    public void createUser(UserData userData){
+        users.put(userData.username(), userData);
+    }
+    public UserData getUser(String username){
+
+        return users.get(username);
+    }
+    public void insertUser(String username){
 
     }
-
-    void getUser() throws  DataAccessException {
-
-    }
-    void insertUser(UserData u) throws  DataAccessException {
-
-    }
-    void clear(UserData u) {
-
+    public void clear(){
+        users.clear();
     }
 }
