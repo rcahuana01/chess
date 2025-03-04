@@ -3,6 +3,8 @@ package dataaccess;
 import model.GameData;
 import model.UserData;
 
+import java.util.List;
+
 public interface GameDAO {
     void clear();
     void createGame(int gameId);
@@ -12,4 +14,6 @@ public interface GameDAO {
     boolean canJoinGame(GameData gameData, int userId);
 
     void updateGamePlayers(int gameId, UserData user);
+    List<GameData> getAvailableGames();
+
 }

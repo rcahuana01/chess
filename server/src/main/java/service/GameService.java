@@ -7,6 +7,7 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 
+import java.util.List;
 import java.util.UUID;
 
 public class GameService {
@@ -20,9 +21,9 @@ public class GameService {
     }
 
     public GameData createGame(String gameName) throws DataAccessException {
-        if (!authDAO.isValidToken(authDAO.getAuthToken())){
-            throw new DataAccessException("Error: unauthorized");
-        }
+//        if (!authDAO.isValidToken(authDAO.getAuthToken())){
+//            throw new DataAccessException("Error: unauthorized");
+//        }
         if (gameName == null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -34,22 +35,38 @@ public class GameService {
     }
 
     public GameData joinGame(GameData gameData, int gameId) throws DataAccessException {
-        if (!authDAO.isValidToken(authDAO.getAuthToken())){
-            throw new DataAccessException("Error: unauthorized");
-        }
+//        if (!authDAO.isValidToken(authDAO.getAuthToken())){
+//            throw new DataAccessException("Error: unauthorized");
+//        }
         GameData checkGame = gameDAO.getGame(gameId);
         if (checkGame==null){
             throw new DataAccessException("Error: bad request");
         }
-        if (gameDAO.canJoinGame(gameData, gameData.gameID())){
-            gameDAO.updateGamePlayers(gameId, userDAO.getUser(gameData.blackUsername()));
+        if (checkGame.whiteUsername()!=null&&checkGame.blackUsername()!=null){
+            throw new DataAccessException("Error: already taken");
         }
-        gameDAO.updateGameList(gameData);
-        return gameData;
+        if (gameDAO.canJoinGame(gameData, gameId)){
+            if (checkGame.whiteUsername()==null) {
+                gameDAO.updateGamePlayers(gameId,userDAO.getUser(gameData.whiteUsername()));
+            } else {
+                gameDAO.updateGamePlayers(gameId,userDAO.getUser(gameData.blackUsername()));
+            }
+        }
+        gameDAO.updateGameList(checkGame);
+        return checkGame;
+    }
+
+
+    public List<GameData> listGames(String authToken) throws DataAccessException{
+//        if (!authDAO.isValidToken(authToken)) {
+//            throw new DataAccessException("Error: unauthorized");
+//        }
+        List<GameData> gameList = gameDAO.getAvailableGames();
+        if (gameList==null){
+            throw new DataAccessException("Error: bad request");
+        }
+        return gameList;
 
     }
 
-    public String getUsernameFromToken(String authHeader) {
-        return null;
-    }
 }

@@ -33,6 +33,7 @@ public class Server {
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
+        Spark.get("/game", this::listGames);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
         //This line initializes the server and can be removed once you have a functioning endpoint
@@ -41,6 +42,7 @@ public class Server {
         Spark.awaitInitialization();
         return Spark.port();
     }
+
     record exceptionMessage(String message){  }
     private void exceptionHandler(DataAccessException ex, Request req, Response res) {
         if (Objects.equals(ex.getMessage(), "Error: already taken")){
@@ -51,7 +53,7 @@ public class Server {
         } else if (Objects.equals(ex.getMessage(), "Error: unauthorized")){
             res.status(401);
 
-        }else {
+        } else {
             res.status(500);
         }
         res.body(new Gson().toJson(new exceptionMessage(ex.getMessage())));
@@ -90,7 +92,7 @@ public class Server {
     private Object joinGame(Request req, Response res) throws DataAccessException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), GameData.class);
-        String username = gameService.getUsernameFromToken(authHeader);
+        String username = req.queryParams("username");
         if (username==null){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -99,7 +101,13 @@ public class Server {
         return new Gson().toJson(updateGame);
     }
 
-    private Object clear(Request req, Response res) {
+    private Object listGames(Request req, Response res) throws DataAccessException{
+        var authHeader = req.headers("Authorization");
+        List<GameData> listGames = gameService.listGames(authHeader);
+        res.status(200);
+        return new Gson().toJson(listGames);
+    }
+    private Object clear(Request req, Response res) throws DataAccessException{
         userDAO.clear();
         gameDAO.clear();
         authDAO.clear();

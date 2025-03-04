@@ -3,7 +3,9 @@ package dataaccess;
 import model.GameData;
 import model.UserData;
 
+import java.util.ArrayList;
 import java.util.HashMap;
+import java.util.List;
 
 public class MemoryGameDAO implements  GameDAO{
     final private HashMap<Integer, GameData> games = new HashMap<>();
@@ -34,10 +36,17 @@ public class MemoryGameDAO implements  GameDAO{
     }
 
     public boolean canJoinGame(GameData gameData, int userId) {
-        if (gameData.game()!=null){
-            return true;
+        return gameData.whiteUsername() == null || gameData.blackUsername() == null;
+    }
+
+    public List<GameData> getAvailableGames(){
+        List<GameData> availableGames = new ArrayList<>();
+        for (GameData game : games.values()){
+            if (game.whiteUsername() == null || game.blackUsername() == null) {
+                availableGames.add(game);
+            }
         }
-        return false;
+        return availableGames;
     }
 
 }
