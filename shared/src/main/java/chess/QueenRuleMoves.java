@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class QueenRuleMoves {
-    public List<ChessMove> QueenRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
+    public List<ChessMove> queenRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         int[][] queenDirections = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}, {1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         List<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();

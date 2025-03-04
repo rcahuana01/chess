@@ -157,6 +157,10 @@ public class ChessGame {
      */
     public boolean isInCheckmate(TeamColor teamColor) {
         if (!isInCheck(teamColor)) return false;
+        return iterateBoard(teamColor);
+    }
+
+    private boolean iterateBoard(TeamColor teamColor) {
         for (int i = 1; i <= 8; i++) {
             for (int j = 1; j <= 8; j++) {
                 ChessPosition pos = new ChessPosition(i, j);
@@ -180,18 +184,7 @@ public class ChessGame {
      */
     public boolean isInStalemate(TeamColor teamColor) {
         if (isInCheck(teamColor)) return false;
-        for (int i = 1; i <= 8; i++) {
-            for (int j = 1; j <= 8; j++) {
-                ChessPosition pos = new ChessPosition(i, j);
-                ChessPiece piece = board.getPiece(pos);
-                if (piece != null && piece.getTeamColor() == teamColor) {
-                    if (!validMoves(pos).isEmpty()) {
-                        return false;
-                    }
-                }
-            }
-        }
-        return true;
+        return iterateBoard(teamColor);
     }
 
     private ChessPosition findKing(TeamColor teamColor, ChessBoard boardState) {

@@ -79,15 +79,15 @@ public class ChessPiece {
                 return kingMoves.getKingMoves(myPosition, board.getPiece(myPosition), board);
             case KNIGHT:
                 KnightRuleMoves knightMoves = new KnightRuleMoves();
-                return knightMoves.KnightRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return knightMoves.knightRuleMoves(myPosition, board.getPiece(myPosition), board);
             case BISHOP:
                 BishopRuleMoves bishopMoves = new BishopRuleMoves();
-                return bishopMoves.BishopRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return bishopMoves.bishopRuleMoves(myPosition, board.getPiece(myPosition), board);
             case ROOK:
                 RookRuleMoves rookMoves = new RookRuleMoves();
-                return rookMoves.RookRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return rookMoves.rookRuleMoves(myPosition, board.getPiece(myPosition), board);
             case QUEEN:
-                return new QueenRuleMoves().QueenRuleMoves(myPosition, board.getPiece(myPosition), board);
+                return new QueenRuleMoves().queenRuleMoves(myPosition, board.getPiece(myPosition), board);
             case PAWN:
                 return new PawnRuleMoves().getPawnMoves(myPosition, board.getPiece(myPosition), board);
             default:

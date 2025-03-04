@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class RookRuleMoves {
-    public List<ChessMove> RookRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
+    public List<ChessMove> rookRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         int[][] rookDirections = {{1, 0}, {0, 1}, {-1, 0}, {0, -1}};
         List<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();

@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class BishopRuleMoves {
-    public List<ChessMove> BishopRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
+    public List<ChessMove> bishopRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         int[][] bishopDirections = {{1, 1}, {1, -1}, {-1, 1}, {-1, -1}};
         List<ChessMove> validMoves = new ArrayList<>();
         int curRow = position.getRow();

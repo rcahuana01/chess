@@ -4,7 +4,7 @@ import java.util.ArrayList;
 import java.util.List;
 
 public class KnightRuleMoves {
-    public List<ChessMove> KnightRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
+    public List<ChessMove> knightRuleMoves(ChessPosition position, ChessPiece piece, ChessBoard board) {
         int[][] knightDirections = {{2, 1}, {2, -1}, {-2, 1}, {-2, -1}, {1, 2}, {1, -2}, {-1, 2}, {-1, -2}};
 
         List<ChessMove> validMoves = new ArrayList<>();

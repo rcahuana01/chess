@@ -43,7 +43,7 @@ public class Server {
         return Spark.port();
     }
 
-    record exceptionMessage(String message){  }
+    record ExceptionMessage(String message){  }
     private void exceptionHandler(DataAccessException ex, Request req, Response res) {
         if (Objects.equals(ex.getMessage(), "Error: already taken")){
             res.status(403);
@@ -56,7 +56,7 @@ public class Server {
         } else {
             res.status(500);
         }
-        res.body(new Gson().toJson(new exceptionMessage(ex.getMessage())));
+        res.body(new Gson().toJson(new ExceptionMessage(ex.getMessage())));
     }
 
     private Object register(Request req, Response res) throws DataAccessException {
