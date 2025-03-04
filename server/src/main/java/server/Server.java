@@ -3,6 +3,7 @@ import com.google.gson.Gson;
 
 import dataaccess.*;
 import model.AuthData;
+import model.GameData;
 import model.UserData;
 import spark.*;
 import java.util.*;
@@ -13,7 +14,7 @@ public class Server {
     UserDAO userDAO = new MemoryUserDAO();
     GameDAO gameDAO = new MemoryGameDAO();
     private final UserService userService = new UserService(userDAO, authDAO);
-//    GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
+    GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
     private ArrayList<String> names = new ArrayList<>();
 
 
@@ -28,10 +29,11 @@ public class Server {
 
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
-
+        Spark.delete("/session", this::logout);
+        Spark.post("/game", this::createGame);
+        Spark.put("/game", this::joinGame);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
-//        Spark.post("/session", this::listNames);
-//        Spark.delete("/name/:name", this::deleteName);
+
         Spark.delete("/db", this::clear);
         //This line initializes the server and can be removed once you have a functioning endpoint 
         Spark.init();
@@ -71,9 +73,26 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
-    private Object listNames(Request req, Response res) {
-        res.type("application/json");
-        return new Gson().toJson(Map.of("name", names));
+    private Object logout(Request req, Response res) throws DataAccessException {
+        var authHeader = req.headers("Authorization");
+        AuthData auth = userService.logout(authHeader);
+        res.status(200);
+        return new Gson().toJson(auth);
+    }
+
+    private Object createGame(Request req, Response res) throws DataAccessException {
+        var authHeader = req.headers("Authorization");
+        GameData auth = gameService.createGame(authHeader);
+        res.status(200);
+        return new Gson().toJson(auth);
+    }
+
+    private Object joinGame(Request req, Response res) throws DataAccessException {
+        var authHeader = req.headers("Authorization");
+        var game = new Gson().fromJson(req.body(), UserData.class);
+        GameData auth = gameService.joinGame(game, authHeader);
+        res.status(200);
+        return new Gson().toJson(auth);
     }
 
     private Object clear(Request req, Response res) {

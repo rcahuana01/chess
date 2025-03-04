@@ -11,10 +11,16 @@ public class MemoryAuthDAO implements AuthDAO{
     public void createAuth(AuthData authData){
         auths.put(authData.authToken(), authData);
     }
-    void getAuth(){
-
+    public void deleteAuth(String authToken){
+        auths.remove(authToken);
     }
     public void clear(){
         auths.clear();
+    }
+    public boolean isValidToken(String authToken) {
+        return auths.containsKey(authToken);
+    }
+    public String getAuthToken(){
+        return auths.keySet().iterator().next();
     }
 }

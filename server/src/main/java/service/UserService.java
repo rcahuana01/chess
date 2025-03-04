@@ -3,7 +3,6 @@ package service;
 import dataaccess.*;
 import model.AuthData;
 import model.UserData;
-import org.eclipse.jetty.client.api.Request;
 
 import java.util.Objects;
 import java.util.UUID;
@@ -18,12 +17,11 @@ public class UserService {
     }
 
 
-
     public AuthData register(UserData user) throws DataAccessException {
-        if (user.username()==null || user.password()==null||user.email()==null){
+        if (user.username() == null || user.password() == null || user.email() == null) {
             throw new DataAccessException("Error: bad request");
         }
-        if (userDAO.getUser(user.username())==null){
+        if (userDAO.getUser(user.username()) == null) {
             userDAO.createUser(user);
             AuthData authData = new AuthData(UUID.randomUUID().toString(), user.username());
             authDAO.createAuth(authData);
@@ -36,14 +34,14 @@ public class UserService {
     }
 
     public AuthData login(UserData user) throws DataAccessException {
-        if (user.username()==null || user.password()==null){
+        if (user.username() == null || user.password() == null) {
             throw new DataAccessException("Error: bad request");
         }
         UserData checkUser = userDAO.getUser(user.username());
-        if (checkUser==null){
-            throw new DataAccessException("Error: bad request");
+        if (checkUser == null) {
+            throw new DataAccessException("Error: unauthorized");
         }
-        if (Objects.equals(checkUser.username(), user.username())&& Objects.equals(checkUser.password(), user.password())){
+        if (Objects.equals(checkUser.username(), user.username()) && Objects.equals(checkUser.password(), user.password())) {
             AuthData authData = new AuthData(UUID.randomUUID().toString(), user.username());
             authDAO.createAuth(authData);
 
@@ -54,7 +52,12 @@ public class UserService {
 
     }
 
-    public void logout(String authToken){
-
+    public AuthData logout(String authToken) throws DataAccessException {
+        if (authDAO.isValidToken(authToken)) {
+            throw new DataAccessException("Error: unauthorized");
+        }
+        authDAO.deleteAuth(authToken);
+        return null;
     }
+
 }
