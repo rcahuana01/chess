@@ -8,8 +8,8 @@ public interface GameDAO {
     void createGame(int gameId);
     GameData getGame(int gameId);
 
-    void updateGamePlayers(int gameId, UserData user);
-
-    void updateGameList();
+    void updateGameList(GameData gameData);
     boolean canJoinGame(GameData gameData, int userId);
+
+    void updateGamePlayers(int gameId, UserData user);
 }

@@ -22,14 +22,21 @@ public class MemoryGameDAO implements  GameDAO{
     }
 
     public void updateGamePlayers(int gameId, UserData user) {
-
+        games.put(gameId, new GameData(gameId, user.username(), null, null, null));
     }
 
-    public void updateGameList() {
+
+    public void updateGameList(GameData gameData) {
+        if (gameData != null){
+            games.put(gameData.gameID(), gameData);
+        }
 
     }
 
     public boolean canJoinGame(GameData gameData, int userId) {
+        if (gameData.game()!=null){
+            return true;
+        }
         return false;
     }
 

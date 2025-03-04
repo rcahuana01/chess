@@ -29,13 +29,13 @@ public class Server {
 
         Spark.post("/user", this::register);
         Spark.post("/session", this::login);
+        Spark.delete("/db", this::clear);
         Spark.delete("/session", this::logout);
         Spark.post("/game", this::createGame);
         Spark.put("/game", this::joinGame);
         Spark.exception(DataAccessException.class, this::exceptionHandler);
 
-        Spark.delete("/db", this::clear);
-        //This line initializes the server and can be removed once you have a functioning endpoint 
+        //This line initializes the server and can be removed once you have a functioning endpoint
         Spark.init();
 
         Spark.awaitInitialization();
@@ -89,10 +89,14 @@ public class Server {
 
     private Object joinGame(Request req, Response res) throws DataAccessException {
         var authHeader = req.headers("Authorization");
-        var game = new Gson().fromJson(req.body(), UserData.class);
-        GameData auth = gameService.joinGame(game, authHeader);
+        var game = new Gson().fromJson(req.body(), GameData.class);
+        String username = gameService.getUsernameFromToken(authHeader);
+        if (username==null){
+            throw new DataAccessException("Error: unauthorized");
+        }
+        GameData updateGame = gameService.joinGame(game, game.gameID());
         res.status(200);
-        return new Gson().toJson(auth);
+        return new Gson().toJson(updateGame);
     }
 
     private Object clear(Request req, Response res) {

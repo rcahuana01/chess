@@ -44,8 +44,12 @@ public class GameService {
         if (gameDAO.canJoinGame(gameData, gameData.gameID())){
             gameDAO.updateGamePlayers(gameId, userDAO.getUser(gameData.blackUsername()));
         }
-        gameDAO.updateGameList();
+        gameDAO.updateGameList(gameData);
         return gameData;
 
+    }
+
+    public String getUsernameFromToken(String authHeader) {
+        return null;
     }
 }
