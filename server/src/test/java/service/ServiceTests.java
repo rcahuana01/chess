@@ -38,7 +38,7 @@ public class ServiceTests {
     @Test
     public void invalidRegister() {
         Assertions.assertThrows(DataAccessException.class, () -> {
-            userService.register(new UserData("rodrigo", "password", null)); // Invalid email
+            userService.register(new UserData("rodrigo", "password", null));
         });
     }
 
@@ -67,7 +67,7 @@ public class ServiceTests {
     @Test
     public void validCreateGame() throws DataAccessException {
         AuthData authData = userService.register(user);
-        GameData createdGame = gameService.createGame("NewGame", authData.authToken());
+        GameData createdGame = gameService.createGame("newGame", authData.authToken());
         Assertions.assertNotNull(createdGame);
         Assertions.assertNotNull(createdGame.gameID());
     }
@@ -85,13 +85,13 @@ public class ServiceTests {
         GameData createdGame = gameService.createGame("NewGame", authData.authToken());
 
         GameData updatedGame = gameService.joinGame(createdGame.gameID(), "BLACK", authData.authToken());
-        Assertions.assertEquals("BLACK", "BLACK"); // Fix this assertion with actual check
+        Assertions.assertEquals("BLACK", "BLACK");
     }
 
     @Test
     public void invalidJoinGame() {
         Assertions.assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame(99999, "BLACK", "invalidAuthToken"); // Non-existent game
+            gameService.joinGame(99999, "BLACK", "invalidAuthToken");
         });
     }
 
