@@ -60,8 +60,8 @@ public class ServiceTests {
 //    @Test
 //    public void validCreateGame() throws DataAccessException {
 //        AuthData authData = UserService.register(user);
-//        Integer gameId = gameService.createGame(authData.authToken(), )
-//        Assertions.assertNotNull(gameId);
+//        Integer gameID = gameService.createGame(authData.authToken(), )
+//        Assertions.assertNotNull(gameID);
 //    }
 
 //    @Test

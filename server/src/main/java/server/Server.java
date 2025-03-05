@@ -94,7 +94,7 @@ public class Server {
     private Object joinGame(Request req, Response res) throws DataAccessException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), JoinRequest.class);
-        GameData auth = gameService.joinGame(game.gameId(), game.playerColor(), authHeader);
+        GameData auth = gameService.joinGame(game.gameID(), game.playerColor(), authHeader);
         res.status(200);
         return new Gson().toJson(auth);
     }

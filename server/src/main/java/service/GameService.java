@@ -39,7 +39,8 @@ public class GameService {
     }
 
     public GameData joinGame(int gameId, String playerColor, String authToken) throws DataAccessException {
-        if (!authDAO.getAuthToken(authToken)){
+        AuthData auth = authDAO.getAuthToken1(authToken);
+        if (auth== null){
             throw new DataAccessException("Error: unauthorized");
         }
 
@@ -49,16 +50,20 @@ public class GameService {
         }
 
         if (playerColor.equals("WHITE") && checkGame.whiteUsername() != null) {
-            throw new DataAccessException("Error: WHITE color already taken");
+            throw new DataAccessException("Error: already taken");
         } else if (playerColor.equals("BLACK") && checkGame.blackUsername() != null) {
-            throw new DataAccessException("Error: BLACK color already taken");
+            throw new DataAccessException("Error: already taken");
         }
 
-//        if (playerColor.equals("WHITE")) {
-//            checkGame = new GameData(gameId, JoinReques.username(), checkGame.blackUsername(), checkGame.gameName(), checkGame.game());
-//        } else if (playerColor.equals("BLACK")) {
-//            checkGame = new GameData(gameId, checkGame.whiteUsername(), .username(), checkGame.gameName(), checkGame.game());
-//        }
+        if (playerColor.equals("WHITE")) {
+            checkGame = new GameData(gameId, auth.username(), checkGame.blackUsername(), checkGame.gameName(), checkGame.game());
+        } else if (playerColor.equals("BLACK")) {
+            checkGame = new GameData(gameId, checkGame.whiteUsername(), auth.username(), checkGame.gameName(), checkGame.game());
+        }else {
+            throw new DataAccessException("Error: bad request");
+        }
+        gameDAO.updateGameList(checkGame);
+
 
 
         return checkGame;

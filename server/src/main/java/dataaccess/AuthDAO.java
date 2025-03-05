@@ -9,4 +9,5 @@ public interface AuthDAO {
 
     void deleteAuth(String authToken);
     boolean getAuthToken(String authToken);
+    AuthData getAuthToken1(String authToken);
     }
