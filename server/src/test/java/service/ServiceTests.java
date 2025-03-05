@@ -65,6 +65,13 @@ public class ServiceTests {
     }
 
     @Test
+    public void invalidLogout() throws DataAccessException {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            userService.logout("invalidAuthToken");
+        });
+    }
+
+    @Test
     public void validCreateGame() throws DataAccessException {
         AuthData authData = userService.register(user);
         GameData createdGame = gameService.createGame("newGame", authData.authToken());
@@ -106,9 +113,20 @@ public class ServiceTests {
     }
 
     @Test
-    public void invalidListGames() {
+    public void invalidListGames() throws DataAccessException{
         Assertions.assertThrows(DataAccessException.class, () -> {
             gameService.listGames("invalidAuthToken");
         });
     }
+
+    @Test
+    public void clear() throws DataAccessException {
+        AuthData authData = userService.register(user);
+        gameService.createGame("Game1", authData.authToken());
+        gameService.createGame("Game2", authData.authToken());
+        gameService.clear();
+        Assertions.assertThrows(DataAccessException.class, () -> userService.login(user));
+        Assertions.assertThrows(DataAccessException.class, () -> gameService.listGames(authData.authToken()));
+    }
+
 }
