@@ -4,6 +4,7 @@ import com.google.gson.Gson;
 import dataaccess.*;
 import model.AuthData;
 import model.GameData;
+import model.JoinRequest;
 import model.UserData;
 import spark.*;
 import java.util.*;
@@ -92,15 +93,15 @@ public class Server {
 
     private Object joinGame(Request req, Response res) throws DataAccessException {
         var authHeader = req.headers("Authorization");
-        var game = new Gson().fromJson(req.body(), GameData.class);
-        GameData auth = gameService.joinGame(game, authHeader);
+        var game = new Gson().fromJson(req.body(), JoinRequest.class);
+        GameData auth = gameService.joinGame(game.gameId(), game.playerColor(), authHeader);
         res.status(200);
         return new Gson().toJson(auth);
     }
 
     private Object listGames(Request req, Response res) throws DataAccessException{
         var authHeader = req.headers("Authorization");
-        List<GameData> listGames = gameService.listGames(authHeader);
+        Collection<GameData> listGames = gameService.listGames(authHeader);
         res.status(200);
         return new Gson().toJson(Map.of("games", listGames));
     }

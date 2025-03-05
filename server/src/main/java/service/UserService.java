@@ -8,8 +8,8 @@ import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
-    public UserDAO userDAO;
-    public AuthDAO authDAO;
+    public static UserDAO userDAO;
+    public static AuthDAO authDAO;
 
     public UserService(UserDAO userDAO, AuthDAO authDAO) {
         this.userDAO = userDAO;
@@ -17,7 +17,7 @@ public class UserService {
     }
 
 
-    public AuthData register(UserData user) throws DataAccessException {
+    public static AuthData register(UserData user) throws DataAccessException {
         if (user.username() == null || user.password() == null || user.email() == null) {
             throw new DataAccessException("Error: bad request");
         }
