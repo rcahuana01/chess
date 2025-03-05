@@ -11,9 +11,8 @@ public interface GameDAO {
     GameData getGame(int gameId);
 
     void updateGameList(GameData gameData);
-    boolean canJoinGame(GameData gameData, int userId);
 
-    void updateGamePlayers(int gameId, UserData user);
     List<GameData> getAvailableGames();
 
+    void updateGamePlayers(int i, UserData whitePlayer, boolean b);
 }

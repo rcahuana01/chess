@@ -8,6 +8,5 @@ public interface AuthDAO {
     void clear();
 
     void deleteAuth(String authToken);
-    boolean isValidToken(String authToken);
-    String getAuthToken();
+    boolean getAuthToken(String authToken);
     }

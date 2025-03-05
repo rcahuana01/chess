@@ -19,25 +19,32 @@ public class MemoryGameDAO implements  GameDAO{
     }
 
     public GameData getGame(int gameId){
-        games.get(gameId);
-        return null;
+        return games.get(gameId);
     }
-
-    public void updateGamePlayers(int gameId, UserData user) {
-        games.put(gameId, new GameData(gameId, user.username(), null, null, null));
-    }
-
 
     public void updateGameList(GameData gameData) {
-        if (gameData != null){
-            games.put(gameData.gameID(), gameData);
+        games.put(gameData.gameID(), gameData);
+
+    }
+
+    public void updateGamePlayers(int gameId, UserData user, boolean isWhite) {
+        GameData game = games.get(gameId);  // Get the game using its ID
+
+        // Create a new updated game based on the current game and assign the player
+        GameData updatedGame;
+
+        if (isWhite) {
+            // If the player is white, update the white username field
+            updatedGame = new GameData(gameId, user.username(), game.blackUsername(), game.gameName(), game.game());
+        } else {
+            // If the player is black, update the black username field
+            updatedGame = new GameData(gameId, game.whiteUsername(), user.username(), game.gameName(), game.game());
         }
 
+        // Put the updated game back into the games map
+        games.put(gameId, updatedGame);
     }
 
-    public boolean canJoinGame(GameData gameData, int userId) {
-        return gameData.whiteUsername() == null || gameData.blackUsername() == null;
-    }
 
     public List<GameData> getAvailableGames(){
         List<GameData> availableGames = new ArrayList<>();

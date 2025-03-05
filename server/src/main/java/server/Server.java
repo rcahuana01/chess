@@ -84,7 +84,8 @@ public class Server {
 
     private Object createGame(Request req, Response res) throws DataAccessException {
         var authHeader = req.headers("Authorization");
-        GameData auth = gameService.createGame(authHeader);
+        var game = new Gson().fromJson(req.body(), GameData.class);
+        GameData auth = gameService.createGame(game.gameName(), authHeader);
         res.status(200);
         return new Gson().toJson(auth);
     }
@@ -92,20 +93,16 @@ public class Server {
     private Object joinGame(Request req, Response res) throws DataAccessException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), GameData.class);
-        String username = req.queryParams("username");
-        if (username==null){
-            throw new DataAccessException("Error: unauthorized");
-        }
-        GameData updateGame = gameService.joinGame(game, game.gameID());
+        GameData auth = gameService.joinGame(game, authHeader);
         res.status(200);
-        return new Gson().toJson(updateGame);
+        return new Gson().toJson(auth);
     }
 
     private Object listGames(Request req, Response res) throws DataAccessException{
         var authHeader = req.headers("Authorization");
         List<GameData> listGames = gameService.listGames(authHeader);
         res.status(200);
-        return new Gson().toJson(listGames);
+        return new Gson().toJson(Map.of("games", listGames));
     }
     private Object clear(Request req, Response res) throws DataAccessException{
         userDAO.clear();
