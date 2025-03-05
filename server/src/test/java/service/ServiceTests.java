@@ -16,21 +16,11 @@ public class ServiceTests {
     private static AuthDAO authDAO;
     private static GameDAO gameDAO;
 
-    private static final UserData user = new UserData("rodrigo", "password", "rcahuana@byu.edu");
-    private static final GameData game = new GameData(1, null, null, "gameName", new ChessGame());
-
-    @BeforeAll
-    public static void setUp() {
-        userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();
-        gameDAO = new MemoryGameDAO();
-        userService = new UserService(userDAO, authDAO);
-        gameService = new GameService(userDAO, authDAO, gameDAO);
-    }
+    private static UserData user = new UserData("rodrigo", "password", "rcahuana@byu.edu");
+    private static GameData game = new GameData(1, null, null, "gameName", new ChessGame());
 
     @BeforeEach
     public void init() {
-        // Reset DAOs before each test to ensure clean state
         userDAO = new MemoryUserDAO();
         authDAO = new MemoryAuthDAO();
         gameDAO = new MemoryGameDAO();
