@@ -9,6 +9,7 @@ import org.junit.jupiter.api.*;
 
 import java.sql.SQLException;
 import java.util.Collection;
+import java.util.List;
 
 public class DataAccessTests {
     private static UserDAO userDAO;
@@ -63,7 +64,7 @@ public class DataAccessTests {
     @Test
     public void invalidGetGame() throws DataAccessException, SQLException {
         Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.getGame(-1);  // Invalid game ID
+            gameDAO.getGame(-1);
         });
     }
 
@@ -120,14 +121,27 @@ public class DataAccessTests {
 
     @Test
     public void validGetAvailableGames() throws DataAccessException, SQLException {
+        gameDAO.createGame(game);
+        gameDAO.createGame(game2);
+        Collection<GameData> availableGames = gameDAO.getAvailableGames();
+        Assertions.assertNotNull(availableGames);
+        Assertions.assertFalse(availableGames.isEmpty());
     }
 
     @Test
     public void invalidGetAvailableGames() throws DataAccessException, SQLException {
+        gameDAO.clear();
+        Collection<GameData> availableGames = gameDAO.getAvailableGames();
+        Assertions.assertNotNull(availableGames);
+        Assertions.assertTrue(availableGames.isEmpty());
     }
 
     @Test
     public void validClearGame() throws DataAccessException, SQLException {
+        gameDAO.createGame(game);
+        gameDAO.clear();
+        GameData clearedGame = gameDAO.getGame(game.gameID());
+        Assertions.assertNull(clearedGame);
     }
 
     @Test
