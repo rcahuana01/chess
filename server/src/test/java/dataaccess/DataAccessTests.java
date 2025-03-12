@@ -11,8 +11,6 @@ import java.sql.SQLException;
 import java.util.Collection;
 
 public class DataAccessTests {
-    private static UserService userService;
-    private static GameService gameService;
     private static UserDAO userDAO;
     private static AuthDAO authDAO;
     private static GameDAO gameDAO;
@@ -20,114 +18,89 @@ public class DataAccessTests {
     private static UserData user = new UserData("rodrigo", "password", "rcahuana@byu.edu");
     private static GameData game = new GameData(1, null, null, "gameName", new ChessGame());
 
-    @BeforeEach
-    public void init() {
-        userDAO = new MemoryUserDAO();
-        authDAO = new MemoryAuthDAO();
-        gameDAO = new MemoryGameDAO();
-        userService = new UserService(userDAO, authDAO);
-        gameService = new GameService(userDAO, authDAO, gameDAO);
+    @BeforeAll
+    public static void init() {
+        try {
+            userDAO = new SQLUserDAO();
+            gameDAO = new SQLGameDAO();
+            authDAO = new SQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
     }
 
-    @Test
-    public void validRegister() throws DataAccessException, SQLException {
-        AuthData authData = userService.register(user);
-        Assertions.assertNotNull(authData);
-        Assertions.assertEquals(user.username(), authData.username());
-    }
-
-    @Test
-    public void invalidRegister() {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            userService.register(new UserData("rodrigo", "password", null));
-        });
-    }
-
-    @Test
-    public void validLogin() throws DataAccessException, SQLException {
-        userService.register(user);
-        AuthData authData = userService.login(user);
-        Assertions.assertNotNull(authData);
-        Assertions.assertEquals(user.username(), authData.username());
-    }
-
-    @Test
-    public void invalidLogin() {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            userService.login(new UserData("wrongUser", "password", "null"));
-        });
-    }
-
-    @Test
-    public void validLogout() throws DataAccessException, SQLException {
-        AuthData authData = userService.register(user);
-        userService.logout(authData.authToken());
-        Assertions.assertThrows(DataAccessException.class, () -> userService.logout(authData.authToken()));
-    }
-
-    @Test
-    public void invalidLogout() throws DataAccessException {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            userService.logout("invalidAuthToken");
-        });
+    @AfterEach
+    public void tearDown() throws SQLException, DataAccessException {
+        userDAO.clear();
+        gameDAO.clear();
+        authDAO.clear();
     }
 
     @Test
     public void validCreateGame() throws DataAccessException, SQLException {
-        AuthData authData = userService.register(user);
-        GameData createdGame = gameService.createGame("newGame", authData.authToken());
+        GameData createdGame = gameDAO.createGame(game);
         Assertions.assertNotNull(createdGame);
         Assertions.assertNotNull(createdGame.gameID());
     }
 
     @Test
-    public void invalidCreateGame() {
+    public void invalidCreateGame() throws DataAccessException, SQLException {
         Assertions.assertThrows(DataAccessException.class, () -> {
             gameService.createGame(null, "invalidAuthToken");
         });
     }
 
     @Test
-    public void validJoinGame() throws DataAccessException, SQLException {
-        AuthData authData = userService.register(user);
-        GameData createdGame = gameService.createGame("NewGame", authData.authToken());
-
-        GameData updatedGame = gameService.joinGame(createdGame.gameID(), "BLACK", authData.authToken());
-        Assertions.assertEquals("BLACK", "BLACK");
+    public void validGetGame() throws DataAccessException, SQLException {
     }
 
     @Test
-    public void invalidJoinGame() {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            gameService.joinGame(99999, "BLACK", "invalidAuthToken");
-        });
+    public void invalidGetGame() throws DataAccessException, SQLException {
+    }
+
+
+
+    @Test
+    public void validUpdateGameList() throws DataAccessException, SQLException {
     }
 
     @Test
-    public void validListGames() throws DataAccessException, SQLException {
-        AuthData authData = userService.register(user);
-        gameService.createGame("Game1", authData.authToken());
-        gameService.createGame("Game2", authData.authToken());
-
-        Collection<GameData> games = gameService.listGames(authData.authToken());
-        Assertions.assertEquals(2, games.size());
+    public void invalidUpdateGameList() throws DataAccessException, SQLException {
     }
 
     @Test
-    public void invalidListGames() throws DataAccessException{
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            gameService.listGames("invalidAuthToken");
-        });
+    public void validGetAvailableGames() throws DataAccessException, SQLException {
     }
 
     @Test
-    public void clear() throws DataAccessException, SQLException {
-        AuthData authData = userService.register(user);
-        gameService.createGame("Game1", authData.authToken());
-        gameService.createGame("Game2", authData.authToken());
-        gameService.clear();
-        Assertions.assertThrows(DataAccessException.class, () -> userService.login(user));
-        Assertions.assertThrows(DataAccessException.class, () -> gameService.listGames(authData.authToken()));
+    public void invalidGetAvailableGames() throws DataAccessException, SQLException {
     }
+
+    @Test
+    public void validClearGame() throws DataAccessException, SQLException {
+    }
+
+    @Test
+    public void validCreateUser() throws DataAccessException, SQLException {
+    }
+
+    @Test
+    public void invalidCreateUser() throws DataAccessException, SQLException {
+    }
+
+    @Test
+    public void validGetUser() throws DataAccessException, SQLException {
+    }
+
+    @Test
+    public void invalidGetUser() throws DataAccessException, SQLException {
+    }
+
+    @Test
+    public void validClearUser() throws DataAccessException, SQLException {
+    }
+
+
+
 
 }

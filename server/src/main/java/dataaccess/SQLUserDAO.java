@@ -1,10 +1,6 @@
 package dataaccess;
 
-import chess.ChessGame;
-import com.google.gson.Gson;
-import model.GameData;
 import model.UserData;
-import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.ResultSet;
 import java.sql.SQLException;
@@ -16,32 +12,6 @@ public class SQLUserDAO implements UserDAO{
     public SQLUserDAO() throws  DataAccessException {
         configureDatabase();
     }
-
-
-
-    public void writeHashedPasswordToDatabase (String username, String hashedPassword) throws SQLException, DataAccessException {
-        var statement = "UPDATE newUser SET password = ? WHERE username = ?";
-        executeUpdate(statement, hashedPassword, username);
-    }
-
-    public String readHashedPasswordFromDatabase(String username) throws DataAccessException {
-        try (var conn = DatabaseManager.getConnection()){
-            var statement = "SELECT password FROM newUser WHERE username=?";
-            try (var ps = conn.prepareStatement(statement)) {
-                ps.setString(1, username);
-                try (var rs = ps.executeQuery()){
-                    if (rs.next()){
-                        return rs.getString("password");
-                    }
-                }
-            }
-        } catch (Exception e) {
-            throw new DataAccessException("Unable to read data");
-        }
-        return null;
-    }
-
-
 
     public void createUser(UserData userData) throws SQLException, DataAccessException {
         var statement = "INSERT INTO newUser (username, password, email) VALUES (?, ?, ?)";

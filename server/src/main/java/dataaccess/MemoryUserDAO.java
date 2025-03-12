@@ -21,13 +21,4 @@ public class MemoryUserDAO implements UserDAO{
         users.clear();
     }
 
-    @Override
-    public String readHashedPasswordFromDatabase(String username) throws DataAccessException {
-        return "";
-    }
-
-    @Override
-    public void writeHashedPasswordToDatabase(String username, String hashedPassword) throws SQLException, DataAccessException {
-
-    }
 }

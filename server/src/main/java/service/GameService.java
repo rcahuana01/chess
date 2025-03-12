@@ -26,7 +26,7 @@ public class GameService {
     }
 
     public GameData createGame(String gameName, String authToken) throws DataAccessException, SQLException {
-        if (!authDAO.getAuthToken(authToken)){
+        if (authDAO.getAuthToken1(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
         if (gameName == null) {
@@ -72,7 +72,7 @@ public class GameService {
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException, SQLException {
-        if (!authDAO.getAuthToken(authToken)||authToken==null) {
+        if (authDAO.getAuthToken1(authToken)==null||authToken==null) {
                 throw new DataAccessException("Error: unauthorized");
         }
         return gameDAO.getAvailableGames();
