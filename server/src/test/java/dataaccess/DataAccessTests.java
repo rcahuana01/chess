@@ -19,7 +19,7 @@ public class DataAccessTests {
     private static UserData user = new UserData("rodrigo", "password", "rcahuana@byu.edu");
     private static GameData game = new GameData(1, null, null, "gameName", new ChessGame());
     private static GameData game2 = new GameData(2, null, null, "gameName2", new ChessGame());
-
+    private static AuthData auth = new AuthData("token", "rodrigo");
     @BeforeAll
     public static void init() {
         try {
@@ -182,7 +182,49 @@ public class DataAccessTests {
         Assertions.assertNull(clearedUser);
     }
 
+    @Test
+    public void validCreateAuth() throws SQLException, DataAccessException {
+        authDAO.createAuth(auth);
+        AuthData retrievedAuth = authDAO.getAuthToken("rodrigo");
+        Assertions.assertNotNull(retrievedAuth);
+        Assertions.assertEquals(auth.username(), retrievedAuth.username());
+    }
 
+    @Test
+    public void invalidCreateAuth(){
+        AuthData invalidAuth = new AuthData("invalidUser", "invalidToken");
+        Assertions.assertThrows(DataAccessException.class, () -> authDAO.createAuth(invalidAuth));
+    }
 
+    @Test
+    public void validDeleteAuth() throws SQLException, DataAccessException {
+        authDAO.createAuth(auth);
+        authDAO.deleteAuth(auth.authToken());
+        AuthData deletedAuth = authDAO.getAuthToken(auth.username());
+        Assertions.assertNull(deletedAuth);
+    }
 
+    @Test
+    public void invalidDeleteAuth(){
+        Assertions.assertThrows(DataAccessException.class, ()-> authDAO.deleteAuth("none"));
+    }
+
+    @Test
+    public void validGetAuthToken() throws DataAccessException {
+        AuthData retrievedAuth = authDAO.getAuthToken("authToken");
+        Assertions.assertEquals(auth.username(), retrievedAuth.username());
+    }
+
+    @Test
+    public void invalidGetAuthToken(){
+        Assertions.assertThrows(DataAccessException.class, ()->authDAO.getAuthToken("empty"));
+    }
+
+    @Test
+    public void validClearAuth() throws SQLException, DataAccessException {
+        authDAO.createAuth(auth);
+        authDAO.clear();
+        AuthData clearedAuth = authDAO.getAuthToken(auth.username());
+        Assertions.assertNull(clearedAuth);
+    }
 }
