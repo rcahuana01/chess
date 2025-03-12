@@ -3,6 +3,7 @@ package dataaccess;
 import model.UserData;
 import org.eclipse.jetty.server.Authentication;
 
+import java.sql.SQLException;
 import java.util.HashMap;
 
 public class MemoryUserDAO implements UserDAO{
@@ -18,5 +19,15 @@ public class MemoryUserDAO implements UserDAO{
 
     public void clear(){
         users.clear();
+    }
+
+    @Override
+    public String readHashedPasswordFromDatabase(String username) throws DataAccessException {
+        return "";
+    }
+
+    @Override
+    public void writeHashedPasswordToDatabase(String username, String hashedPassword) throws SQLException, DataAccessException {
+
     }
 }

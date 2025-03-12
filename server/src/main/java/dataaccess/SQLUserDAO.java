@@ -17,32 +17,33 @@ public class SQLUserDAO implements UserDAO{
         configureDatabase();
     }
 
-    void storeUserPassword(String username, String clearTextPassword) throws SQLException, DataAccessException {
-        String hashedPassword = BCrypt.hashpw(clearTextPassword, BCrypt.gensalt());
 
-        // write the hashed password in database along with the user's other information
-        writeHashedPasswordToDatabase(username, hashedPassword);
-    }
 
     public void writeHashedPasswordToDatabase (String username, String hashedPassword) throws SQLException, DataAccessException {
         var statement = "UPDATE newUser SET password = ? WHERE username = ?";
         executeUpdate(statement, hashedPassword, username);
     }
 
-    public String readHashedPasswordFromDatabase(String username) {
-        var statement = "SELECT password FROM newUser WHERE username=?";
-        return statement;
+    public String readHashedPasswordFromDatabase(String username) throws DataAccessException {
+        try (var conn = DatabaseManager.getConnection()){
+            var statement = "SELECT password FROM newUser WHERE username=?";
+            try (var ps = conn.prepareStatement(statement)) {
+                ps.setString(1, username);
+                try (var rs = ps.executeQuery()){
+                    if (rs.next()){
+                        return rs.getString("password");
+                    }
+                }
+            }
+        } catch (Exception e) {
+            throw new DataAccessException("Unable to read data");
+        }
+        return null;
     }
 
-    boolean verifyUser(String username, String providedClearTextPassword) {
-        // read the previously hashed password from the database
-        var hashedPassword = readHashedPasswordFromDatabase(username);
 
-        return BCrypt.checkpw(providedClearTextPassword, hashedPassword);
-    }
 
     public void createUser(UserData userData) throws SQLException, DataAccessException {
-
         var statement = "INSERT INTO newUser (username, password, email) VALUES (?, ?, ?)";
         executeUpdate(statement, userData.username(), userData.password(), userData.email());
     }
