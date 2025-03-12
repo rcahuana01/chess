@@ -146,22 +146,40 @@ public class DataAccessTests {
 
     @Test
     public void validCreateUser() throws DataAccessException, SQLException {
+        userDAO.createUser(user);
+        UserData retrievedUser = userDAO.getUser(user.username());
+        Assertions.assertNotNull(retrievedUser);
+        Assertions.assertEquals("rodrigo", retrievedUser.username());
     }
 
     @Test
     public void invalidCreateUser() throws DataAccessException, SQLException {
+        userDAO.createUser(user);
+        Assertions.assertThrows(DataAccessException.class, ()-> userDAO.createUser(user));
     }
 
     @Test
     public void validGetUser() throws DataAccessException, SQLException {
+        userDAO.createUser(user);
+        UserData retrievedUser = userDAO.getUser(user.username());
+        Assertions.assertNotNull(retrievedUser);
+        Assertions.assertEquals("rodrigo", retrievedUser.username());
     }
 
     @Test
     public void invalidGetUser() throws DataAccessException, SQLException {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            userDAO.getUser("cosmo");
+        });
+
     }
 
     @Test
     public void validClearUser() throws DataAccessException, SQLException {
+        userDAO.createUser(user);
+        userDAO.clear();
+        UserData clearedUser = userDAO.getUser(user.username());
+        Assertions.assertNull(clearedUser);
     }
 
 
