@@ -17,6 +17,7 @@ public class DataAccessTests {
 
     private static UserData user = new UserData("rodrigo", "password", "rcahuana@byu.edu");
     private static GameData game = new GameData(1, null, null, "gameName", new ChessGame());
+    private static GameData game2 = new GameData(2, null, null, "gameName2", new ChessGame());
 
     @BeforeAll
     public static void init() {
@@ -38,34 +39,83 @@ public class DataAccessTests {
 
     @Test
     public void validCreateGame() throws DataAccessException, SQLException {
-        GameData createdGame = gameDAO.createGame(game);
-        Assertions.assertNotNull(createdGame);
-        Assertions.assertNotNull(createdGame.gameID());
+        gameDAO.createGame(game);
+        GameData retrievedGame = gameDAO.getGame(game.gameID());
+        Assertions.assertNotNull(retrievedGame);
+        Assertions.assertEquals(1, retrievedGame.gameID());
+        Assertions.assertEquals("gameName", retrievedGame.gameName());
     }
 
     @Test
     public void invalidCreateGame() throws DataAccessException, SQLException {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            gameService.createGame(null, "invalidAuthToken");
-        });
+        gameDAO.createGame(game);
+        Assertions.assertThrows(DataAccessException.class, ()-> gameDAO.createGame(game));
     }
 
     @Test
     public void validGetGame() throws DataAccessException, SQLException {
+        gameDAO.createGame(game);
+        GameData retrievedGame = gameDAO.getGame(game.gameID());
+        Assertions.assertNotNull(retrievedGame);
+        Assertions.assertEquals(1, game.gameID());
     }
 
     @Test
     public void invalidGetGame() throws DataAccessException, SQLException {
+        Assertions.assertThrows(DataAccessException.class, () -> {
+            gameDAO.getGame(-1);  // Invalid game ID
+        });
     }
-
 
 
     @Test
     public void validUpdateGameList() throws DataAccessException, SQLException {
+        gameDAO.createGame(game);
+        gameDAO.createGame(game2);
+        gameDAO.updateGameList(game2);
+
+        int count = 0;
+        try (var conn = DatabaseManager.getConnection()) {
+            String query = "SELECT COUNT(*) FROM games";
+            try (var preparedStatement = conn.prepareStatement(query)) {
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()) {
+                    count = rs.getInt(1);
+                }
+            }
+        }
+        Assertions.assertEquals(2, count);
     }
+
 
     @Test
     public void invalidUpdateGameList() throws DataAccessException, SQLException {
+        gameDAO.createGame(game);
+        int initialCount = 0;
+
+        try (var conn = DatabaseManager.getConnection()){
+            String query = "SELECT COUNT(*) FROM games";
+            try (var preparedStatement = conn.prepareStatement(query)){
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()){
+                    initialCount = rs.getInt(1);
+                }
+            }
+        }
+        GameData invalidGame = new GameData(999, null, null, null, null);
+        gameDAO.updateGameList(invalidGame);
+        int finalCount = 0;
+        try (var conn = DatabaseManager.getConnection()){
+            String query = "SELECT COUNT(*) FROM games";
+            try (var preparedStatement = conn.prepareStatement(query)){
+                var rs = preparedStatement.executeQuery();
+                if (rs.next()){
+                    finalCount = rs.getInt(1);
+                }
+            }
+        }
+        Assertions.assertEquals(initialCount, finalCount);
+
     }
 
     @Test
