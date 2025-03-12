@@ -71,7 +71,7 @@ public class GameService {
         return checkGame;
     }
 
-    public Collection<GameData> listGames(String authToken) throws DataAccessException{
+    public Collection<GameData> listGames(String authToken) throws DataAccessException, SQLException {
         if (!authDAO.getAuthToken(authToken)||authToken==null) {
                 throw new DataAccessException("Error: unauthorized");
         }

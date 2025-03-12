@@ -30,7 +30,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void validRegister() throws DataAccessException {
+    public void validRegister() throws DataAccessException, SQLException {
         AuthData authData = userService.register(user);
         Assertions.assertNotNull(authData);
         Assertions.assertEquals(user.username(), authData.username());
@@ -44,7 +44,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void validLogin() throws DataAccessException {
+    public void validLogin() throws DataAccessException, SQLException {
         userService.register(user);
         AuthData authData = userService.login(user);
         Assertions.assertNotNull(authData);
@@ -59,7 +59,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void validLogout() throws DataAccessException {
+    public void validLogout() throws DataAccessException, SQLException {
         AuthData authData = userService.register(user);
         userService.logout(authData.authToken());
         Assertions.assertThrows(DataAccessException.class, () -> userService.logout(authData.authToken()));

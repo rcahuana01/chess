@@ -13,8 +13,26 @@ import java.util.*;
 import service.*;
 
 public class Server {
-    AuthDAO authDAO = new MemoryAuthDAO();
-    UserDAO userDAO = new MemoryUserDAO();
+    AuthDAO authDAO;
+
+    {
+        try {
+            authDAO = new SQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    UserDAO userDAO;
+
+    {
+        try {
+            userDAO = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     GameDAO gameDAO;
 
     {
@@ -71,7 +89,7 @@ public class Server {
         res.body(new Gson().toJson(new ExceptionMessage(ex.getMessage())));
     }
 
-    private Object register(Request req, Response res) throws DataAccessException {
+    private Object register(Request req, Response res) throws DataAccessException, SQLException {
         var user = new Gson().fromJson(req.body(), UserData.class);
 
         AuthData auth = userService.register(user);
@@ -79,7 +97,7 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
-    private Object login(Request req, Response res) throws DataAccessException {
+    private Object login(Request req, Response res) throws DataAccessException, SQLException {
         var user = new Gson().fromJson(req.body(), UserData.class);
 
         AuthData auth = userService.login(user);
@@ -87,7 +105,7 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
-    private Object logout(Request req, Response res) throws DataAccessException {
+    private Object logout(Request req, Response res) throws DataAccessException, SQLException {
         var authHeader = req.headers("Authorization");
         AuthData auth = userService.logout(authHeader);
         res.status(200);
@@ -110,7 +128,7 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
-    private Object listGames(Request req, Response res) throws DataAccessException{
+    private Object listGames(Request req, Response res) throws DataAccessException, SQLException {
         var authHeader = req.headers("Authorization");
         Collection<GameData> listGames = gameService.listGames(authHeader);
         res.status(200);

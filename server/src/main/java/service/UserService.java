@@ -4,6 +4,7 @@ import dataaccess.*;
 import model.AuthData;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.Objects;
 import java.util.UUID;
 
@@ -17,7 +18,7 @@ public class UserService {
     }
 
 
-    public static AuthData register(UserData user) throws DataAccessException {
+    public static AuthData register(UserData user) throws DataAccessException, SQLException {
         if (user.username() == null || user.password() == null || user.email() == null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -33,7 +34,7 @@ public class UserService {
 
     }
 
-    public AuthData login(UserData user) throws DataAccessException {
+    public AuthData login(UserData user) throws DataAccessException, SQLException {
         if (user.username() == null || user.password() == null) {
             throw new DataAccessException("Error: bad request");
         }
@@ -41,7 +42,7 @@ public class UserService {
         if (checkUser == null) {
             throw new DataAccessException("Error: unauthorized");
         }
-        if (Objects.equals(checkUser.username(), user.username()) && Objects.equals(checkUser.password(), user.password())) {
+        if (Objects.equals(checkUser.username(), user.username()) && verifyUser()) {
             AuthData authData = new AuthData(UUID.randomUUID().toString(), user.username());
             authDAO.createAuth(authData);
 
@@ -52,7 +53,7 @@ public class UserService {
 
     }
 
-    public AuthData logout(String authToken) throws DataAccessException {
+    public AuthData logout(String authToken) throws DataAccessException, SQLException {
         if (!authDAO.getAuthToken(authToken)) {
             throw new DataAccessException("Error: unauthorized");
         }
