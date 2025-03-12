@@ -7,6 +7,7 @@ import model.GameData;
 import model.UserData;
 import org.junit.jupiter.api.*;
 
+import java.sql.SQLException;
 import java.util.Collection;
 
 public class ServiceTests {
@@ -72,7 +73,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void validCreateGame() throws DataAccessException {
+    public void validCreateGame() throws DataAccessException, SQLException {
         AuthData authData = userService.register(user);
         GameData createdGame = gameService.createGame("newGame", authData.authToken());
         Assertions.assertNotNull(createdGame);
@@ -87,7 +88,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void validJoinGame() throws DataAccessException {
+    public void validJoinGame() throws DataAccessException, SQLException {
         AuthData authData = userService.register(user);
         GameData createdGame = gameService.createGame("NewGame", authData.authToken());
 
@@ -103,7 +104,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void validListGames() throws DataAccessException {
+    public void validListGames() throws DataAccessException, SQLException {
         AuthData authData = userService.register(user);
         gameService.createGame("Game1", authData.authToken());
         gameService.createGame("Game2", authData.authToken());
@@ -120,7 +121,7 @@ public class ServiceTests {
     }
 
     @Test
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, SQLException {
         AuthData authData = userService.register(user);
         gameService.createGame("Game1", authData.authToken());
         gameService.createGame("Game2", authData.authToken());

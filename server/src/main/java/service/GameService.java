@@ -1,5 +1,6 @@
 package service;
 
+import chess.ChessGame;
 import dataaccess.AuthDAO;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
@@ -9,6 +10,7 @@ import model.GameData;
 import model.JoinRequest;
 import model.UserData;
 
+import java.sql.SQLException;
 import java.util.*;
 
 public class GameService {
@@ -23,7 +25,7 @@ public class GameService {
         this.joinRequest = new JoinRequest(0, "WHITE");
     }
 
-    public GameData createGame(String gameName, String authToken) throws DataAccessException {
+    public GameData createGame(String gameName, String authToken) throws DataAccessException, SQLException {
         if (!authDAO.getAuthToken(authToken)){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -32,13 +34,13 @@ public class GameService {
         }
         int gameId = new Random().nextInt(1000000);
 
-        GameData gameData = new GameData(gameId, null, null, gameName, null);
+        GameData gameData = new GameData(gameId, null, null, gameName, new ChessGame());
         gameDAO.createGame(gameData);
         return gameData;
 
     }
 
-    public GameData joinGame(int gameId, String playerColor, String authToken) throws DataAccessException {
+    public GameData joinGame(int gameId, String playerColor, String authToken) throws DataAccessException, SQLException {
         AuthData auth = authDAO.getAuthToken1(authToken);
         if (auth== null){
             throw new DataAccessException("Error: unauthorized");
@@ -77,7 +79,7 @@ public class GameService {
 
     }
 
-    public void clear() throws DataAccessException {
+    public void clear() throws DataAccessException, SQLException {
         userDAO.clear();
         gameDAO.clear();
         authDAO.clear();

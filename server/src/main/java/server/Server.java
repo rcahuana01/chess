@@ -7,13 +7,24 @@ import model.GameData;
 import model.JoinRequest;
 import model.UserData;
 import spark.*;
+
+import java.sql.SQLException;
 import java.util.*;
 import service.*;
 
 public class Server {
     AuthDAO authDAO = new MemoryAuthDAO();
     UserDAO userDAO = new MemoryUserDAO();
-    GameDAO gameDAO = new MemoryGameDAO();
+    GameDAO gameDAO;
+
+    {
+        try {
+            gameDAO = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
     private final UserService userService = new UserService(userDAO, authDAO);
     GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
     private ArrayList<String> names = new ArrayList<>();
@@ -83,7 +94,7 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
-    private Object createGame(Request req, Response res) throws DataAccessException {
+    private Object createGame(Request req, Response res) throws DataAccessException, SQLException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), GameData.class);
         GameData auth = gameService.createGame(game.gameName(), authHeader);
@@ -91,7 +102,7 @@ public class Server {
         return new Gson().toJson(auth);
     }
 
-    private Object joinGame(Request req, Response res) throws DataAccessException {
+    private Object joinGame(Request req, Response res) throws DataAccessException, SQLException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), JoinRequest.class);
         GameData auth = gameService.joinGame(game.gameID(), game.playerColor(), authHeader);
@@ -105,7 +116,7 @@ public class Server {
         res.status(200);
         return new Gson().toJson(Map.of("games", listGames));
     }
-    private Object clear(Request req, Response res) throws DataAccessException{
+    private Object clear(Request req, Response res) throws DataAccessException, SQLException {
         userDAO.clear();
         gameDAO.clear();
         authDAO.clear();
