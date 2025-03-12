@@ -6,7 +6,6 @@ import model.UserData;
 import org.mindrot.jbcrypt.BCrypt;
 
 import java.sql.SQLException;
-import java.util.Objects;
 import java.util.UUID;
 
 public class UserService {
@@ -63,7 +62,7 @@ public class UserService {
     }
 
     public AuthData logout(String authToken) throws DataAccessException, SQLException {
-        if (authDAO.getAuthToken1(authToken)==null) {
+        if (authDAO.getAuthToken(authToken)==null) {
             throw new DataAccessException("Error: unauthorized");
         }
         authDAO.deleteAuth(authToken);

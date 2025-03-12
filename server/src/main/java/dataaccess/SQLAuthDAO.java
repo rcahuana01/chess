@@ -31,7 +31,7 @@ public class SQLAuthDAO implements AuthDAO{
         executeUpdate(statement, authToken);
     }
 
-    public AuthData getAuthToken1(String authToken) throws DataAccessException {
+    public AuthData getAuthToken(String authToken) throws DataAccessException {
         try (var conn = DatabaseManager.getConnection()){
             var statement = "SELECT * FROM newAuth WHERE authToken=?";
             try (var ps = conn.prepareStatement(statement)) {

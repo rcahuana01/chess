@@ -8,7 +8,6 @@ import dataaccess.UserDAO;
 import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
-import model.UserData;
 
 import java.sql.SQLException;
 import java.util.*;
@@ -26,7 +25,7 @@ public class GameService {
     }
 
     public GameData createGame(String gameName, String authToken) throws DataAccessException, SQLException {
-        if (authDAO.getAuthToken1(authToken) == null){
+        if (authDAO.getAuthToken(authToken) == null){
             throw new DataAccessException("Error: unauthorized");
         }
         if (gameName == null) {
@@ -41,7 +40,7 @@ public class GameService {
     }
 
     public GameData joinGame(int gameId, String playerColor, String authToken) throws DataAccessException, SQLException {
-        AuthData auth = authDAO.getAuthToken1(authToken);
+        AuthData auth = authDAO.getAuthToken(authToken);
         if (auth== null){
             throw new DataAccessException("Error: unauthorized");
         }
@@ -72,7 +71,7 @@ public class GameService {
     }
 
     public Collection<GameData> listGames(String authToken) throws DataAccessException, SQLException {
-        if (authDAO.getAuthToken1(authToken)==null||authToken==null) {
+        if (authDAO.getAuthToken(authToken)==null||authToken==null) {
                 throw new DataAccessException("Error: unauthorized");
         }
         return gameDAO.getAvailableGames();
