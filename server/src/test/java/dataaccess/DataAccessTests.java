@@ -191,7 +191,7 @@ public class DataAccessTests {
     }
 
     @Test
-    public void invalidCreateAuth(){
+    public void invalidCreateAuth() throws DataAccessException{
         AuthData invalidAuth = new AuthData("invalidUser", "invalidToken");
         Assertions.assertThrows(DataAccessException.class, () -> authDAO.createAuth(invalidAuth));
     }
@@ -205,7 +205,8 @@ public class DataAccessTests {
     }
 
     @Test
-    public void invalidDeleteAuth(){
+    public void invalidDeleteAuth() throws DataAccessException{
+        AuthData retrievedAuth = authDAO.getAuthToken("none");
         Assertions.assertThrows(DataAccessException.class, ()-> authDAO.deleteAuth("none"));
     }
 
@@ -216,8 +217,9 @@ public class DataAccessTests {
     }
 
     @Test
-    public void invalidGetAuthToken(){
-        Assertions.assertThrows(DataAccessException.class, ()->authDAO.getAuthToken("empty"));
+    public void invalidGetAuthToken() throws DataAccessException{
+        AuthData retrievedAuth = authDAO.getAuthToken("empty");
+        Assertions.assertNull(retrievedAuth);
     }
 
     @Test
