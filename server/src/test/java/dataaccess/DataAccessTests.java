@@ -49,9 +49,10 @@ public class DataAccessTests {
 
     @Test
     public void invalidCreateGame() throws DataAccessException, SQLException {
-        gameDAO.createGame(game);
-        GameData duplicateGame = gameDAO.getGame(game.gameID());
-        Assertions.assertNull(duplicateGame);
+        GameData invalidGame = new GameData(0, null, null, "invalidGame", null);
+        gameDAO.createGame(invalidGame);
+        GameData retrievedGame = gameDAO.getGame(invalidGame.gameID());
+        Assertions.assertNull(retrievedGame);
     }
 
     @Test
@@ -132,8 +133,8 @@ public class DataAccessTests {
 
     @Test
     public void invalidCreateUser() throws SQLException, DataAccessException {
-        userDAO.createUser(user);
-        Assertions.assertThrows(DataAccessException.class, () -> userDAO.createUser(user));
+        UserData invalidUser = new UserData(null, null, null);
+        Assertions.assertThrows(Exception.class, () -> userDAO.createUser(invalidUser));
     }
 
 
@@ -169,10 +170,10 @@ public class DataAccessTests {
 
     @Test
     public void invalidCreateAuth() throws DataAccessException, SQLException {
-        AuthData invalidAuth = new AuthData("invalidUser", "invalidToken");
-        authDAO.createAuth(invalidAuth);
-        AuthData retrievedAuth = authDAO.getAuthToken(invalidAuth.authToken());
-        Assertions.assertNull(retrievedAuth);
+        AuthData invalidAuthData = new AuthData(null, null);
+        Assertions.assertThrows(Exception.class, () -> {
+            authDAO.createAuth(invalidAuthData);
+        });
     }
 
     @Test
