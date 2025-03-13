@@ -56,7 +56,6 @@ public class UserService {
     }
 
     boolean verifyUser(String username, String providedClearTextPassword) throws DataAccessException, SQLException {
-        // read the previously hashed password from the database
         var hashedPassword = userDAO.getUser(username).password();
         return BCrypt.checkpw(providedClearTextPassword, hashedPassword);
     }
