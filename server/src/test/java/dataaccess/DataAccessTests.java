@@ -142,7 +142,6 @@ public class DataAccessTests {
     public void validGetUser() throws DataAccessException, SQLException {
         userDAO.createUser(user);
         UserData retrievedUser = userDAO.getUser(user.username());
-        Assertions.assertNotNull(retrievedUser);
         Assertions.assertEquals("rodrigo", retrievedUser.username());
     }
 
@@ -194,7 +193,6 @@ public class DataAccessTests {
     public void validGetAuthToken() throws DataAccessException, SQLException {
         authDAO.createAuth(auth);
         AuthData retrievedAuth = authDAO.getAuthToken(auth.authToken());
-        Assertions.assertNotNull(retrievedAuth);
         Assertions.assertEquals(auth.username(), retrievedAuth.username());
     }
 
