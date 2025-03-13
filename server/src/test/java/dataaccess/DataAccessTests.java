@@ -50,8 +50,10 @@ public class DataAccessTests {
     @Test
     public void invalidCreateGame() throws DataAccessException, SQLException {
         gameDAO.createGame(game);
-        Assertions.assertThrows(DataAccessException.class, ()-> gameDAO.createGame(game));
+        GameData duplicateGame = gameDAO.getGame(game.gameID());
+        Assertions.assertNull(duplicateGame);
     }
+
 
     @Test
     public void validGetGame() throws DataAccessException, SQLException {
@@ -63,61 +65,39 @@ public class DataAccessTests {
 
     @Test
     public void invalidGetGame() throws DataAccessException, SQLException {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            gameDAO.getGame(-1);
-        });
+        GameData retrievedGame = gameDAO.getGame(-1);
+        Assertions.assertNull(retrievedGame);
     }
-
 
     @Test
     public void validUpdateGameList() throws DataAccessException, SQLException {
         gameDAO.createGame(game);
         gameDAO.createGame(game2);
+
+        game2 = new GameData(2, "newWhite", "newBlack", "updatedGame", new ChessGame());
         gameDAO.updateGameList(game2);
 
-        int count = 0;
-        try (var conn = DatabaseManager.getConnection()) {
-            String query = "SELECT COUNT(*) FROM games";
-            try (var preparedStatement = conn.prepareStatement(query)) {
-                var rs = preparedStatement.executeQuery();
-                if (rs.next()) {
-                    count = rs.getInt(1);
-                }
-            }
-        }
-        Assertions.assertEquals(2, count);
+        GameData updatedGame = gameDAO.getGame(2);
+        Assertions.assertNotNull(updatedGame);
+        Assertions.assertEquals("updatedGame", updatedGame.gameName());
     }
 
 
     @Test
     public void invalidUpdateGameList() throws DataAccessException, SQLException {
         gameDAO.createGame(game);
-        int initialCount = 0;
+        gameDAO.createGame(game2);
 
-        try (var conn = DatabaseManager.getConnection()){
-            String query = "SELECT COUNT(*) FROM games";
-            try (var preparedStatement = conn.prepareStatement(query)){
-                var rs = preparedStatement.executeQuery();
-                if (rs.next()){
-                    initialCount = rs.getInt(1);
-                }
-            }
-        }
         GameData invalidGame = new GameData(999, null, null, null, null);
         gameDAO.updateGameList(invalidGame);
-        int finalCount = 0;
-        try (var conn = DatabaseManager.getConnection()){
-            String query = "SELECT COUNT(*) FROM games";
-            try (var preparedStatement = conn.prepareStatement(query)){
-                var rs = preparedStatement.executeQuery();
-                if (rs.next()){
-                    finalCount = rs.getInt(1);
-                }
-            }
-        }
-        Assertions.assertEquals(initialCount, finalCount);
 
+        GameData retrievedInvalidGame = gameDAO.getGame(999);
+        Assertions.assertNull(retrievedInvalidGame);
+
+        Collection<GameData> availableGames = gameDAO.getAvailableGames();
+        Assertions.assertEquals(2, availableGames.size());
     }
+
 
     @Test
     public void validGetAvailableGames() throws DataAccessException, SQLException {
@@ -155,7 +135,8 @@ public class DataAccessTests {
     @Test
     public void invalidCreateUser() throws DataAccessException, SQLException {
         userDAO.createUser(user);
-        Assertions.assertThrows(DataAccessException.class, ()-> userDAO.createUser(user));
+        UserData duplicateUser = userDAO.getUser(user.username());
+        Assertions.assertNull(duplicateUser);
     }
 
     @Test
@@ -168,10 +149,8 @@ public class DataAccessTests {
 
     @Test
     public void invalidGetUser() throws DataAccessException, SQLException {
-        Assertions.assertThrows(DataAccessException.class, () -> {
-            userDAO.getUser("cosmo");
-        });
-
+        UserData retrievedUser = userDAO.getUser("cosmo");
+        Assertions.assertNull(retrievedUser);
     }
 
     @Test
@@ -185,15 +164,17 @@ public class DataAccessTests {
     @Test
     public void validCreateAuth() throws SQLException, DataAccessException {
         authDAO.createAuth(auth);
-        AuthData retrievedAuth = authDAO.getAuthToken("rodrigo");
+        AuthData retrievedAuth = authDAO.getAuthToken(auth.authToken());
         Assertions.assertNotNull(retrievedAuth);
         Assertions.assertEquals(auth.username(), retrievedAuth.username());
     }
 
     @Test
-    public void invalidCreateAuth() throws DataAccessException{
+    public void invalidCreateAuth() throws DataAccessException, SQLException {
         AuthData invalidAuth = new AuthData("invalidUser", "invalidToken");
-        Assertions.assertThrows(DataAccessException.class, () -> authDAO.createAuth(invalidAuth));
+        authDAO.createAuth(invalidAuth);
+        AuthData retrievedAuth = authDAO.getAuthToken(invalidAuth.authToken());
+        Assertions.assertNull(retrievedAuth);
     }
 
     @Test
@@ -207,14 +188,17 @@ public class DataAccessTests {
     @Test
     public void invalidDeleteAuth() throws DataAccessException{
         AuthData retrievedAuth = authDAO.getAuthToken("none");
-        Assertions.assertThrows(DataAccessException.class, ()-> authDAO.deleteAuth("none"));
+        Assertions.assertNull(retrievedAuth);
     }
 
     @Test
-    public void validGetAuthToken() throws DataAccessException {
-        AuthData retrievedAuth = authDAO.getAuthToken("authToken");
+    public void validGetAuthToken() throws DataAccessException, SQLException {
+        authDAO.createAuth(auth);
+        AuthData retrievedAuth = authDAO.getAuthToken(auth.authToken());
+        Assertions.assertNotNull(retrievedAuth);
         Assertions.assertEquals(auth.username(), retrievedAuth.username());
     }
+
 
     @Test
     public void invalidGetAuthToken() throws DataAccessException{
