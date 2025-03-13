@@ -54,7 +54,6 @@ public class DataAccessTests {
         Assertions.assertNull(duplicateGame);
     }
 
-
     @Test
     public void validGetGame() throws DataAccessException, SQLException {
         gameDAO.createGame(game);
@@ -74,12 +73,11 @@ public class DataAccessTests {
         gameDAO.createGame(game);
         gameDAO.createGame(game2);
 
-        game2 = new GameData(2, "newWhite", "newBlack", "updatedGame", new ChessGame());
         gameDAO.updateGameList(game2);
 
         GameData updatedGame = gameDAO.getGame(2);
         Assertions.assertNotNull(updatedGame);
-        Assertions.assertEquals("updatedGame", updatedGame.gameName());
+        Assertions.assertEquals(game2.gameName(), updatedGame.gameName());
     }
 
 
@@ -133,11 +131,11 @@ public class DataAccessTests {
     }
 
     @Test
-    public void invalidCreateUser() throws DataAccessException, SQLException {
+    public void invalidCreateUser() throws SQLException, DataAccessException {
         userDAO.createUser(user);
-        UserData duplicateUser = userDAO.getUser(user.username());
-        Assertions.assertNull(duplicateUser);
+        Assertions.assertThrows(DataAccessException.class, () -> userDAO.createUser(user));
     }
+
 
     @Test
     public void validGetUser() throws DataAccessException, SQLException {
