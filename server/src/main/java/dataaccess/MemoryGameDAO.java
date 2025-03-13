@@ -1,13 +1,9 @@
 package dataaccess;
 
 import model.GameData;
-import model.JoinRequest;
-import model.UserData;
 
-import java.util.ArrayList;
 import java.util.Collection;
 import java.util.HashMap;
-import java.util.List;
 
 public class MemoryGameDAO implements  GameDAO{
     final private HashMap<Integer, GameData> games = new HashMap<>();
