@@ -1,41 +1,52 @@
 package ui;
 
 import com.sun.nio.sctp.NotificationHandler;
-import exception.ResponseException;
+import dataaccess.DataAccessException;
+import model.UserData;
+
 import java.util.Arrays;
 
+import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
+
 public class ChessClient {
-    private String visitorName = null;
+    private final String visitorName = null;
     private final ServerFacade server;
-    private String serverUrl;
-    private final NotificationHandler notificationHandler;
-    private State state = State.SIGNEDOUT;
-    public ChessClient(String serverUrl, NotificationHandler notificationHandler){
+    private final String serverUrl;
+    private final State state = State.SIGNEDOUT;
+    public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
-        this.notificationHandler = notificationHandler;
     }
 
-    public String eval(String input){
-        try {
-            var tokens = input.toLowerCase().split(" ");
-            var cmd = (tokens.length > 0) ? tokens[0] : "help";
-            var params = Arrays.copyOfRange(tokens, 1, tokens.length);
-            return switch(cmd){
-                case "signin" -> signIn(params);
-                case
-                default -> help();
-            };
-        } catch (ResponseException ex){
-            return ex.getMessage();
+    public String eval(String input) throws DataAccessException{
+        var tokens = input.toLowerCase().split(" ");
+        var cmd = (tokens.length > 0) ? tokens[0] : "help";
+        var params = Arrays.copyOfRange(tokens, 1, tokens.length);
+        return switch(cmd){
+            case "login" -> login(params);
+            case "register" -> register(params);
+            case "help" -> help();
+            case "quit" -> quit();
+            default -> help();
+        };
+    }
+
+
+    public String login(String ...params){
+        // take 2 params
+        if (params.length >= 1) {
+            UserData user = new UserData(params[0], params[1], null);
+            server.makeRequest("POST", "/user", user, UserData.class);
+            return String.format("You signed in as %s.", params[0]);
         }
-    }
-
-    void preLogin(){
 
     }
 
-    void postLogin() {
+    public String register(String ...params){
+
+    }
+
+    public String quit(){
 
     }
     public String help() {

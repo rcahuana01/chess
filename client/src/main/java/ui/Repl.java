@@ -1,17 +1,14 @@
 package ui;
 
-import client.ChessClient;
-import com.sun.nio.sctp.HandlerResult;
-import com.sun.nio.sctp.Notification;
-import com.sun.nio.sctp.NotificationHandler;
-import ui.EscapeSequences.*;
 import java.util.Scanner;
 
-public class Repl implements NotificationHandler {
+import static ui.EscapeSequences.*;
+
+public class Repl{
     private final ChessClient client;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl, this);
+        client = new ChessClient(serverUrl);
     }
     public void run() {
         System.out.println("\uD83D\uDC36 Welcome to the chess game. Sign in to start.");
@@ -31,17 +28,13 @@ public class Repl implements NotificationHandler {
         System.out.println();
     }
 
-    public void notify(Notification notification){
-        System.out.println(SET_TEXT_COLOR_RED + notification.message());
-        printPrompt();
-    }
+//    public void notify(Notification notification){
+//        System.out.println(SET_TEXT_COLOR_RED + notification.message());
+//        printPrompt();
+//    }
 
     private void printPrompt() {
-        System.out.print("\n" + SET_TEXT_COLOR_RESET + ">>> " + SET_TEXT_COLOR_GREEN);
+        System.out.print("\n" + RESET_TEXT_COLOR + ">>> " + SET_TEXT_COLOR_GREEN);
     }
 
-    @Override
-    public HandlerResult handleNotification(Notification notification, Object attachment) {
-        return null;
-    }
 }
