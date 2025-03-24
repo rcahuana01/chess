@@ -1,4 +1,4 @@
-package client;
+package ui;
 
 import com.sun.nio.sctp.NotificationHandler;
 import exception.ResponseException;
@@ -9,7 +9,7 @@ public class ChessClient {
     private final ServerFacade server;
     private String serverUrl;
     private final NotificationHandler notificationHandler;
-    private client.State state = client.State.SIGNEDOUT;
+    private State state = State.SIGNEDOUT;
     public ChessClient(String serverUrl, NotificationHandler notificationHandler){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
@@ -23,11 +23,20 @@ public class ChessClient {
             var params = Arrays.copyOfRange(tokens, 1, tokens.length);
             return switch(cmd){
                 case "signin" -> signIn(params);
+                case
                 default -> help();
             };
         } catch (ResponseException ex){
             return ex.getMessage();
         }
+    }
+
+    void preLogin(){
+
+    }
+
+    void postLogin() {
+
     }
     public String help() {
         if (state == State.SIGNEDOUT) {
@@ -37,12 +46,13 @@ public class ChessClient {
                     """;
         }
         return """
-                - list
-                - adopt <pet id>
-                - rescue <name> <CAT|DOG|FROG|FISH>
-                - adoptAll
-                - signOut
-                - quit
+                create <NAME> - a game
+                list - games
+                join <ID> [WHITE|BLACK] - a game
+                observe <ID>
+                logout - when you are done
+                quit - playing chess
+                help - with possible commands
                 """;
     }
 }
