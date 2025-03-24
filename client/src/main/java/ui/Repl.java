@@ -11,7 +11,7 @@ public class Repl{
         client = new ChessClient(serverUrl);
     }
     public void run() {
-        System.out.println("\uD83D\uDC36 Welcome to the chess game. Sign in to start.");
+        System.out.println("Welcome to the chess game. Type help to get started.");
         Scanner scanner = new Scanner(System.in);
         var result = "";
         while (!result.equals("quit")){

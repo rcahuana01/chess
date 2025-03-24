@@ -1,6 +1,7 @@
 package ui;
 
 import com.google.gson.Gson;
+import dataaccess.DataAccessException;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -21,7 +22,7 @@ public class ServerFacade {
     }
 
 
-    public <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) {
+    public <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
@@ -32,23 +33,21 @@ public class ServerFacade {
             http.connect();
             throwIfNotSuccessful(http);
             return readBody(http, responseClass);
-        } catch (ResponseException ex) {
-            throw ex;
         } catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
+            throw new DataAccessException(ex.getMessage());
         }
     }
 
-    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException {
+    private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
         var status = http.getResponseCode();
         if (!isSuccessful(status)) {
             try (InputStream respErr = http.getErrorStream()) {
                 if (respErr != null) {
-                    throw ResponseException.fromJson(respErr);
+                    throw DataAccessException.fromJson(respErr);
                 }
             }
 
-            throw new ResponseException(status, "other failure: " + status);
+            throw new DataAccessException("other failure: " + status);
         }
     }
 

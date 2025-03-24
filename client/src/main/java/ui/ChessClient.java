@@ -31,37 +31,28 @@ public class ChessClient {
         };
     }
 
-
-    public String login(String ...params){
-        // take 2 params
+    public String login(String ...params) throws DataAccessException{
         if (params.length >= 1) {
             UserData user = new UserData(params[0], params[1], null);
             server.makeRequest("POST", "/user", user, UserData.class);
             return String.format("You signed in as %s.", params[0]);
         }
-
+        return "";
     }
 
     public String register(String ...params){
 
+        return "";
     }
 
     public String quit(){
 
+        return "";
     }
     public String help() {
-        if (state == State.SIGNEDOUT) {
-            return """
-                    - signIn <yourname>
-                    - quit
-                    """;
-        }
         return """
-                create <NAME> - a game
-                list - games
-                join <ID> [WHITE|BLACK] - a game
-                observe <ID>
-                logout - when you are done
+                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
+                login <USERNAME> <PASSWORD> - to play chess
                 quit - playing chess
                 help - with possible commands
                 """;
