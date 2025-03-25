@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessPiece;
+
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
@@ -14,8 +16,7 @@ public class Graphics {
 
     // Padded characters.
     private static final String EMPTY = "   ";
-    private static final String X = " X ";
-    private static final String O = " O ";
+    private static final ChessPiece piece = null;
 
     private static Random rand = new Random();
 
@@ -28,6 +29,7 @@ public class Graphics {
         drawHeaders(out);
 
         drawChessBoard(out);
+        drawHeaders(out);
 
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
@@ -49,7 +51,7 @@ public class Graphics {
 
     private static void drawHeader(PrintStream out, String headerText) {
         int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-        int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
+        int suffixLength = 0;
 
         out.print(EMPTY.repeat(prefixLength));
         printHeaderText(out, headerText);
@@ -71,38 +73,32 @@ public class Graphics {
 
             drawRowOfSquares(out);
 
-            if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
-                // Draw horizontal row separator.
-                setBlack(out);
-            }
+//            if (boardRow < BOARD_SIZE_IN_SQUARES - 1) {
+//                // Draw horizontal row separator.
+//                setBlack(out);
+//            }
         }
     }
 
     private static void drawRowOfSquares(PrintStream out) {
+        String[] headers = { "a", "b", "c", "d", "e", "f", "g", "h" }; // headers for the columns
 
         for (int squareRow = 0; squareRow < SQUARE_SIZE_IN_PADDED_CHARS; ++squareRow) {
-            for (int boardCol = 0; boardCol < BOARD_SIZE_IN_SQUARES; ++boardCol) {
-                setWhite(out);
-
-                if (squareRow == SQUARE_SIZE_IN_PADDED_CHARS / 2) {
-                    int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
-                    int suffixLength = SQUARE_SIZE_IN_PADDED_CHARS - prefixLength - 1;
-
-                    out.print(EMPTY.repeat(prefixLength));
-                    printPlayer(out, rand.nextBoolean() ? X : O);
-                    out.print(EMPTY.repeat(suffixLength));
-                }
-                else {
-                    out.print(EMPTY.repeat(SQUARE_SIZE_IN_PADDED_CHARS));
+            setBlack(out);
+            for (int boardCol = 0; boardCol < 10; ++boardCol) {
+                    setBlack(out);
                 }
 
-                if (boardCol < BOARD_SIZE_IN_SQUARES - 1) {
-                    // Draw vertical column separator.
-                    setRed(out);
-                }
+            setWhite(out);
 
-                setBlack(out);
-            }
+            int prefixLength = SQUARE_SIZE_IN_PADDED_CHARS / 2;
+            int suffixLength = 0;
+
+            out.print(EMPTY.repeat(prefixLength));
+            out.print(EMPTY.repeat(suffixLength));
+
+
+            setBlack(out);
 
             out.println();
         }

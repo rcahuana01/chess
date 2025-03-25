@@ -32,25 +32,32 @@ public class ServerFacade {
         int gameId = new Random().nextInt(1000000);
         GameData game = new GameData(gameId, null,null, params[0], new ChessGame());
         this.makeRequest("POST", "/game", game, GameData.class, authToken);
+
     }
 
     public Collection<GameData> list() throws DataAccessException{
         record ListGames(Collection<GameData> games){}
+        int i = 0;
         var response = this.makeRequest("GET", "/game", null, ListGames.class, authToken);
         if (response == null || response.games() == null){
             throw new DataAccessException("Error: No games found.");
         }
+        for (GameData game : response.games){
+            i++;
+            System.out.println(i+ " " + game.gameName());
+        }
+
         return response.games;
     }
 
     public void join(String... params) throws DataAccessException{
         var game = new JoinRequest(Integer.parseInt(params[0]), params[1]);
-        this.makeRequest("PUT", "/game", game, JoinRequest.class, authToken);
+        this.makeRequest("PUT", "/game", game, null, authToken);
     }
 
     public void observe(String... params) throws DataAccessException{
         var game = new JoinRequest(Integer.parseInt(params[0]), null);
-        this.makeRequest("PUT", "/game", game, JoinRequest.class, authToken);
+        this.makeRequest("PUT", "/game", game, null, authToken);
     }
 
     public void logout() throws DataAccessException{
@@ -59,16 +66,16 @@ public class ServerFacade {
 
     public void login(String... params) throws DataAccessException{
         UserData user = new UserData(params[0], params[1],null);
-        this.makeRequest("POST", "/session", user, UserData.class, null);
+        authToken = this.makeRequest("POST", "/session", user, AuthData.class, null).authToken();
     }
 
     public void register(String... params) throws DataAccessException{
         UserData user = new UserData(params[0], params[1], params[2]);
-        this.makeRequest("POST", "/user", user, UserData.class, null);
+        authToken = this.makeRequest("POST", "/user", user, AuthData.class, null).authToken();
     }
 
     public void quit() throws DataAccessException{
-        this.makeRequest("DELETE", "/user", null, null, null);
+        this.makeRequest("DELETE", "/user", null, null, authToken);
     }
 
 

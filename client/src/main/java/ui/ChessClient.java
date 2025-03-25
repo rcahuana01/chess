@@ -2,6 +2,7 @@ package ui;
 
 import com.sun.nio.sctp.NotificationHandler;
 import dataaccess.DataAccessException;
+import model.AuthData;
 import model.GameData;
 import model.UserData;
 
@@ -60,7 +61,7 @@ public class ChessClient {
     public String list() throws DataAccessException{
         server.list();
         state = State.SIGNEDIN;
-        return "List of Games:\n";
+        return "";
     }
 
     public String join(String... params) throws DataAccessException{
@@ -81,10 +82,10 @@ public class ChessClient {
         return String.format("You joined as observer to game %s.", params[0]);
     }
 
-    public String logout(String... params) throws DataAccessException{
+    public String logout() throws DataAccessException{
         server.logout();
         state = State.SIGNEDOUT;
-        return String.format("You logged out as %s.", params[0]);
+        return "You logged out.";
     }
 
     public String helpPostLogin() {
@@ -113,17 +114,21 @@ public class ChessClient {
         if (params.length < 3) {
             return "Error: Missing parameters. Use: register <USERNAME> <PASSWORD> <EMAIL>";
         }
-        server.register(params[0], params[1], params[2]);
-        state = State.SIGNEDIN;
-        return String.format("You logged in as %s.", params[0]);
+        try {
+            server.register(params[0], params[1], params[2]);
+            state = State.SIGNEDIN;
+            return String.format("You logged in as %s.", params[0]);
+        } catch (DataAccessException e) {
+            return "Error: User already exists or registration failed. ";
+        }
     }
 
     public String quit() throws DataAccessException {
-        server.quit();
-        state = State.SIGNEDOUT;
-        return "See you later.";
-
+        System.out.println("Goodbye!");
+        System.exit(0);
+        return "";
     }
+
 
     public String helpPreLogin() {
         return """
