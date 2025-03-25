@@ -28,30 +28,29 @@ public class ServerFacade {
     }
 
     public void create(String... params) throws DataAccessException{
+
         int gameId = new Random().nextInt(1000000);
-        GameData game = new GameData(gameId, null,null, params[3], new ChessGame());
+        GameData game = new GameData(gameId, null,null, params[0], new ChessGame());
         this.makeRequest("POST", "/game", game, GameData.class);
     }
 
-    public Collection<GameData> list(String... params) throws DataAccessException{
+    public Collection<GameData> list() throws DataAccessException{
         record ListGames(Collection<GameData> games){}
         var response = this.makeRequest("GET", "/game", null, ListGames.class);
         return response.games;
     }
 
     public void join(String... params) throws DataAccessException{
-        int gameId = new Random().nextInt(1000000);
-        GameData game = new GameData(gameId, params[1], params[2], params[3], ChessGame.class);
+        var game = new JoinRequest(Integer.parseInt(params[0]), params[1]);
         this.makeRequest("PUT", "/game", game, JoinRequest.class);
     }
 
     public void observe(String... params) throws DataAccessException{
-        int gameId = new Random().nextInt(1000000);
-        GameData game = new GameData(gameId, params[1], params[2], params[3], params[4]);
-        this.makeRequest("POST", "/session", game, JoinRequest.class);
+        var game = new JoinRequest(Integer.parseInt(params[0]), null);
+        this.makeRequest("PUT", "/game", game, JoinRequest.class);
     }
 
-    public void logout(String... params) throws DataAccessException{
+    public void logout() throws DataAccessException{
         this.makeRequest("DELETE", "/session", null, null);
     }
 
@@ -65,7 +64,7 @@ public class ServerFacade {
         this.makeRequest("POST", "/user", user, UserData.class);
     }
 
-    public void quit(String... params) throws DataAccessException{
+    public void quit() throws DataAccessException{
         this.makeRequest("DELETE", "/user", null, null);
     }
 

@@ -35,7 +35,7 @@ public class ChessClient {
         } else if (state == State.SIGNEDIN){
             return switch(cmd){
                 case "create" -> create(params);
-                case "list" -> list(params);
+                case "list" -> list();
                 case "join" -> join(params);
                 case "observe" -> observe(params);
                 case "logout" -> logout();
@@ -49,27 +49,36 @@ public class ChessClient {
     }
 
     public String create(String... params) throws DataAccessException{
-        server.create(params);
-        state = State.SIGNEDOUT;
+        if (params.length == 0) {
+            return "Game name is required.";
+        }
+        server.create(params[0]);
+        state = State.SIGNEDIN;
         return String.format("You created a game as %s.", params[3]);
     }
 
-    public String list(String... params) throws DataAccessException{
+    public String list() throws DataAccessException{
         server.list();
-        state = State.SIGNEDOUT;
-        return String.format("You logged out as %s.", params[0]);
+        state = State.SIGNEDIN;
+        return "List of Games:\n";
     }
 
     public String join(String... params) throws DataAccessException{
-        server.join();
-        state = State.SIGNEDOUT;
-        return String.format("You joined as %s.", params[0]);
+        if (params.length < 2) {
+            return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
+        }
+        server.join(String.valueOf(Integer.parseInt(params[0])), params[1]);
+        state = State.SIGNEDIN;
+        return String.format("You joined as %s.", params[1]);
     }
 
     public String observe(String... params) throws DataAccessException{
-        server.observe();
-        state = State.SIGNEDOUT;
-        return String.format("You joined as observer as %s.", params[0]);
+        if (params.length == 0) {
+            return "Game ID is required.";
+        }
+        server.observe(String.valueOf(Integer.parseInt(params[0])));
+        state = State.SIGNEDIN;
+        return String.format("You joined as observer to game %s.", params[0]);
     }
 
     public String logout(String... params) throws DataAccessException{
@@ -80,8 +89,11 @@ public class ChessClient {
 
     public String helpPostLogin() {
         return """
-                register <USERNAME> <PASSWORD> <EMAIL> - to create an account
-                login <USERNAME> <PASSWORD> - to play chess
+                create <NAME> - a game
+                list - games
+                join <ID> [WHITE|BLACK] - a game
+                observe <ID> - a game
+                logout - when you are done
                 quit - playing chess
                 help - with possible commands
                 """;
