@@ -1,7 +1,11 @@
 package ui;
 
+import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import model.GameData;
+import model.JoinRequest;
+import model.UserData;
 
 import java.io.InputStream;
 import java.io.InputStreamReader;
@@ -9,9 +13,10 @@ import java.net.HttpURLConnection;
 import java.net.URI;
 import java.net.URL;
 
-import java.util.Map;
 import java.io.*;
-import java.net.*;
+import java.util.Collection;
+import java.util.Map;
+import java.util.Random;
 
 public class ServerFacade {
 
@@ -19,6 +24,49 @@ public class ServerFacade {
 
     public ServerFacade(String url) {
         serverUrl = url;
+
+    }
+
+    public void create(String... params) throws DataAccessException{
+        int gameId = new Random().nextInt(1000000);
+        GameData game = new GameData(gameId, null,null, params[3], new ChessGame());
+        this.makeRequest("POST", "/game", game, GameData.class);
+    }
+
+    public Collection<GameData> list(String... params) throws DataAccessException{
+        record ListGames(Collection<GameData> games){}
+        var response = this.makeRequest("GET", "/game", null, ListGames.class);
+        return response.games;
+    }
+
+    public void join(String... params) throws DataAccessException{
+        int gameId = new Random().nextInt(1000000);
+        GameData game = new GameData(gameId, params[1], params[2], params[3], ChessGame.class);
+        this.makeRequest("PUT", "/game", game, JoinRequest.class);
+    }
+
+    public void observe(String... params) throws DataAccessException{
+        int gameId = new Random().nextInt(1000000);
+        GameData game = new GameData(gameId, params[1], params[2], params[3], params[4]);
+        this.makeRequest("POST", "/session", game, JoinRequest.class);
+    }
+
+    public void logout(String... params) throws DataAccessException{
+        this.makeRequest("DELETE", "/session", null, null);
+    }
+
+    public void login(String... params) throws DataAccessException{
+        UserData user = new UserData(params[0], params[1],null);
+        this.makeRequest("POST", "/session", user, UserData.class);
+    }
+
+    public void register(String... params) throws DataAccessException{
+        UserData user = new UserData(params[0], params[1], params[2]);
+        this.makeRequest("POST", "/user", user, UserData.class);
+    }
+
+    public void quit(String... params) throws DataAccessException{
+        this.makeRequest("DELETE", "/user", null, null);
     }
 
 
