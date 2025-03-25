@@ -45,7 +45,7 @@ public class ChessClient {
             };
         }
 
-        return cmd;
+        return "";
     }
 
     public String create(String... params) throws DataAccessException{
@@ -54,7 +54,7 @@ public class ChessClient {
         }
         server.create(params[0]);
         state = State.SIGNEDIN;
-        return String.format("You created a game as %s.", params[3]);
+        return String.format("You created a game as %s.", params[0]);
     }
 
     public String list() throws DataAccessException{
@@ -67,7 +67,7 @@ public class ChessClient {
         if (params.length < 2) {
             return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
         }
-        server.join(String.valueOf(Integer.parseInt(params[0])), params[1]);
+        server.join(params[0], params[1]);
         state = State.SIGNEDIN;
         return String.format("You joined as %s.", params[1]);
     }
@@ -76,7 +76,7 @@ public class ChessClient {
         if (params.length == 0) {
             return "Game ID is required.";
         }
-        server.observe(String.valueOf(Integer.parseInt(params[0])));
+        server.observe(params[0]);
         state = State.SIGNEDIN;
         return String.format("You joined as observer to game %s.", params[0]);
     }

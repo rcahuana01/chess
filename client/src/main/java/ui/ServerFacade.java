@@ -3,6 +3,7 @@ package ui;
 import chess.ChessGame;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
 import model.UserData;
@@ -21,69 +22,98 @@ import java.util.Random;
 public class ServerFacade {
 
     private final String serverUrl;
-
+    private String authToken;
     public ServerFacade(String url) {
         serverUrl = url;
-
     }
 
     public void create(String... params) throws DataAccessException{
 
         int gameId = new Random().nextInt(1000000);
         GameData game = new GameData(gameId, null,null, params[0], new ChessGame());
-        this.makeRequest("POST", "/game", game, GameData.class);
+        this.makeRequest("POST", "/game", game, GameData.class, authToken);
     }
 
     public Collection<GameData> list() throws DataAccessException{
         record ListGames(Collection<GameData> games){}
-        var response = this.makeRequest("GET", "/game", null, ListGames.class);
+        var response = this.makeRequest("GET", "/game", null, ListGames.class, authToken);
+        if (response == null || response.games() == null){
+            throw new DataAccessException("Error: No games found.");
+        }
         return response.games;
     }
 
     public void join(String... params) throws DataAccessException{
         var game = new JoinRequest(Integer.parseInt(params[0]), params[1]);
-        this.makeRequest("PUT", "/game", game, JoinRequest.class);
+        this.makeRequest("PUT", "/game", game, JoinRequest.class, authToken);
     }
 
     public void observe(String... params) throws DataAccessException{
         var game = new JoinRequest(Integer.parseInt(params[0]), null);
-        this.makeRequest("PUT", "/game", game, JoinRequest.class);
+        this.makeRequest("PUT", "/game", game, JoinRequest.class, authToken);
     }
 
     public void logout() throws DataAccessException{
-        this.makeRequest("DELETE", "/session", null, null);
+        this.makeRequest("DELETE", "/session", null, null, authToken);
     }
 
     public void login(String... params) throws DataAccessException{
         UserData user = new UserData(params[0], params[1],null);
-        this.makeRequest("POST", "/session", user, UserData.class);
+        this.makeRequest("POST", "/session", user, UserData.class, null);
     }
 
     public void register(String... params) throws DataAccessException{
         UserData user = new UserData(params[0], params[1], params[2]);
-        this.makeRequest("POST", "/user", user, UserData.class);
+        this.makeRequest("POST", "/user", user, UserData.class, null);
     }
 
     public void quit() throws DataAccessException{
-        this.makeRequest("DELETE", "/user", null, null);
+        this.makeRequest("DELETE", "/user", null, null, null);
     }
 
 
-    public <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+//    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
+//        try {
+//            URL url = (new URI(serverUrl + path)).toURL();
+//            HttpURLConnection http = (HttpURLConnection) url.openConnection();
+//            http.setRequestMethod(method);
+//            http.setDoOutput(true);
+//
+//            writeBody(request, http);
+//            http.connect();
+//            throwIfNotSuccessful(http);
+//            return readBody(http, responseClass);
+//        } catch (Exception ex) {
+//            throw new DataAccessException(ex.getMessage());
+//        }
+//    }
+    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         try {
+            // Prepare the URL
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
 
+            // Add the Authorization header
+            http.setRequestProperty("Authorization", authToken);
+
+            // Write the body (request data) to the connection
             writeBody(request, http);
+
+            // Connect to the server
             http.connect();
+
+            // Check if the response was successful
             throwIfNotSuccessful(http);
+
+            // Read and return the response body
             return readBody(http, responseClass);
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
         }
     }
+
 
     private void throwIfNotSuccessful(HttpURLConnection http) throws IOException, DataAccessException {
         var status = http.getResponseCode();
