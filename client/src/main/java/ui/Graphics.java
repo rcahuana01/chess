@@ -1,5 +1,7 @@
 package ui;
 
+import chess.ChessBoard;
+import chess.ChessGame;
 import chess.ChessPiece;
 
 import java.io.PrintStream;
@@ -7,6 +9,7 @@ import java.nio.charset.StandardCharsets;
 import java.util.Random;
 import java.util.StringJoiner;
 
+import static chess.ChessPiece.PieceType.*;
 import static ui.EscapeSequences.*;
 
 public class Graphics {
@@ -18,7 +21,8 @@ public class Graphics {
     // Padded characters.
     private static final String EMPTY = "   ";
     private static final ChessPiece piece = null;
-
+    private static final String[] HEADERS = { "a", "b", "c", "d", "e", "f", "g", "h" };
+    public static ChessBoard gameBoard;
 
 
     public static void main(String[] args) {
@@ -49,49 +53,54 @@ public class Graphics {
     }
 
 
+
     private static void drawBoard(PrintStream out) {
-        // Top border
-
-        for (int i = 0; i < 10; i++){
-            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
-            for (int j = 1; j < 9; j++){
-                drawSquare(out, SET_TEXT_COLOR_BLACK, headers[i]);
-            }
-        }
-        for (int i = 1; i < 9; i++){
-            drawSquare(out, SET_TEXT_COLOR_BLACK, headers[i]);
-        }
-
+        // Top header
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        for (String h : HEADERS) drawSquare(out, SET_BG_COLOR_LIGHT_GREY, h);
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
         out.println(RESET_BG_COLOR);
-        // Middle
-        for (int i = 0;i < 8;i++){
-            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
-            for (int j=0;j < 8;j++){
-                boolean light = (i + j) % 2 == 0;
-                String bg = light ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
-                drawSquare(out, bg, null);
 
+        ChessPiece[][] board = gameBoard.getBoard();
+
+        // Each rank
+        for (int row = 0; row < BOARD_SIZE_IN_SQUARES; row++) {
+            String rankLabel = String.valueOf(8 - row);
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rankLabel);
+
+            for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
+                boolean isLight = (row + col) % 2 == 0;
+                String bg = isLight ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
+
+                ChessPiece piece = board[row][col];
+                String symbol = (piece == null) ? null : getSymbol(piece);
+                drawSquare(out, bg, symbol);
             }
-            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rankLabel);
             out.println(RESET_BG_COLOR);
         }
-        // Bottom border
-        for (int i = 0; i < 10; i++){
-            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
-        }
+
+        // Bottom header
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        for (String h : HEADERS) drawSquare(out, SET_BG_COLOR_LIGHT_GREY, h);
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
         out.println(RESET_BG_COLOR);
     }
 
-    private static void printLabels(PrintStream out){
-        out.println("   ");
-        String[] headers = { "a", "b", "c", "d", "e", "f", "g", "h" };
-
-        for (int letter = headers[0].charAt(0);letter <= headers.length; letter++){
-            String label = String.valueOf(letter);
-            out.print(center(label, SQUARE_SIZE));
+    public static String getSymbol(ChessPiece piece) {
+        switch (piece.getPieceType()) {
+            case KING:   return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_KING   : BLACK_KING;
+            case QUEEN:  return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_QUEEN  : BLACK_QUEEN;
+            case ROOK:   return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_ROOK   : BLACK_ROOK;
+            case BISHOP: return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_BISHOP : BLACK_BISHOP;
+            case KNIGHT: return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_KNIGHT : BLACK_KNIGHT;
+            case PAWN:   return (piece.getTeamColor() == ChessGame.TeamColor.WHITE) ? WHITE_PAWN   : BLACK_PAWN;
+            default: 	return " ";
         }
-        out.println();
     }
+
+
 
 
 }

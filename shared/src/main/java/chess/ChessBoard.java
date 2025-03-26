@@ -105,4 +105,8 @@ public class ChessBoard {
     public int hashCode() {
         return Objects.hash(Arrays.deepHashCode(board), piece);
     }
+
+    public ChessPiece[][] getBoard() {
+        return board;
+    }
 }
