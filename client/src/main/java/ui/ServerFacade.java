@@ -98,10 +98,6 @@ public class ServerFacade {
         authToken = this.makeRequest("POST", "/user", user, AuthData.class, null).authToken();
     }
 
-    public void quit() throws DataAccessException{
-        this.makeRequest("DELETE", "/user", null, null, authToken);
-    }
-
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         try {
             URL url = (new URI(serverUrl + path)).toURL();
@@ -157,5 +153,8 @@ public class ServerFacade {
 
     private boolean isSuccessful(int status) {
         return status / 100 == 2;
+    }
+    public void clear() throws DataAccessException{
+        this.makeRequest("DELETE", "/db", null,null,null);
     }
 }

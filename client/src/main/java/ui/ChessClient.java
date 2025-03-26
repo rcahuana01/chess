@@ -18,13 +18,10 @@ import static java.lang.System.out;
 import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
 
 public class ChessClient {
-    private String visitorName = null;
     private final ServerFacade server;
-    private final String serverUrl;
     private State state = State.SIGNEDOUT;
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
-        this.serverUrl = serverUrl;
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
     }
@@ -141,7 +138,6 @@ public class ChessClient {
 
     public String quit() throws DataAccessException {
         out.println("Goodbye!");
-        server.quit();
         System.exit(0);
         return "";
     }
@@ -155,4 +151,5 @@ public class ChessClient {
                 help - with possible commands
                 """;
     }
+
 }
