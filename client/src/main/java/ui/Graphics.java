@@ -11,7 +11,6 @@ import static ui.EscapeSequences.*;
 public class Graphics {
     private static final int BOARD_SIZE = 8;
     private static final int SQUARE_SIZE = 3;
-    private static final ChessGame game = new ChessGame();
 
 
     public static void main(String[] args) {
