@@ -46,7 +46,7 @@ public class GameService {
         }
 
         GameData checkGame = gameDAO.getGame(gameId);
-        if (checkGame == null && playerColor == null) {
+        if (checkGame == null || playerColor == null) {
             throw new DataAccessException("Error: bad request");
         }
 
