@@ -6,8 +6,10 @@ import model.AuthData;
 import model.GameData;
 import model.UserData;
 
+import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
+import java.util.List;
 
 import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
 
@@ -68,9 +70,10 @@ public class ChessClient {
         if (params.length < 2) {
             return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
         }
-        server.join(params[0], params[1]);
+        server.join(params[0], params[1].toUpperCase());
         state = State.SIGNEDIN;
         return String.format("You joined as %s.", params[1]);
+
     }
 
     public String observe(String... params) throws DataAccessException{

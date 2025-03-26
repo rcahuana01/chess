@@ -16,6 +16,7 @@ import java.net.URL;
 
 import java.io.*;
 import java.util.Collection;
+import java.util.HashMap;
 import java.util.Map;
 import java.util.Random;
 
@@ -51,13 +52,34 @@ public class ServerFacade {
     }
 
     public void join(String... params) throws DataAccessException{
-        var game = new JoinRequest(Integer.parseInt(params[0]), params[1]);
-        this.makeRequest("PUT", "/game", game, null, authToken);
+        Map<Integer, Integer> gamesIDs = new HashMap<>();
+        var games = list();
+        int i = 0;
+
+        for (GameData game : games) {
+            gamesIDs.put(i, game.gameID());
+            i++;
+        }
+        int selectedIndex = Integer.parseInt(params[0]);
+        int gameId = gamesIDs.get(selectedIndex);
+
+        var joinRequest = new JoinRequest(gameId, params[1].toUpperCase());
+        this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
 
     public void observe(String... params) throws DataAccessException{
-        var game = new JoinRequest(Integer.parseInt(params[0]), null);
-        this.makeRequest("PUT", "/game", game, null, authToken);
+        Map<Integer, Integer> gamesIDs = new HashMap<>();
+        var games = list();
+        int i = 0;
+
+        for (GameData game : games) {
+            gamesIDs.put(i, game.gameID());
+            i++;
+        }
+        int selectedIndex = Integer.parseInt(params[0]);
+        int gameId = gamesIDs.get(selectedIndex);
+        var joinRequest = new JoinRequest(gameId, null);
+        this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
 
     public void logout() throws DataAccessException{

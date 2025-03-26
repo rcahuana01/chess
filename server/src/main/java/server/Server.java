@@ -115,17 +115,17 @@ public class Server {
     private Object createGame(Request req, Response res) throws DataAccessException, SQLException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), GameData.class);
-        GameData auth = gameService.createGame(game.gameName(), authHeader);
+        GameData gameData = gameService.createGame(game.gameName(), authHeader);
         res.status(200);
-        return new Gson().toJson(auth);
+        return new Gson().toJson(gameData);
     }
 
     private Object joinGame(Request req, Response res) throws DataAccessException, SQLException {
         var authHeader = req.headers("Authorization");
         var game = new Gson().fromJson(req.body(), JoinRequest.class);
-        GameData auth = gameService.joinGame(game.gameID(), game.playerColor(), authHeader);
+        GameData gameData = gameService.joinGame(game.gameID(), game.playerColor(), authHeader);
         res.status(200);
-        return new Gson().toJson(auth);
+        return new Gson().toJson(gameData);
     }
 
     private Object listGames(Request req, Response res) throws DataAccessException, SQLException {
