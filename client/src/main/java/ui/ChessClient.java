@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import com.sun.nio.sctp.NotificationHandler;
 import dataaccess.DataAccessException;
 import model.AuthData;
@@ -77,9 +78,9 @@ public class ChessClient {
         }
         server.join(params[0], params[1].toUpperCase());
         if (params[1].equalsIgnoreCase("WHITE")){
-            Graphics.drawBoard(out, false);
+            Graphics.drawBoard(out, new ChessGame(),false);
         } else if (params[1].equalsIgnoreCase("BLACK")){
-            Graphics.drawBoard(out, true);
+            Graphics.drawBoard(out, new ChessGame(),true);
 
         }
         state = State.SIGNEDIN;
@@ -92,7 +93,7 @@ public class ChessClient {
             return "Game ID is required.";
         }
         server.observe(params[0]);
-        Graphics.drawBoard(out, false);
+        Graphics.drawBoard(out, new ChessGame(),false);
         state = State.SIGNEDIN;
         return String.format("You joined as observer to game %s.", params[0]);
     }
@@ -140,6 +141,7 @@ public class ChessClient {
 
     public String quit() throws DataAccessException {
         out.println("Goodbye!");
+        server.quit();
         System.exit(0);
         return "";
     }

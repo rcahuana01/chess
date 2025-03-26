@@ -21,55 +21,68 @@ public class ServerFacade {
 
     private final String serverUrl;
     private String authToken;
-    private final Vector<GameData> games = new Vector<>();
+    private final Map<Integer, Integer> gameIndexMap = new HashMap<>();
 
     public ServerFacade(String url) {
         serverUrl = url;
     }
 
     public void create(String... params) throws DataAccessException{
-
         int gameId = new Random().nextInt(1000000);
         GameData game = new GameData(gameId, null,null, params[0], new ChessGame());
         this.makeRequest("POST", "/game", game, GameData.class, authToken);
-
+        gameIndexMap.clear();
+        record ListGames(Collection<GameData> games) {}
+        var response = this.makeRequest("GET", "/game", null, ListGames.class, authToken);
+        List<GameData> gameList = new ArrayList<>(response.games());
+        int i = 1;
+        for (GameData gamedata : gameList) {
+            gameIndexMap.put(i, gamedata.gameID());
+            System.out.println(i + " " + gamedata.gameName());
+            i++;
+        }
     }
 
-    public Collection<GameData> list() throws DataAccessException{
-        record ListGames(Collection<GameData> games){}
+    public Collection<GameData> list() throws DataAccessException {
+        record ListGames(Collection<GameData> games) {}
         var response = this.makeRequest("GET", "/game", null, ListGames.class, authToken);
-        if (response == null || response.games() == null){
+        if (response == null || response.games() == null) {
             throw new DataAccessException("Error: No games found.");
         }
-        int i = 0;
-        for (GameData game : response.games){
-            games.add(game);
+        gameIndexMap.clear();
+        List<GameData> gameList = new ArrayList<>(response.games());
+        int i = 1;
+        for (GameData game : gameList) {
+            gameIndexMap.put(i, game.gameID());
+            System.out.println(i + " " + game.gameName());
             i++;
-            System.out.println(i+ " " + game.gameName());
         }
 
-        return response.games;
+        return gameList;
     }
 
-    public void join(String... params) throws DataAccessException{
-        int selectedIndex = Integer.parseInt(params[0]);
-        if (selectedIndex < 0) {
-            throw new DataAccessException("Invalid game index: " + (selectedIndex + 1));
+    public void join(String... params) throws DataAccessException {
+        int index = Integer.parseInt(params[0]);
+        if (!gameIndexMap.containsKey(index)) {
+            throw new DataAccessException("Invalid game index: " + index);
         }
-        int gameId =  games.get(selectedIndex).gameID();
+        int gameId = gameIndexMap.get(index);
         var joinRequest = new JoinRequest(gameId, params[1].toUpperCase());
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
 
-    public void observe(String... params) throws DataAccessException{
-        int selectedIndex = Integer.parseInt(params[0]);
-        if (selectedIndex < 0) {
-            throw new DataAccessException("Invalid game index: " + (selectedIndex + 1));
+
+    public void observe(String... params) throws DataAccessException {
+        int index = Integer.parseInt(params[0]);
+        if (!gameIndexMap.containsKey(index)) {
+            throw new DataAccessException("Invalid game index: " + index);
         }
-        int gameId =  games.get(selectedIndex).gameID();
-        var joinRequest = new JoinRequest(gameId, null);
+        int gameId = gameIndexMap.get(index);
+        var joinRequest = new JoinRequest(gameId, "BLACK");
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
+
+
 
     public void logout() throws DataAccessException{
         this.makeRequest("DELETE", "/session", null, null, authToken);
@@ -89,43 +102,16 @@ public class ServerFacade {
         this.makeRequest("DELETE", "/user", null, null, authToken);
     }
 
-
-//    private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass) throws DataAccessException {
-//        try {
-//            URL url = (new URI(serverUrl + path)).toURL();
-//            HttpURLConnection http = (HttpURLConnection) url.openConnection();
-//            http.setRequestMethod(method);
-//            http.setDoOutput(true);
-//
-//            writeBody(request, http);
-//            http.connect();
-//            throwIfNotSuccessful(http);
-//            return readBody(http, responseClass);
-//        } catch (Exception ex) {
-//            throw new DataAccessException(ex.getMessage());
-//        }
-//    }
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
         try {
-            // Prepare the URL
             URL url = (new URI(serverUrl + path)).toURL();
             HttpURLConnection http = (HttpURLConnection) url.openConnection();
             http.setRequestMethod(method);
             http.setDoOutput(true);
-
-            // Add the Authorization header
             http.setRequestProperty("Authorization", authToken);
-
-            // Write the body (request data) to the connection
             writeBody(request, http);
-
-            // Connect to the server
             http.connect();
-
-            // Check if the response was successful
             throwIfNotSuccessful(http);
-
-            // Read and return the response body
             return readBody(http, responseClass);
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
