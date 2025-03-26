@@ -5,12 +5,15 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import java.io.PrintStream;
 
+import java.nio.charset.StandardCharsets;
 import java.util.ArrayList;
 import java.util.Arrays;
 import java.util.Collection;
 import java.util.List;
 
+import static java.lang.System.out;
 import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
 
 public class ChessClient {
@@ -21,6 +24,8 @@ public class ChessClient {
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
         this.serverUrl = serverUrl;
+        PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
+
     }
 
     public String eval(String input) throws DataAccessException{
@@ -71,6 +76,12 @@ public class ChessClient {
             return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
         }
         server.join(params[0], params[1].toUpperCase());
+        if (params[1].equalsIgnoreCase("WHITE")){
+            Graphics.drawBoard(out, false);
+        } else if (params[1].equalsIgnoreCase("BLACK")){
+            Graphics.drawBoard(out, true);
+
+        }
         state = State.SIGNEDIN;
         return String.format("You joined as %s.", params[1]);
 
@@ -81,6 +92,7 @@ public class ChessClient {
             return "Game ID is required.";
         }
         server.observe(params[0]);
+        Graphics.drawBoard(out, false);
         state = State.SIGNEDIN;
         return String.format("You joined as observer to game %s.", params[0]);
     }
@@ -127,7 +139,7 @@ public class ChessClient {
     }
 
     public String quit() throws DataAccessException {
-        System.out.println("Goodbye!");
+        out.println("Goodbye!");
         System.exit(0);
         return "";
     }

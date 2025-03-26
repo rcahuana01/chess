@@ -13,6 +13,7 @@ public class Graphics {
     private static final int SQUARE_SIZE = 3;
     private static final ChessGame game = new ChessGame();
 
+
     public static void main(String[] args) {
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
         out.print(ERASE_SCREEN);
@@ -34,7 +35,7 @@ public class Graphics {
         out.print(RESET_TEXT_COLOR);
     }
 
-    private static void drawBoard(PrintStream out, boolean reversed) {
+    public static void drawBoard(PrintStream out, boolean reversed) {
         ChessPiece[][] board = game.getBoard().getBoard();
         String[] files = reversed ? reverseFileLabels() : fileLabels();
 

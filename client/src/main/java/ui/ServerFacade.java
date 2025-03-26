@@ -15,15 +15,14 @@ import java.net.URI;
 import java.net.URL;
 
 import java.io.*;
-import java.util.Collection;
-import java.util.HashMap;
-import java.util.Map;
-import java.util.Random;
+import java.util.*;
 
 public class ServerFacade {
 
     private final String serverUrl;
     private String authToken;
+    private final Vector<GameData> games = new Vector<>();
+
     public ServerFacade(String url) {
         serverUrl = url;
     }
@@ -38,12 +37,13 @@ public class ServerFacade {
 
     public Collection<GameData> list() throws DataAccessException{
         record ListGames(Collection<GameData> games){}
-        int i = 0;
         var response = this.makeRequest("GET", "/game", null, ListGames.class, authToken);
         if (response == null || response.games() == null){
             throw new DataAccessException("Error: No games found.");
         }
+        int i = 0;
         for (GameData game : response.games){
+            games.add(game);
             i++;
             System.out.println(i+ " " + game.gameName());
         }
@@ -52,45 +52,21 @@ public class ServerFacade {
     }
 
     public void join(String... params) throws DataAccessException{
-        Map<Integer, Integer> gamesIDs = new HashMap<>();
-        var games = list();
-        int i = 0;
-
-        for (GameData game : games) {
-            gamesIDs.put(i, game.gameID());
-            i++;
-        }
         int selectedIndex = Integer.parseInt(params[0]);
-        int gameId = gamesIDs.get(selectedIndex);
-//        GameData selectedGame = null;
-//        for (GameData game : games) {
-//            if (game.gameID() == gameId) {
-//                selectedGame = game;
-//                break;
-//            }
-//        }
-//        String color = params[1].toUpperCase();
-//        if ("WHITE".equals(color) && selectedGame.whiteUsername()!=null) {
-//            throw new DataAccessException("Error: White color is already taken in this game.");
-//        }
-//        if ("BLACK".equals(color) && selectedGame.blackUsername()!=null) {
-//            throw new DataAccessException("Error: Black color is already taken in this game.");
-//        }
+        if (selectedIndex < 0) {
+            throw new DataAccessException("Invalid game index: " + (selectedIndex + 1));
+        }
+        int gameId =  games.get(selectedIndex).gameID();
         var joinRequest = new JoinRequest(gameId, params[1].toUpperCase());
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
 
     public void observe(String... params) throws DataAccessException{
-        Map<Integer, Integer> gamesIDs = new HashMap<>();
-        var games = list();
-        int i = 0;
-
-        for (GameData game : games) {
-            gamesIDs.put(i, game.gameID());
-            i++;
-        }
         int selectedIndex = Integer.parseInt(params[0]);
-        int gameId = gamesIDs.get(selectedIndex);
+        if (selectedIndex < 0) {
+            throw new DataAccessException("Invalid game index: " + (selectedIndex + 1));
+        }
+        int gameId =  games.get(selectedIndex).gameID();
         var joinRequest = new JoinRequest(gameId, null);
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
