@@ -5,6 +5,7 @@ import chess.ChessPiece;
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
 import java.util.Random;
+import java.util.StringJoiner;
 
 import static ui.EscapeSequences.*;
 
@@ -50,13 +51,21 @@ public class Graphics {
 
     private static void drawBoard(PrintStream out) {
         // Top border
+
         for (int i = 0; i < 10; i++){
             drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+            for (int j = 1; j < 9; j++){
+                drawSquare(out, SET_TEXT_COLOR_BLACK, headers[i]);
+            }
         }
-        out.println();
+        for (int i = 1; i < 9; i++){
+            drawSquare(out, SET_TEXT_COLOR_BLACK, headers[i]);
+        }
+
+        out.println(RESET_BG_COLOR);
         // Middle
         for (int i = 0;i < 8;i++){
-            drawSquare(out, SET_BG_COLOR_WHITE, null);
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
             for (int j=0;j < 8;j++){
                 boolean light = (i + j) % 2 == 0;
                 String bg = light ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
@@ -64,11 +73,25 @@ public class Graphics {
 
             }
             drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
-
-            out.println();
+            out.println(RESET_BG_COLOR);
         }
+        // Bottom border
+        for (int i = 0; i < 10; i++){
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        }
+        out.println(RESET_BG_COLOR);
     }
 
+    private static void printLabels(PrintStream out){
+        out.println("   ");
+        String[] headers = { "a", "b", "c", "d", "e", "f", "g", "h" };
+
+        for (int letter = headers[0].charAt(0);letter <= headers.length; letter++){
+            String label = String.valueOf(letter);
+            out.print(center(label, SQUARE_SIZE));
+        }
+        out.println();
+    }
 
 
 }
