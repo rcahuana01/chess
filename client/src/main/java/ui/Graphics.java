@@ -52,7 +52,7 @@ public class Graphics {
             for (int c = 0; c < BOARD_SIZE; c++) {
                 int col = reversed ? BOARD_SIZE - 1 - c : c;
                 boolean light = (row + col) % 2 == 0;
-                String bg = light ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
+                String bg = light ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE;
                 ChessPiece piece = board[row][col];
                 String symbol = (piece == null) ? null : getSymbol(piece);
                 drawSquare(out, bg, symbol);

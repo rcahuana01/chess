@@ -71,19 +71,6 @@ public class ServerFacade {
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
 
-
-    public void observe(String... params) throws DataAccessException {
-        int index = Integer.parseInt(params[0]);
-        if (!gameIndexMap.containsKey(index)) {
-            throw new DataAccessException("Invalid game index: " + index);
-        }
-        int gameId = gameIndexMap.get(index);
-        var joinRequest = new JoinRequest(gameId, "BLACK");
-        this.makeRequest("PUT", "/game", joinRequest, null, authToken);
-    }
-
-
-
     public void logout() throws DataAccessException{
         this.makeRequest("DELETE", "/session", null, null, authToken);
     }

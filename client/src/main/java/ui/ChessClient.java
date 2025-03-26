@@ -89,8 +89,7 @@ public class ChessClient {
         if (params.length == 0) {
             return "Game ID is required.";
         }
-        server.observe(params[0]);
-        Graphics.drawBoard(out, new ChessGame(),false);
+        Graphics.drawBoard(out, new ChessGame(),false); // white perspective
         state = State.SIGNEDIN;
         return String.format("You joined as observer to game %s.", params[0]);
     }

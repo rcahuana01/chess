@@ -104,20 +104,6 @@ public class ServerFacadeTests {
     }
 
     @Test
-    void validObserve() throws Exception {
-        facade.register(validUser.username(), validUser.password(), validUser.email());
-        facade.create(validGame.gameName());
-        facade.list();
-        assertDoesNotThrow(() -> facade.observe("1"));
-    }
-
-    @Test
-    void invalidObserve() throws Exception {
-        facade.register(validUser.username(), validUser.password(), validUser.email());
-        assertThrows(Exception.class, () -> facade.observe(String.valueOf(invalidGame.gameID())));
-    }
-
-    @Test
     void validLogout() throws Exception {
         facade.register(validUser.username(), validUser.password(), validUser.email());
         assertDoesNotThrow(() -> facade.logout());

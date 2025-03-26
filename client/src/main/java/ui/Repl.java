@@ -22,7 +22,7 @@ public class Repl{
                 System.out.print(SET_TEXT_COLOR_BLUE + result);
             } catch (Throwable e){
                 var msg = e.toString();
-                System.out.print(msg);
+                System.out.print("Invalid input.");
             }
         }
         System.out.println();
