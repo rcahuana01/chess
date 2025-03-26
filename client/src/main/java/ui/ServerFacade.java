@@ -62,7 +62,20 @@ public class ServerFacade {
         }
         int selectedIndex = Integer.parseInt(params[0]);
         int gameId = gamesIDs.get(selectedIndex);
-
+//        GameData selectedGame = null;
+//        for (GameData game : games) {
+//            if (game.gameID() == gameId) {
+//                selectedGame = game;
+//                break;
+//            }
+//        }
+//        String color = params[1].toUpperCase();
+//        if ("WHITE".equals(color) && selectedGame.whiteUsername()!=null) {
+//            throw new DataAccessException("Error: White color is already taken in this game.");
+//        }
+//        if ("BLACK".equals(color) && selectedGame.blackUsername()!=null) {
+//            throw new DataAccessException("Error: Black color is already taken in this game.");
+//        }
         var joinRequest = new JoinRequest(gameId, params[1].toUpperCase());
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
