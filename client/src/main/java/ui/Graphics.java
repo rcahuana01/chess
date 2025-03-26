@@ -25,7 +25,7 @@ public class Graphics {
 
         out.print(ERASE_SCREEN);
 
-//        drawSquare(out);
+//        drawSquare(out, SET_TEXT_COLOR_WHITE, WHITE_BISHOP);
         drawBoard(out);
         out.print(SET_BG_COLOR_BLACK);
         out.print(SET_TEXT_COLOR_WHITE);
@@ -33,41 +33,42 @@ public class Graphics {
 
 
 
-    private static void drawSquare(PrintStream out) {
-        for (int row = 0; row < SQUARE_SIZE; row++) {
-                out.print(" ");
-            }
-            out.print(SET_BG_COLOR_BLACK);
+    private static void drawSquare(PrintStream out, String bgColor, String content) {
+        out.print(bgColor);
+        if (content !=null && !content.isBlank()){
+            int side = (SQUARE_SIZE - 1) / 2;
+            out.print(" ".repeat(side));
+            out.print(content);
+            out.print(" ".repeat(side));
+
+        } else {
+            out.print(" ".repeat(SQUARE_SIZE));
+        }
+        out.print(RESET_TEXT_COLOR);
     }
 
 
     private static void drawBoard(PrintStream out) {
-        for (int row = 0; row < BOARD_SIZE_IN_SQUARES; row++) {
-            for (int col = 0; col < BOARD_SIZE_IN_SQUARES; col++) {
-                if ((row + col) % 2 == 0) {
-                    out.print(SET_BG_COLOR_WHITE);
-                } else {
-                    out.print(SET_BG_COLOR_BLACK);
-                }
-                drawSquare(out);
+        // Top border
+        for (int i = 0; i < 10; i++){
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        }
+        out.println();
+        // Middle
+        for (int i = 0;i < 8;i++){
+            drawSquare(out, SET_BG_COLOR_WHITE, null);
+            for (int j=0;j < 8;j++){
+                boolean light = (i + j) % 2 == 0;
+                String bg = light ? SET_BG_COLOR_WHITE : SET_BG_COLOR_BLACK;
+                drawSquare(out, bg, null);
+
             }
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+
             out.println();
         }
     }
 
-    private static void setWhite(PrintStream out) {
-        out.print(SET_BG_COLOR_WHITE);
-        out.print(SET_TEXT_COLOR_WHITE);
-    }
 
-    private static void setGray(PrintStream out) {
-        out.print(SET_BG_COLOR_LIGHT_GREY);
-        out.print(SET_TEXT_COLOR_LIGHT_GREY);
-    }
-
-    private static void setBlack(PrintStream out) {
-        out.print(SET_BG_COLOR_BLACK);
-        out.print(SET_TEXT_COLOR_BLACK);
-    }
 
 }
