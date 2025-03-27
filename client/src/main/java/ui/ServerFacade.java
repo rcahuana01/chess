@@ -52,9 +52,12 @@ public class ServerFacade {
         gameIndexMap.clear();
         List<GameData> gameList = new ArrayList<>(response.games());
         int i = 1;
-        for (GameData game : gameList) {
+        System.out.printf("%-3s %-15s %-15s %-15s%n", "ID", "Name", "White Player", "Black Player");
+        System.out.println("------------------------------------------------------");        for (GameData game : gameList) {
             gameIndexMap.put(i, game.gameID());
-            System.out.println(i + " " + game.gameName());
+            String whitePlayer = game.whiteUsername() == null ? "N/A" : game.whiteUsername();
+            String blackPlayer = game.blackUsername() == null ? "N/A" : game.blackUsername();
+            System.out.printf("%-3d %-15s %-15s %-15s%n", i, game.gameName(), whitePlayer, blackPlayer);
             i++;
         }
 
