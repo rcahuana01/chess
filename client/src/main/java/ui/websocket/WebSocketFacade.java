@@ -16,10 +16,10 @@ import java.net.URISyntaxException;
 public class WebSocketFacade extends Endpoint {
 
     Session session;
-    client.websocket.NotificationHandler notificationHandler;
+    ui.websocket.NotificationHandler notificationHandler;
 
 
-    public WebSocketFacade(String url, client.websocket.NotificationHandler notificationHandler) throws DataAccessException {
+    public WebSocketFacade(String url, ui.websocket.NotificationHandler notificationHandler) throws DataAccessException {
         try {
             url = url.replace("http", "ws");
             URI socketURI = new URI(url + "/ws");
@@ -32,7 +32,7 @@ public class WebSocketFacade extends Endpoint {
             this.session.addMessageHandler(new MessageHandler.Whole<String>() {
                 @Override
                 public void onMessage(String message) {
-                    Notification notification = new Gson().fromJson(message, Notification.class);
+                    ServerMessage notification = new Gson().fromJson(message, ServerMessage.class);
                     notificationHandler.notify(notification);
                 }
             });
