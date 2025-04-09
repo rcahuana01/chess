@@ -20,34 +20,43 @@ public class WebSocketHandler {
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand.CommandType action = new Gson().fromJson(message, G.class);
-        switch (action.type()) {
-            case CONNECT -> enter(action.visitorName(), session);
-            case EXIT -> exit(action.visitorName());
+        UserGameCommand.CommandType action = new Gson().fromJson(message, UserGameCommand.CommandType.class);
+        switch (action) {
+            case CONNECT -> connect(action.name(), session);
+            case MAKE_MOVE -> makeMove(action.name());
+            case LEAVE -> leave(action.name(), session);
+            case RESIGN -> resign(action.name(), session);
         }
     }
 
-    private void enter(String visitorName, Session session) throws IOException {
+    private void connect(String visitorName, Session session) throws IOException {
         connections.add(visitorName, session);
         var message = String.format("%s is in the shop", visitorName);
         var notification = new Notification(Notification.Type.ARRIVAL, message);
         connections.broadcast(visitorName, notification);
     }
 
-    private void exit(String visitorName) throws IOException {
+    private void makeMove(String visitorName) throws IOException {
         connections.remove(visitorName);
         var message = String.format("%s left the shop", visitorName);
         var notification = new Notification(Notification.Type.DEPARTURE, message);
         connections.broadcast(visitorName, notification);
     }
 
-    public void makeNoise(String petName, String sound) throws ResponseException {
+    public void leave(String petName, String sound) throws DataAccessException {
         try {
             var message = String.format("%s says %s", petName, sound);
             var notification = new Notification(Notification.Type.NOISE, message);
             connections.broadcast("", notification);
         } catch (Exception ex) {
-            throw new ResponseException(500, ex.getMessage());
+            throw new DataAccessException(ex.getMessage());
         }
+    }
+
+    private void resign(String visitorName) throws IOException {
+        connections.remove(visitorName);
+        var message = String.format("%s left the shop", visitorName);
+        var notification = new Notification(Notification.Type.DEPARTURE, message);
+        connections.broadcast(visitorName, notification);
     }
 }
