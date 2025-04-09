@@ -47,10 +47,10 @@ public class Server {
     private final UserService userService = new UserService(userDAO, authDAO);
     private ArrayList<String> names = new ArrayList<>();
     private final WebSocketHandler webSocketHandler;
+    GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
 
     public Server() {
         webSocketHandler = new WebSocketHandler();
-        GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
 
     }
 

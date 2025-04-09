@@ -9,24 +9,23 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final Map<Integer, Set<Connection>> connections = new HashMap<>();
+    public final Map<Integer, Set<Session>> connections = new HashMap<>();
 
     public void addSessionToGame(int gameId, Session session) {
-        Connection c = new Connection(gameId, session);
         if (connections.get(gameId)==null){
-            Set<Connection> set = new HashSet<>();
-            set.add(c);
+            Set<Session> set = new HashSet<>();
+            set.add(session);
             connections.put(gameId, set);
         } else {
-            connections.get(gameId).add(c);
+            connections.get(gameId).add(session);
         }
     }
 
-    public void removeSessionFromGame(Connection c) {
-        connections.get(c.gameId).remove(c);
+    public void removeSessionFromGame(int gameId, Session session) {
+        connections.get(gameId).remove(session);
     }
 
-    public Set<Connection> getConnectionsForGame(int gameId) {
+    public Set<Session> getSessionsForGame(int gameId) {
         return connections.get(gameId);
     }
 

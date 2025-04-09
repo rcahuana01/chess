@@ -21,14 +21,14 @@ import java.util.Timer;
 public class WebSocketHandler {
 
     private final ConnectionManager sessions = new ConnectionManager();
-
+    private final GameDAO gameDAO = new GameDAO() {};
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
             switch (command.getCommandType()) {
                 case CONNECT -> connect(command.getGameID(), command.getAuthToken(), session);
                 case LEAVE -> leave(command.getGameID(), session);
-                case RESIGN -> resign(action.name(), session);
+                case RESIGN -> resign(command.getGameID().name(), session);
                 case MAKE_MOVE -> makeMove(makeMove);
 
             }
@@ -49,30 +49,34 @@ public class WebSocketHandler {
         broadcast(session, command.getGameID(), message, notification);
     }
 
-    public void leave(String excSession, MakeMoveCommand command, Session session) throws DataAccessException {
+    public void leave(String excSession, UserGameCommand command, Session session) throws DataAccessException {
         try {
-            sessions.removeSessionFromGame(command.getGameID());
+            GameDAO gameDAO = new GameDAO() {
+            }
+            gameDao.
+            sessions.removeSessionFromGame(command.getGameID(), session);
 
-            var message = String.format("%s says %s", petName, sound);
+            var message = String.format("%s left the game %s", excSession, command.getGameID());
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-            broadcast(session, gameId, message, notification);
+            broadcast(session, command.getGameID(), message, notification);
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
         }
     }
 
-    private void resign(String excSession, int gameId, Session session) throws IOException {
-        sessions.removeSessionFromGame();
+    private void resign(String excSession, UserGameCommand command, Session session) throws IOException {
+        sessions.removeSessionFromGame(command.getGameID(), session);
+
         var message = String.format("%s left the shop", excSession);
         var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        broadcast(session, gameId, message, notification);
+        broadcast(session, command.getGameID(), message, notification);
     }
 
 
     public void broadcast(Session excSession, int gameId, String message, ServerMessage notification) throws IOException {
         var removeList = new ArrayList<Connection>();
-        for (var c : sessions.getConnectionsForGame(gameId)) {
-            if (c.session.isOpen() && c.session!=excSession) {
+        for (var c : sessions.getSessionsForGame(gameId)) {
+            if (c.isOpen() && c!=excSession) {
                 c.sendMessage(notification.toString(), c.session);
             } else {
                 removeList.add(c);
@@ -81,7 +85,7 @@ public class WebSocketHandler {
 
         // Clean up any connections that were left open.
         for (var c : removeList) {
-            sessions.getConnectionsForGame(gameId).remove(c);
+            sessions.getSessionsForGame(gameId).remove(c);
         }
     }
 

@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessGame;
 import websocket.messages.ServerMessage;
 
 import java.util.Scanner;
@@ -8,7 +9,7 @@ import static ui.EscapeSequences.*;
 import static websocket.messages.ServerMessage.*;
 import static websocket.messages.ServerMessage.ServerMessageType.*;
 
-public class Repl implements client.websocket.NotificationHandler {
+public class Repl implements ui.websocket.NotificationHandler {
     private final ChessClient client;
 
     public Repl(String serverUrl) {
@@ -39,14 +40,16 @@ public class Repl implements client.websocket.NotificationHandler {
 
     @Override
     public void notify(ServerMessage notification) {
-        switch (notification){
+        switch (notification.getServerMessageType()){
             case LOAD_GAME:
 
-                da;
+                ChessGame game = new ChessGame();
+                game.getBoard();
             case ERROR:
-                printPrompt();
+                System.out.print("Error");
+
             case NOTIFICATION:
-                printPrompt();
+                System.out.println("Notification");
         }
     }
 }
