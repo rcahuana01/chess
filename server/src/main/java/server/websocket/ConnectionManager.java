@@ -9,42 +9,25 @@ import java.util.*;
 import java.util.concurrent.ConcurrentHashMap;
 
 public class ConnectionManager {
-    public final Map<Integer, Set<Session>> sessionMap = new HashMap<>();
+    public final Map<Integer, Set<Connection>> connections = new HashMap<>();
 
     public void addSessionToGame(int gameId, Session session) {
-        if (sessionMap.get(gameId)==null){
-            Set<Session> set = new HashSet<>();
-            set.add(session);
-            sessionMap.put(gameId, set);
+        Connection c = new Connection(gameId, session);
+        if (connections.get(gameId)==null){
+            Set<Connection> set = new HashSet<>();
+            set.add(c);
+            connections.put(gameId, set);
         } else {
-            sessionMap.get(gameId).add(session);
+            connections.get(gameId).add(c);
         }
     }
 
-    public void removeSessionFromGame(int gameId, Session session) {
-        sessionMap.remove(gameId);
-
+    public void removeSessionFromGame(Connection c) {
+        connections.get(c.gameId).remove(c);
     }
 
-    public Set<Session> getSessionForGame(int gameId) {
-        return sessionMap.get(gameId);
+    public Set<Connection> getConnectionsForGame(int gameId) {
+        return connections.get(gameId);
     }
 
-//    public void broadcast(String excludeVisitorName, ServerMessage notification) throws IOException {
-//        var removeList = new ArrayList<Connection>();
-//        for (var c : connections.values()) {
-//            if (c.session.isOpen()) {
-//                if (!c.visitorName.equals(excludeVisitorName)) {
-//                    c.send(notification.toString());
-//                }
-//            } else {
-//                removeList.add(c);
-//            }
-//        }
-//
-//        // Clean up any connections that were left open.
-//        for (var c : removeList) {
-//            connections.remove(c.visitorName);
-//        }
-//    }
 }

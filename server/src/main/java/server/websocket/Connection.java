@@ -12,8 +12,9 @@ public class Connection {
         this.gameId = gameId;
         this.session = session;
     }
+    public void sendMessage(String message, Session session) throws IOException {
+        session.getRemote().sendString(message);
 
-    public void send(String msg) throws IOException {
-        session.getRemote().sendString(msg);
     }
+
 }

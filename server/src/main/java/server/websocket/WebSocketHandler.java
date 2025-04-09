@@ -13,55 +13,76 @@ import websocket.messages.ServerMessage;
 //import Notification;
 
 import java.io.IOException;
+import java.util.ArrayList;
 import java.util.Timer;
 
 
 @WebSocket
 public class WebSocketHandler {
 
-    private final ConnectionManager connections = new ConnectionManager();
+    private final ConnectionManager sessions = new ConnectionManager();
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
-        UserGameCommand.CommandType action = new Gson().fromJson(message, UserGameCommand.CommandType.class);
-        UserGameCommand.CommandType makeMove = new Gson().fromJson(message, MakeMoveCommand.CommandType.class);
+        UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
+            switch (command.getCommandType()) {
+                case CONNECT -> connect(command.getGameID(), command.getAuthToken(), session);
+                case LEAVE -> leave(command.getGameID(), session);
+                case RESIGN -> resign(action.name(), session);
+                case MAKE_MOVE -> makeMove(makeMove);
 
-        switch (action) {
-            case CONNECT -> connect(action.name(), session);
-            case MAKE_MOVE -> makeMove(makeMove.name());
-            case LEAVE -> leave(action.name(), session);
-            case RESIGN -> resign(action.name(), session);
-        }
+            }
+
     }
 
-    private void connect(String visitorName, Session session) throws IOException {
-        connections.add(visitorName, session);
-        var message = String.format("%s is in the shop", visitorName);
-        var notification = new ServerMessage(Notification.Type.ARRIVAL, message);
-        connections.broadcast(visitorName, notification);
+    private void connect(String excSession, UserGameCommand command, Session session) throws IOException {
+        sessions.addSessionToGame(command.getGameID(), session);
+        var message = String.format("%s is connected to chess", excSession);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        broadcast(session, command.getGameID(), message, notification);
     }
 
-    private void makeMove(ChessMove move) throws IOException {
-        connections.makeMove(move);
-        var message = String.format("%s left the shop", visitorName);
-        var notification = new Notification(Notification.Type.DEPARTURE, message);
-        connections.broadcast(visitorName, notification);
+    private void makeMove(String excSession, MakeMoveCommand command, Session session) throws IOException {
+        sessions.addSessionToGame(command.getGameID(), session);
+        var message = String.format("%s made a move %s", excSession, command.getMove());
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        broadcast(session, command.getGameID(), message, notification);
     }
 
-    public void leave(String petName, String sound) throws DataAccessException {
+    public void leave(String excSession, MakeMoveCommand command, Session session) throws DataAccessException {
         try {
+            sessions.removeSessionFromGame(command.getGameID());
+
             var message = String.format("%s says %s", petName, sound);
-            var notification = new Notification(Notification.Type.NOISE, message);
-            connections.broadcast("", notification);
+            var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+            broadcast(session, gameId, message, notification);
         } catch (Exception ex) {
             throw new DataAccessException(ex.getMessage());
         }
     }
 
-    private void resign(String visitorName) throws IOException {
-        connections.remove(visitorName);
-        var message = String.format("%s left the shop", visitorName);
-        var notification = new Notification(Notification.Type.DEPARTURE, message);
-        connections.broadcast(visitorName, notification);
+    private void resign(String excSession, int gameId, Session session) throws IOException {
+        sessions.removeSessionFromGame();
+        var message = String.format("%s left the shop", excSession);
+        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
+        broadcast(session, gameId, message, notification);
     }
+
+
+    public void broadcast(Session excSession, int gameId, String message, ServerMessage notification) throws IOException {
+        var removeList = new ArrayList<Connection>();
+        for (var c : sessions.getConnectionsForGame(gameId)) {
+            if (c.session.isOpen() && c.session!=excSession) {
+                c.sendMessage(notification.toString(), c.session);
+            } else {
+                removeList.add(c);
+            }
+        }
+
+        // Clean up any connections that were left open.
+        for (var c : removeList) {
+            sessions.getConnectionsForGame(gameId).remove(c);
+        }
+    }
+
 }
