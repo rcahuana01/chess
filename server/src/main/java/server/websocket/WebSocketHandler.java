@@ -21,15 +21,17 @@ import java.util.Timer;
 public class WebSocketHandler {
 
     private final ConnectionManager sessions = new ConnectionManager();
-    private final GameDAO gameDAO = new GameDAO() {};
+//    private final GameDAO gameDAO = new GameDAO() {};
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException {
+    public void onMessage(Session session, String message) throws IOException, DataAccessException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-            switch (command.getCommandType()) {
-                case CONNECT -> connect(command.getGameID(), command.getAuthToken(), session);
-                case LEAVE -> leave(command.getGameID(), session);
-                case RESIGN -> resign(command.getGameID().name(), session);
-                case MAKE_MOVE -> makeMove(makeMove);
+        String excSession = session.getRemoteAddress().toString();
+        MakeMoveCommand makeCommand = new Gson().fromJson(message, MakeMoveCommand.class);
+        switch (command.getCommandType()) {
+                case CONNECT -> connect(excSession, command, session);
+                case LEAVE -> leave(excSession, command, session);
+                case RESIGN -> resign(excSession, command, session);
+                case MAKE_MOVE -> makeMove(excSession, makeCommand, session);
 
             }
 
@@ -51,11 +53,7 @@ public class WebSocketHandler {
 
     public void leave(String excSession, UserGameCommand command, Session session) throws DataAccessException {
         try {
-            GameDAO gameDAO = new GameDAO() {
-            }
-            gameDao.
             sessions.removeSessionFromGame(command.getGameID(), session);
-
             var message = String.format("%s left the game %s", excSession, command.getGameID());
             var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
             broadcast(session, command.getGameID(), message, notification);
@@ -74,18 +72,18 @@ public class WebSocketHandler {
 
 
     public void broadcast(Session excSession, int gameId, String message, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Connection>();
-        for (var c : sessions.getSessionsForGame(gameId)) {
+        var removeList = new ArrayList<Session>();
+        for (Session c : sessions.getSessionsForGame(gameId)) {
             if (c.isOpen() && c!=excSession) {
-                c.sendMessage(notification.toString(), c.session);
+                c.getRemote().sendString(notification.toString());
             } else {
                 removeList.add(c);
             }
         }
 
         // Clean up any connections that were left open.
-        for (var c : removeList) {
-            sessions.getSessionsForGame(gameId).remove(c);
+        for (Session c : removeList) {
+            sessions.removeSessionFromGame(gameId, c);
         }
     }
 

@@ -1,10 +1,13 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessPiece;
+import chess.ChessPosition;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.List;
 
 import static ui.EscapeSequences.*;
 
@@ -31,6 +34,31 @@ public class Graphics {
         }
         out.print(RESET_TEXT_COLOR);
     }
+
+//    public static void highlightMoves(PrintStream out, ChessGame game, ChessPosition position, boolean reversed){
+//        ChessPiece[][] board = game.getBoard().getBoard();
+//        ChessPiece piece = board[position.getRow()][position.getColumn()];
+//        for (int r = 0; r < BOARD_SIZE; r++){
+//            int row = reversed ? r : BOARD_SIZE - 1 - r;
+//            String rank = centerLabel(String.valueOf(reversed ? r + 1 : BOARD_SIZE - r));
+//            drawSquare(out, SET_BG_COLOR_YELLOW, rank);
+//            for (int c  = 0; c < BOARD_SIZE; c++){
+//                int col = reversed ? BOARD_SIZE - 1 - c : c;
+//                String bg = isLegalMove(legalMoves, row, col) ? SET_BG_COLOR_YELLOW : ((row + col) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE);
+//                String symbol = (piece == null) ? null : getSymbol(piece);
+//                drawSquare(out, bg, symbol);
+//            }
+//            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rank);
+//            out.println(RESET_BG_COLOR);
+//        }
+//        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+//        for (String f : reverseFileLabels()) {
+//            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, f);
+//        }
+//        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+//        out.println(RESET_BG_COLOR);
+//
+//    }
 
     public static void drawBoard(PrintStream out, ChessGame game, boolean reversed) {
         ChessPiece[][] board = game.getBoard().getBoard();

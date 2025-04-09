@@ -6,6 +6,9 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import ui.websocket.WebSocketFacade;
+import websocket.commands.UserGameCommand;
+
 import java.io.PrintStream;
 
 import java.nio.charset.StandardCharsets;
@@ -19,9 +22,12 @@ import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
 
 public class ChessClient {
     private final ServerFacade server;
+    private WebSocketFacade ws;
     private State state = State.SIGNEDOUT;
     public ChessClient(String serverUrl){
         server = new ServerFacade(serverUrl);
+        webSocketFacade = new WebSocketFacade()
+
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
     }
@@ -49,9 +55,68 @@ public class ChessClient {
                 case "help" -> helpPostLogin();
                 default -> helpPostLogin();
             };
+        } else if (state == State.GAMEPLAY){
+            return switch (cmd){
+                case "move" -> makeMove(params);
+                case "redraw" -> redrawChessBoard(params);
+                case "leave" -> leave(params);
+                case "resign" -> resign(params);
+                case "highlight" -> highlightMoves(params);
+                case "help" -> helpGamePlay();
+
+            };
         }
 
         return "";
+    }
+
+    private String helpGamePlay() {
+        return """
+                move <c1,a7> - makes move from c1 to a7
+                redraw - redraws the board
+                leave - removes the user from the game
+                resign - forfeits the game and the game is over
+                highlight <c3> -  highlight legal moves from c3
+                """;
+    }
+
+    private String highlightMoves(String... params) {
+        int gameId = Integer.parseInt(params[0]);
+        return "";
+    }
+
+    private String resign(String... params) {
+        if (params.length == 0) {
+            return "Game ID is required for resigning.";
+        }
+        int gameId = Integer.parseInt(params[0]);
+        ws.resignGame(authToken, gameId);
+        return "You resigned the game";
+    }
+
+    private String leave(String[] params) {
+        int gameId = Integer.parseInt(params[0]);
+        ws.leaveGame(authToken, gameId);
+        return "You left the game";
+
+    }
+
+    private String redrawChessBoard(String[] params) {
+        if (params[1].equalsIgnoreCase("WHITE")){
+            Graphics.drawBoard(out, new ChessGame(),false);
+        } else if (params[1].equalsIgnoreCase("BLACK")){
+            Graphics.drawBoard(out, new ChessGame(),true);
+
+        }
+        return "";
+
+    }
+
+    private String makeMove(String[] params) {
+        int gameId = Integer.parseInt(params[0]);
+        ws.makeMove(authToken, gameId);
+        return "You made a move";
+
     }
 
     public String create(String... params) throws DataAccessException{
