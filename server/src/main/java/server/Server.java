@@ -6,6 +6,7 @@ import model.AuthData;
 import model.GameData;
 import model.JoinRequest;
 import model.UserData;
+import server.websocket.WebSocketHandler;
 import spark.*;
 
 import java.sql.SQLException;
@@ -44,16 +45,23 @@ public class Server {
     }
 
     private final UserService userService = new UserService(userDAO, authDAO);
-    GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
     private ArrayList<String> names = new ArrayList<>();
+    private final WebSocketHandler webSocketHandler;
 
+    public Server() {
+        webSocketHandler = new WebSocketHandler();
+        GameService gameService=  new GameService(userDAO,  authDAO, gameDAO);
+
+    }
 
 
     public int run(int desiredPort) {
 
         Spark.port(desiredPort);
 
-        Spark.staticFiles.location("web");
+        Spark.staticFiles.location("public");
+        Spark.webSocket("/ws", webSocketHandler);
+
 
         // Register your endpoints and handle exceptions here.
 
