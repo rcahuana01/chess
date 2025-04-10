@@ -1,11 +1,13 @@
 package ui;
 
 import chess.ChessGame;
-import com.sun.nio.sctp.NotificationHandler;
+import chess.ChessMove;
+import chess.ChessPosition;
 import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
 
@@ -23,10 +25,14 @@ import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
 public class ChessClient {
     private final ServerFacade server;
     private WebSocketFacade ws;
+    private String authToken;
+    private final String serverUrl;
+    private final NotificationHandler notificationHandler;
     private State state = State.SIGNEDOUT;
-    public ChessClient(String serverUrl){
+    public ChessClient(String serverUrl, NotificationHandler handler){
         server = new ServerFacade(serverUrl);
-        webSocketFacade = new WebSocketFacade()
+        this.notificationHandler = handler;
+        this.serverUrl = serverUrl;
 
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
 
@@ -96,7 +102,7 @@ public class ChessClient {
 
     private String leave(String[] params) {
         int gameId = Integer.parseInt(params[0]);
-        ws.leaveGame(authToken, gameId);
+        ws.leaveGame(, gameId);
         return "You left the game";
 
     }
@@ -113,10 +119,32 @@ public class ChessClient {
     }
 
     private String makeMove(String[] params) {
-        int gameId = Integer.parseInt(params[0]);
-        ws.makeMove(authToken, gameId);
-        return "You made a move";
+        if (!params[0].contains(",")) {
+            return "Error: Move format is invalid. Use: move <start,end>";
+        }
 
+        String[] squares = params[1].split(",");
+        ChessPosition start = parseAlgebraic(squares[0]);
+        ChessPosition end = parseAlgebraic(squares[1]);
+
+        ChessMove move = new ChessMove(start, end,null);
+        int gameId = Integer.parseInt(params[1]);
+
+        try {
+            ws.makeMove(authToken, gameId, move);
+        } catch (DataAccessException e) {
+            return "Failed to make move: " + e.getMessage();
+
+        }
+        return "You made a move";
+    }
+
+    private ChessPosition parseAlgebraic(String pos){
+        char file = pos.charAt(0);
+        char rank = pos.charAt(1);
+        int col = file - 'a' + 1;
+        int row = Character.getNumericValue(rank);
+        return new ChessPosition(row, col);
     }
 
     public String create(String... params) throws DataAccessException{
@@ -138,7 +166,10 @@ public class ChessClient {
         if (params.length < 2) {
             return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
         }
+        int gameId = server.
         server.join(params[0], params[1].toUpperCase());
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws.connect(authToken, gameId);
         if (params[1].equalsIgnoreCase("WHITE")){
             Graphics.drawBoard(out, new ChessGame(),false);
         } else if (params[1].equalsIgnoreCase("BLACK")){

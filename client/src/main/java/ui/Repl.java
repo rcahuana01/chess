@@ -39,17 +39,17 @@ public class Repl implements ui.websocket.NotificationHandler {
     }
 
     @Override
-    public void notify(ServerMessage notification) {
-        switch (notification.getServerMessageType()){
+    public void notify(ServerMessage message) {
+        switch (message.getServerMessageType()){
             case LOAD_GAME:
+                System.out.println(SET_TEXT_COLOR_BLUE + "Game loaded!");
 
-                ChessGame game = new ChessGame();
-                game.getBoard();
+                Graphics.drawBoard(System.out, new ChessGame(), false);
             case ERROR:
-                System.out.print("Error");
+                System.out.println(SET_TEXT_COLOR_RED + "Error from server: " + message.getServerMessageType());
 
             case NOTIFICATION:
-                System.out.println("Notification");
+                System.out.println(SET_TEXT_COLOR_YELLOW + "Server notification: " + message.getServerMessageType());
         }
     }
 }
