@@ -1,12 +1,10 @@
 package server.websocket;
 
 import org.eclipse.jetty.websocket.api.Session;
-import websocket.commands.UserGameCommand;
-import websocket.messages.ServerMessage;
-
-import java.io.IOException;
-import java.util.*;
-import java.util.concurrent.ConcurrentHashMap;
+import java.util.HashMap;
+import java.util.HashSet;
+import java.util.Map;
+import java.util.Set;
 
 public class ConnectionManager {
     public final Map<Integer, Set<Session>> connections = new HashMap<>();
@@ -22,11 +20,16 @@ public class ConnectionManager {
     }
 
     public void removeSessionFromGame(int gameId, Session session) {
-        connections.get(gameId).remove(session);
+        if (connections.containsKey(gameId)){
+            connections.get(gameId).remove(session);
+            if (connections.get(gameId).isEmpty()){
+                connections.remove(gameId);
+            }
+        }
     }
 
     public Set<Session> getSessionsForGame(int gameId) {
-        return connections.get(gameId);
+        return connections.getOrDefault(gameId, new HashSet<>());
     }
 
 }

@@ -41,6 +41,18 @@ public class ChessGame {
         teamTurn = team;
     }
 
+    public void applyMove(ChessMove move) {
+        ChessPiece piece = board.getPiece(move.getStartPosition());
+        Collection<ChessMove> validMoves = validMoves(move.getStartPosition());
+        if (move.getPromotionPiece() != null){
+            board.addPiece(move.getEndPosition(), new ChessPiece(teamTurn, move.getPromotionPiece()));
+        } else {
+            board.addPiece(move.getEndPosition(), piece);
+        }
+        board.removePiece(move.getStartPosition());
+        teamTurn = (teamTurn == TeamColor.WHITE) ? TeamColor.BLACK : TeamColor.WHITE;
+    }
+
     /**
      * Enum identifying the 2 possible teams in a chess game
      */

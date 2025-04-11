@@ -13,7 +13,7 @@ public class Repl implements ui.websocket.NotificationHandler {
     private final ChessClient client;
 
     public Repl(String serverUrl) {
-        client = new ChessClient(serverUrl);
+        client = new ChessClient(serverUrl, this);
     }
     public void run() {
         System.out.println("Welcome to the chess game. Type help to get started.");
@@ -43,13 +43,17 @@ public class Repl implements ui.websocket.NotificationHandler {
         switch (message.getServerMessageType()){
             case LOAD_GAME:
                 System.out.println(SET_TEXT_COLOR_BLUE + "Game loaded!");
-
                 Graphics.drawBoard(System.out, new ChessGame(), false);
+                break;
+
             case ERROR:
                 System.out.println(SET_TEXT_COLOR_RED + "Error from server: " + message.getServerMessageType());
+                break;
 
             case NOTIFICATION:
                 System.out.println(SET_TEXT_COLOR_YELLOW + "Server notification: " + message.getServerMessageType());
+                break;
+
         }
     }
 }

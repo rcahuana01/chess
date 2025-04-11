@@ -69,6 +69,7 @@ public class ChessClient {
                 case "resign" -> resign(params);
                 case "highlight" -> highlightMoves(params);
                 case "help" -> helpGamePlay();
+                default -> helpGamePlay();
 
             };
         }
@@ -91,7 +92,7 @@ public class ChessClient {
         return "";
     }
 
-    private String resign(String... params) {
+    private String resign(String... params) throws DataAccessException {
         if (params.length == 0) {
             return "Game ID is required for resigning.";
         }
@@ -100,9 +101,9 @@ public class ChessClient {
         return "You resigned the game";
     }
 
-    private String leave(String[] params) {
+    private String leave(String[] params) throws DataAccessException {
         int gameId = Integer.parseInt(params[0]);
-        ws.leaveGame(, gameId);
+        ws.leaveGame(authToken, gameId);
         return "You left the game";
 
     }
@@ -123,21 +124,20 @@ public class ChessClient {
             return "Error: Move format is invalid. Use: move <start,end>";
         }
 
-        String[] squares = params[1].split(",");
+        String[] squares = params[0].split(",");
         ChessPosition start = parseAlgebraic(squares[0]);
         ChessPosition end = parseAlgebraic(squares[1]);
-
-        ChessMove move = new ChessMove(start, end,null);
+        ChessMove move = new ChessMove(start, end, null);
         int gameId = Integer.parseInt(params[1]);
 
         try {
             ws.makeMove(authToken, gameId, move);
         } catch (DataAccessException e) {
             return "Failed to make move: " + e.getMessage();
-
         }
         return "You made a move";
     }
+
 
     private ChessPosition parseAlgebraic(String pos){
         char file = pos.charAt(0);
@@ -166,17 +166,16 @@ public class ChessClient {
         if (params.length < 2) {
             return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
         }
-        int gameId = server.
         server.join(params[0], params[1].toUpperCase());
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
-        ws.connect(authToken, gameId);
         if (params[1].equalsIgnoreCase("WHITE")){
             Graphics.drawBoard(out, new ChessGame(),false);
         } else if (params[1].equalsIgnoreCase("BLACK")){
             Graphics.drawBoard(out, new ChessGame(),true);
 
         }
-        state = State.SIGNEDIN;
+        ws = new WebSocketFacade(serverUrl, notificationHandler);
+        ws.connect(authToken, Integer.parseInt(params[0]));
+        state = State.GAMEPLAY;
         return String.format("You joined as %s.", params[1]);
 
     }
