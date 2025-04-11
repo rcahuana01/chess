@@ -25,9 +25,9 @@ import static javax.swing.text.html.FormSubmitEvent.MethodType.*;
 public class ChessClient {
     private final ServerFacade server;
     private WebSocketFacade ws;
-    private String authToken;
     private final String serverUrl;
     private final NotificationHandler notificationHandler;
+    private AuthData authData;
     private State state = State.SIGNEDOUT;
     public ChessClient(String serverUrl, NotificationHandler handler){
         server = new ServerFacade(serverUrl);
@@ -97,13 +97,13 @@ public class ChessClient {
             return "Game ID is required for resigning.";
         }
         int gameId = Integer.parseInt(params[0]);
-        ws.resignGame(authToken, gameId);
+        ws.resignGame(authData.authToken(), gameId);
         return "You resigned the game";
     }
 
     private String leave(String[] params) throws DataAccessException {
         int gameId = Integer.parseInt(params[0]);
-        ws.leaveGame(authToken, gameId);
+        ws.leaveGame(authData.authToken(), gameId);
         return "You left the game";
 
     }
@@ -131,7 +131,7 @@ public class ChessClient {
         int gameId = Integer.parseInt(params[1]);
 
         try {
-            ws.makeMove(authToken, gameId, move);
+            ws.makeMove(authData.authToken(), gameId, move);
         } catch (DataAccessException e) {
             return "Failed to make move: " + e.getMessage();
         }
@@ -174,7 +174,7 @@ public class ChessClient {
 
         }
         ws = new WebSocketFacade(serverUrl, notificationHandler);
-        ws.connect(authToken, Integer.parseInt(params[0]));
+        ws.connect(authData.authToken(), Integer.parseInt(params[0]));
         state = State.GAMEPLAY;
         return String.format("You joined as %s.", params[1]);
 

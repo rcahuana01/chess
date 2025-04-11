@@ -3,6 +3,10 @@ package server.websocket;
 import chess.*;
 import com.google.gson.Gson;
 import dataaccess.DataAccessException;
+import dataaccess.SQLAuthDAO;
+import dataaccess.SQLGameDAO;
+import dataaccess.SQLUserDAO;
+import model.AuthData;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -19,18 +23,47 @@ public class WebSocketHandler {
 
     private final ConnectionManager sessions = new ConnectionManager();
     private static final Map<Integer, GameState> gameStates = new HashMap<>();
+    private final SQLUserDAO userDao;
+
+    {
+        try {
+            userDao = new SQLUserDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final SQLGameDAO gameDao;
+
+    {
+        try {
+            gameDao = new SQLGameDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
+
+    private final SQLAuthDAO authDao;
+
+    {
+        try {
+            authDao = new SQLAuthDAO();
+        } catch (DataAccessException e) {
+            throw new RuntimeException(e);
+        }
+    }
 
     @OnWebSocketMessage
     public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
         try {
             switch (command.getCommandType()) {
-                case CONNECT -> handleConnect(command, session);
-                case LEAVE -> handleLeave(command, session);
-                case RESIGN -> handleResign(command, session);
+                case CONNECT -> connect(command, session);
+                case LEAVE -> leave(command, session);
+                case RESIGN -> resign(command, session);
                 case MAKE_MOVE -> {
                     MakeMoveCommand makeMoveCmd = new Gson().fromJson(message, MakeMoveCommand.class);
-                    handleMakeMove(makeMoveCmd, session);
+                    makeMove(makeMoveCmd, session);
                 }
             }
         } catch (DataAccessException ex) {
@@ -38,7 +71,15 @@ public class WebSocketHandler {
         }
     }
 
-    private void handleConnect(UserGameCommand command, Session session) throws IOException, DataAccessException {
+    private void connect(UserGameCommand command, Session session) throws IOException, DataAccessException {
+        AuthData authData = authDao.getAuthToken(command.getAuthToken());
+        GameData gameData = gameDao.getGame(command.getGameID());
+        if (authData==null){
+            throw new DataAccessException("Invalid auth token");
+        }
+        if (gameData == null){
+            throw new DataAccessException("Invalid gameId");
+        }
         if (!gameStates.containsKey(command.getGameID())) {
             GameState gs = new GameState();
             if ("WHITE".equals(command.getAuthToken())) gs.whitePlayer = "WHITE";
@@ -71,7 +112,7 @@ public class WebSocketHandler {
         broadcastNotification(command.getGameID(), note, session);
     }
 
-    private void handleLeave(UserGameCommand command, Session session) throws DataAccessException, IOException {
+    private void leave(UserGameCommand command, Session session) throws DataAccessException, IOException {
         if (!gameStates.containsKey(command.getGameID())) {
             throw new DataAccessException("Invalid game ID for leave");
         }
@@ -85,7 +126,7 @@ public class WebSocketHandler {
         broadcastNotification(command.getGameID(), note, session);
     }
 
-    private void handleResign(UserGameCommand command, Session session) throws DataAccessException, IOException {
+    private void resign(UserGameCommand command, Session session) throws DataAccessException, IOException {
         if (!gameStates.containsKey(command.getGameID())) {
             throw new DataAccessException("Invalid game ID for resign");
         }
@@ -102,7 +143,7 @@ public class WebSocketHandler {
         broadcastNotification(command.getGameID(), note, null);
     }
 
-    private void handleMakeMove(MakeMoveCommand command, Session session) throws DataAccessException, IOException {
+    private void makeMove(MakeMoveCommand command, Session session) throws DataAccessException, IOException {
         if (!gameStates.containsKey(command.getGameID())) {
             throw new DataAccessException("Invalid game ID for move");
         }
