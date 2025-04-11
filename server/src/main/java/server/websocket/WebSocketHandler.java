@@ -1,10 +1,8 @@
-
 package server.websocket;
 
-import chess.ChessGame;
-import chess.ChessMove;
+import chess.*;
 import com.google.gson.Gson;
-import dataaccess.*;
+import dataaccess.DataAccessException;
 import model.GameData;
 import org.eclipse.jetty.websocket.api.Session;
 import org.eclipse.jetty.websocket.api.annotations.OnWebSocketMessage;
@@ -12,122 +10,183 @@ import org.eclipse.jetty.websocket.api.annotations.WebSocket;
 import websocket.commands.MakeMoveCommand;
 import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
-//import Notification;
 
 import java.io.IOException;
 import java.util.*;
-
 
 @WebSocket
 public class WebSocketHandler {
 
     private final ConnectionManager sessions = new ConnectionManager();
-    private static final Map<Integer, ChessGame> validGames = new HashMap<>();
-
-    static {
-        try {
-            SQLGameDAO gameDAO = new SQLGameDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static {
-        try {
-            SQLUserDAO userDAO = new SQLUserDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
-
-    static {
-        try {
-            SQLAuthDAO authDAO = new SQLAuthDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
+    private static final Map<Integer, GameState> gameStates = new HashMap<>();
 
     @OnWebSocketMessage
-    public void onMessage(Session session, String message) throws IOException, DataAccessException {
+    public void onMessage(Session session, String message) throws IOException {
         UserGameCommand command = new Gson().fromJson(message, UserGameCommand.class);
-        String excSession = session.getRemoteAddress().toString();
-        switch (command.getCommandType()) {
-                case CONNECT -> connect(excSession, command, session);
-                case LEAVE -> leave(excSession, command, session);
-                case RESIGN -> resign(excSession, command, session);
-                case MAKE_MOVE -> {
-                    MakeMoveCommand makeCommand = new Gson().fromJson(message, MakeMoveCommand.class);
-                    makeMove(excSession, makeCommand, session);
-                }
-
-            }
-
-    }
-
-    private void connect(String excSession, UserGameCommand command, Session session) throws IOException {
-        sessions.addSessionToGame(command.getGameID(), session);
-        ChessGame game = new ChessGame();
-        session.getRemote().sendString(new Gson().toJson(game));
-        var message = String.format("%s has connected to chess", excSession);
-        var notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION);
-        broadcast(session, command.getGameID(), message, notification);
-    }
-
-    private void makeMove(String excSession, MakeMoveCommand command, Session session) throws IOException {
-        int gameId = command.getGameID();
-        if (!validGames.containsKey(gameId)) {
-            validGames.put(gameId, new ChessGame());
-        }
-
-        ChessGame game = validGames.get(gameId);
-        ChessMove move = command.getMove();
-        game.applyMove(move);
-        String message = String.format("Player %s made a move: %s", excSession, move);
-        ServerMessage notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        broadcast(session, gameId, message, notification);
-    }
-
-    public void leave(String excSession, UserGameCommand command, Session session) throws DataAccessException {
-        int gameId = command.getGameID();
         try {
-            sessions.removeSessionFromGame(gameId, session);
-            String message = String.format("Player %s left the game %d", excSession, gameId);
-            ServerMessage notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-            broadcast(session, gameId, message, notification);
-        } catch (Exception ex) {
-            throw new DataAccessException(ex.getMessage());
+            switch (command.getCommandType()) {
+                case CONNECT -> handleConnect(command, session);
+                case LEAVE -> handleLeave(command, session);
+                case RESIGN -> handleResign(command, session);
+                case MAKE_MOVE -> {
+                    MakeMoveCommand makeMoveCmd = new Gson().fromJson(message, MakeMoveCommand.class);
+                    handleMakeMove(makeMoveCmd, session);
+                }
+            }
+        } catch (DataAccessException ex) {
+            sendError(session, "Error: " + ex.getMessage());
         }
     }
 
-    private void resign(String excSession, UserGameCommand command, Session session) throws IOException {
-        int gameId = command.getGameID();
-        String authToken = command.getAuthToken();
-        if (!"WHITE".equals(authToken) && !"BLACK".equals(authToken)) {
-            return;
+    private void handleConnect(UserGameCommand command, Session session) throws IOException, DataAccessException {
+        if (!gameStates.containsKey(command.getGameID())) {
+            GameState gs = new GameState();
+            if ("WHITE".equals(command.getAuthToken())) gs.whitePlayer = "WHITE";
+            else if ("BLACK".equals(command.getAuthToken())) gs.blackPlayer = "BLACK";
+            else gs.observers.add(command.getAuthToken());
+            gameStates.put(command.getGameID(), gs);
         }
-        validGames.remove(gameId);
 
-        String message = String.format("Player %s resigned from game %d", excSession, gameId);
-        ServerMessage notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, message);
-        broadcast(session, gameId, message, notification);
+        GameState gameState = gameStates.get(command.getGameID());
+        if (gameState.isOver) {
+            throw new DataAccessException("Game is over, cannot connect");
+        }
+        String user = command.getAuthToken();
+        if (!Objects.equals(gameState.whitePlayer, user) &&
+                !Objects.equals(gameState.blackPlayer, user) &&
+                !gameState.observers.contains(user)) {
+            if (gameState.whitePlayer == null && "WHITE".equals(user)) {
+                gameState.whitePlayer = user;
+            } else if (gameState.blackPlayer == null && "BLACK".equals(user)) {
+                gameState.blackPlayer = user;
+            } else {
+                gameState.observers.add(user);
+            }
+        }
+
+        sessions.addSessionToGame(command.getGameID(), session);
+        ServerMessage loadGameMsg = new ServerMessage(gameState.game);
+        session.getRemote().sendString(new Gson().toJson(loadGameMsg));
+        String note = user + " has connected to game " + command.getGameID();
+        broadcastNotification(command.getGameID(), note, session);
     }
 
+    private void handleLeave(UserGameCommand command, Session session) throws DataAccessException, IOException {
+        if (!gameStates.containsKey(command.getGameID())) {
+            throw new DataAccessException("Invalid game ID for leave");
+        }
+        GameState gs = gameStates.get(command.getGameID());
+        if (gs.isOver) {
+        }
+        sessions.removeSessionFromGame(command.getGameID(), session);
 
-    public void broadcast(Session excSession, int gameId, String message, ServerMessage notification) throws IOException {
-        var removeList = new ArrayList<Session>();
-        for (Session c : sessions.getSessionsForGame(gameId)) {
-            if (c.isOpen() && c!=excSession) {
-                c.getRemote().sendString(new Gson().toJson(notification));
+        String user = command.getAuthToken();
+        String note = user + " left the game " + command.getGameID();
+        broadcastNotification(command.getGameID(), note, session);
+    }
+
+    private void handleResign(UserGameCommand command, Session session) throws DataAccessException, IOException {
+        if (!gameStates.containsKey(command.getGameID())) {
+            throw new DataAccessException("Invalid game ID for resign");
+        }
+        GameState gs = gameStates.get(command.getGameID());
+        if (gs.isOver) {
+            throw new DataAccessException("Game is already over, cannot resign");
+        }
+        String user = command.getAuthToken();
+        if (!Objects.equals(gs.whitePlayer, user) && !Objects.equals(gs.blackPlayer, user)) {
+            throw new DataAccessException("Observers cannot resign");
+        }
+        gs.isOver = true;
+        String note = user + " resigned from game " + command.getGameID();
+        broadcastNotification(command.getGameID(), note, null);
+    }
+
+    private void handleMakeMove(MakeMoveCommand command, Session session) throws DataAccessException, IOException {
+        if (!gameStates.containsKey(command.getGameID())) {
+            throw new DataAccessException("Invalid game ID for move");
+        }
+        GameState gs = gameStates.get(command.getGameID());
+        if (gs.isOver) {
+            throw new DataAccessException("Game is already over, cannot move");
+        }
+
+        String user = command.getAuthToken();
+        boolean isWhite = Objects.equals(gs.whitePlayer, user);
+        boolean isBlack = Objects.equals(gs.blackPlayer, user);
+        if (!isWhite && !isBlack) {
+            throw new DataAccessException("Observer or unknown user cannot move");
+        }
+
+        ChessGame.TeamColor currentTurn = gs.game.getTeamTurn();
+        if ((currentTurn == ChessGame.TeamColor.WHITE && !isWhite) ||
+                (currentTurn == ChessGame.TeamColor.BLACK && !isBlack)) {
+            throw new DataAccessException("It is not your turn");
+        }
+        ChessMove move = command.getMove();
+        try {
+            gs.game.makeMove(move);
+        } catch (InvalidMoveException e) {
+            throw new DataAccessException("Invalid move");
+        }
+
+        ServerMessage loadGameMsg = new ServerMessage(gs.game);
+        broadcastMessage(command.getGameID(), loadGameMsg);
+
+        String note = user + " made a move: " + move;
+        broadcastNotification(command.getGameID(), note, session);
+
+        ChessGame.TeamColor next = gs.game.getTeamTurn();
+        if (gs.game.isInCheck(next)) {
+            if (gs.game.isInCheckmate(next)) {
+                broadcastNotification(command.getGameID(),
+                        (next == ChessGame.TeamColor.WHITE ? gs.whitePlayer : gs.blackPlayer) + " is in checkmate", null);
+                gs.isOver = true;
+            } else {
+                broadcastNotification(command.getGameID(),
+                        (next == ChessGame.TeamColor.WHITE ? gs.whitePlayer : gs.blackPlayer) + " is in check", null);
+            }
+        } else if (gs.game.isInStalemate(next)) {
+            broadcastNotification(command.getGameID(),
+                    (next == ChessGame.TeamColor.WHITE ? gs.whitePlayer : gs.blackPlayer) + " is in stalemate", null);
+            gs.isOver = true;
+        }
+    }
+
+    private void broadcastMessage(int gameID, ServerMessage msg) throws IOException {
+        Set<Session> removeList = new HashSet<>();
+        for (Session c : sessions.getSessionsForGame(gameID)) {
+            if (c.isOpen()) {
+                c.getRemote().sendString(new Gson().toJson(msg));
             } else {
                 removeList.add(c);
             }
         }
-
-        // Clean up any connections that were left open.
         for (Session s : removeList) {
-            sessions.removeSessionFromGame(gameId, s);
+            sessions.removeSessionFromGame(gameID, s);
         }
     }
 
+    private void broadcastNotification(int gameID, String note, Session exclude) throws IOException {
+        ServerMessage notification = new ServerMessage(ServerMessage.ServerMessageType.NOTIFICATION, note);
+        Set<Session> removeList = new HashSet<>();
+        for (Session c : sessions.getSessionsForGame(gameID)) {
+            if (!c.isOpen()) {
+                removeList.add(c);
+                continue;
+            }
+            if (c == exclude) {
+                continue;
+            }
+            c.getRemote().sendString(new Gson().toJson(notification));
+        }
+        for (Session s : removeList) {
+            sessions.removeSessionFromGame(gameID, s);
+        }
+    }
+
+    private void sendError(Session session, String msg) throws IOException {
+        ServerMessage err = new ServerMessage(msg);
+        session.getRemote().sendString(new Gson().toJson(err));
+    }
 }
