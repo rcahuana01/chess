@@ -16,6 +16,7 @@ import websocket.commands.UserGameCommand;
 import websocket.messages.ServerMessage;
 
 import java.io.IOException;
+import java.sql.SQLException;
 import java.util.*;
 
 @WebSocket
@@ -66,6 +67,8 @@ public class WebSocketHandler {
             }
         } catch (DataAccessException ex) {
             sendError(session, "Error: " + ex.getMessage());
+        } catch (SQLException e) {
+            throw new RuntimeException(e);
         }
     }
 
@@ -116,13 +119,24 @@ public class WebSocketHandler {
         broadcastNotification(command.getGameID(), note, session);
     }
 
-    private void leave(UserGameCommand command, Session session) throws DataAccessException, IOException {
+    private void leave(UserGameCommand command, Session session) throws DataAccessException, IOException, SQLException {
         if (!gameStates.containsKey(command.getGameID())) {
             throw new DataAccessException("Invalid game ID for leave");
         }
+
         GameState gameState = gameStates.get(command.getGameID());
+        GameData gameData = gameDao.getGame(command.getGameID());
         AuthData authData = authDao.getAuthToken(command.getAuthToken());
         String username = authData.username();
+
+        if (username.equals(gameData.whiteUsername())) {
+            gameDao.updateGameList(new GameData(command.getGameID(),null,gameData.blackUsername(), gameData.gameName(),
+                    gameData.game()));
+        }
+        if (username.equals(gameData.blackUsername())) {
+            gameDao.updateGameList(new GameData(command.getGameID(), gameData.whiteUsername(), null, gameData.gameName(),
+                    gameData.game()));
+        }
 
         if (username.equals(gameState.whitePlayer)) {
             gameState.whitePlayer = null;
@@ -137,82 +151,84 @@ public class WebSocketHandler {
         broadcastNotification(command.getGameID(), note, session);
     }
 
+
+
     private void resign(UserGameCommand command, Session session) throws DataAccessException, IOException {
         if (!gameStates.containsKey(command.getGameID())) {
             throw new DataAccessException("Invalid game ID for resign");
         }
         GameState gameState = gameStates.get(command.getGameID());
-        if (gameState.isOver) {
-            throw new DataAccessException("Game is already over, cannot resign");
-        }
         AuthData authData = authDao.getAuthToken(command.getAuthToken());
         String username = authData.username();
 
         if (!username.equals(gameState.whitePlayer) && !username.equals(gameState.blackPlayer)) {
             throw new DataAccessException("Observers cannot resign");
         }
-
+        if (gameState.isOver) {
+            ServerMessage msg = new ServerMessage("Game is already over");
+            session.getRemote().sendString(new Gson().toJson(msg));
+            return;
+        }
         gameState.isOver = true;
         if (username.equals(gameState.whitePlayer)) {
             gameState.whitePlayer = null;
-        } else if (username.equals(gameState.blackPlayer)) {
+        } else {
             gameState.blackPlayer = null;
         }
         String note = username + " resigned from game " + command.getGameID();
         broadcastNotification(command.getGameID(), note, null);
-        // Remove the session if desired (optional):
         sessions.removeSessionFromGame(command.getGameID(), session);
     }
 
     private void makeMove(MakeMoveCommand command, Session session) throws DataAccessException, IOException {
+        AuthData authData = authDao.getAuthToken(command.getAuthToken());
+        if (authData == null) {
+            throw new DataAccessException("Invalid auth token");
+        }
+        String username = authData.username();
         if (!gameStates.containsKey(command.getGameID())) {
             throw new DataAccessException("Invalid game ID for move");
         }
-        GameState gameState = gameStates.get(command.getGameID());
-        if (gameState.isOver) {
+        GameState gs = gameStates.get(command.getGameID());
+        if (gs.isOver) {
             throw new DataAccessException("Game is already over, cannot move");
         }
 
-        AuthData authData = authDao.getAuthToken(command.getAuthToken());
-        String username = authData.username();
-        boolean isWhite = username.equals(gameState.whitePlayer);
-        boolean isBlack = username.equals(gameState.blackPlayer);
+        boolean isWhite = username.equals(gs.whitePlayer);
+        boolean isBlack = username.equals(gs.blackPlayer);
         if (!isWhite && !isBlack) {
             throw new DataAccessException("Observer or unknown user cannot move");
         }
-
-        ChessGame.TeamColor currentTurn = gameState.game.getTeamTurn();
+        ChessGame.TeamColor currentTurn = gs.game.getTeamTurn();
         if ((currentTurn == ChessGame.TeamColor.WHITE && !isWhite) ||
                 (currentTurn == ChessGame.TeamColor.BLACK && !isBlack)) {
             throw new DataAccessException("It is not your turn");
         }
         ChessMove move = command.getMove();
         try {
-            gameState.game.makeMove(move);
+            gs.game.makeMove(move);
         } catch (InvalidMoveException e) {
             throw new DataAccessException("Invalid move");
         }
-
-        ServerMessage loadGameMsg = new ServerMessage(gameState.game);
+        ServerMessage loadGameMsg = new ServerMessage(gs.game);
         broadcastMessage(command.getGameID(), loadGameMsg);
 
         String note = username + " made a move: " + move;
         broadcastNotification(command.getGameID(), note, session);
-
-        ChessGame.TeamColor next = gameState.game.getTeamTurn();
-        if (gameState.game.isInCheck(next)) {
-            if (gameState.game.isInCheckmate(next)) {
+        ChessGame.TeamColor next = gs.game.getTeamTurn();
+        if (gs.game.isInCheck(next)) {
+            if (gs.game.isInCheckmate(next)) {
                 broadcastNotification(command.getGameID(),
-                        (next == ChessGame.TeamColor.WHITE ? gameState.whitePlayer : gameState.blackPlayer) + " is in checkmate", null);
-                gameState.isOver = true;
+                        (next == ChessGame.TeamColor.WHITE ? gs.whitePlayer : gs.blackPlayer) + " is in checkmate", null);
+                gs.isOver = true;
             } else {
                 broadcastNotification(command.getGameID(),
-                        (next == ChessGame.TeamColor.WHITE ? gameState.whitePlayer : gameState.blackPlayer) + " is in check", null);
+                        (next == ChessGame.TeamColor.WHITE ? gs.whitePlayer : gs.blackPlayer) + " is in check", null);
             }
-        } else if (gameState.game.isInStalemate(next)) {
+        } else if (gs.game.isInStalemate(next)) {
             broadcastNotification(command.getGameID(),
-                    (next == ChessGame.TeamColor.WHITE ? gameState.whitePlayer : gameState.blackPlayer) + " is in stalemate", null);
-            gameState.isOver = true;
+                    (next == ChessGame.TeamColor.WHITE ? gs.whitePlayer : gs.blackPlayer) + " is in stalemate", null);
+            gs.isOver = true;
         }
     }
 
