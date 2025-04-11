@@ -60,4 +60,8 @@ public class ChessMove {
     public ChessPiece.PieceType getPromotionPiece() {
         return promotionPiece;
     }
+
+    public ChessPosition getEnd() {
+        return endPosition;
+    }
 }

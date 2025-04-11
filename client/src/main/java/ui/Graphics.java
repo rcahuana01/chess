@@ -1,12 +1,10 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessPiece;
-import chess.ChessPosition;
+import chess.*;
 
 import java.io.PrintStream;
 import java.nio.charset.StandardCharsets;
+import java.util.Collection;
 import java.util.List;
 
 import static ui.EscapeSequences.*;
@@ -35,31 +33,74 @@ public class Graphics {
         out.print(RESET_TEXT_COLOR);
     }
 
-//    public static void highlightMoves(PrintStream out, ChessGame game, ChessPosition position, boolean reversed){
-//        ChessPiece[][] board = game.getBoard().getBoard();
-//        ChessPiece piece = board[position.getRow()][position.getColumn()];
-//        for (int r = 0; r < BOARD_SIZE; r++){
-//            int row = reversed ? r : BOARD_SIZE - 1 - r;
-//            String rank = centerLabel(String.valueOf(reversed ? r + 1 : BOARD_SIZE - r));
-//            drawSquare(out, SET_BG_COLOR_YELLOW, rank);
-//            for (int c  = 0; c < BOARD_SIZE; c++){
-//                int col = reversed ? BOARD_SIZE - 1 - c : c;
-////                String bg = isLegalMove(legalMoves, row, col) ? SET_BG_COLOR_YELLOW : ((row + col) % 2 == 0 ?
-//                SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE);
-//                String symbol = (piece == null) ? null : getSymbol(piece);
-////                drawSquare(out, bg, symbol);
-//            }
-//            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rank);
-//            out.println(RESET_BG_COLOR);
-//        }
-//        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
-//        for (String f : reverseFileLabels()) {
-//            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, f);
-//        }
-//        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
-//        out.println(RESET_BG_COLOR);
-//
-//    }
+    public static void highlightMoves(PrintStream out, ChessGame game, ChessPosition from, boolean reversed) {
+        int fromRow = from.getRow() - 1;
+        int fromCol = from.getColumn() - 1;
+        Collection<ChessMove> legalMoves = game.validMoves(from);
+        ChessPiece[][] board = game.getBoard().getBoard();
+
+        String[] files = reversed ? reverseFileLabels() : fileLabels();
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        for (String f : files) {
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, f);
+        }
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        out.println(RESET_BG_COLOR);
+
+        for (int r = 0; r < BOARD_SIZE; r++) {
+            int displayRow = reversed ? r : BOARD_SIZE - 1 - r;
+            String rankLabel = centerLabel(reversed ? String.valueOf(r + 1)
+                    : String.valueOf(BOARD_SIZE - r));
+
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rankLabel);
+
+            for (int c = 0; c < BOARD_SIZE; c++) {
+                int displayCol = reversed ? BOARD_SIZE - 1 - c : c;
+
+                boolean isFrom      = (displayRow == fromRow && displayCol == fromCol);
+                boolean isLegalDest = isLegalDestination(legalMoves, displayRow, displayCol);
+                String bgColor;
+                if (isFrom) {
+                    bgColor = SET_BG_COLOR_GREEN;
+                } else if (isLegalDest) {
+                    bgColor = SET_BG_COLOR_YELLOW;
+                } else {
+                    bgColor = ((displayRow + displayCol) % 2 == 0)
+                            ? SET_BG_COLOR_BLACK
+                            : SET_BG_COLOR_WHITE;
+                }
+
+                ChessPiece piece = board[displayRow][displayCol];
+                String symbol = (piece == null) ? null : getSymbol(piece);
+
+                drawSquare(out, bgColor, symbol);
+            }
+
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rankLabel);
+            out.println(RESET_BG_COLOR);
+        }
+
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        for (String f : files) {
+            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, f);
+        }
+        drawSquare(out, SET_BG_COLOR_LIGHT_GREY, null);
+        out.println(RESET_BG_COLOR);
+    }
+
+    private static boolean isLegalDestination(Collection<ChessMove> moves, int arrRow, int arrCol) {
+        if (moves == null) return false;
+        for (ChessMove move : moves) {
+            int endRow = move.getEnd().getRow() - 1;   // 1-based to 0-based
+            int endCol = move.getEnd().getColumn() - 1;
+            if (endRow == arrRow && endCol == arrCol) {
+                return true;
+            }
+        }
+        return false;
+    }
+
+
 
     public static void drawBoard(PrintStream out, ChessGame game, boolean reversed) {
         ChessPiece[][] board = game.getBoard().getBoard();

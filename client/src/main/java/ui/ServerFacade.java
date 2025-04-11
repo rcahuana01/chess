@@ -147,4 +147,9 @@ public class ServerFacade {
     public void clear() throws DataAccessException{
         this.makeRequest("DELETE", "/db", null,null,null);
     }
+
+    public int getGameIdForIndex(int index) {
+        return gameIndexMap.get(index);
+    }
+
 }
