@@ -1,5 +1,6 @@
 package ui;
 
+import chess.ChessBoard;
 import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
@@ -7,6 +8,7 @@ import dataaccess.DataAccessException;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
+import java.util.*;
 import ui.websocket.NotificationHandler;
 import ui.websocket.WebSocketFacade;
 import websocket.commands.UserGameCommand;
@@ -28,6 +30,9 @@ public class ChessClient {
     private final String serverUrl;
     private final NotificationHandler notificationHandler;
     private AuthData authData;
+    private ChessBoard currentBoard = null;
+    private ChessGame currentGame  = null;
+    private Scanner scanner = new Scanner(System.in);
     private State state = State.SIGNEDOUT;
     public ChessClient(String serverUrl, NotificationHandler handler){
         server = new ServerFacade(serverUrl);
@@ -88,17 +93,30 @@ public class ChessClient {
     }
 
     private String highlightMoves(String... params) {
-        int gameId = Integer.parseInt(params[0]);
+        try {
+            System.out.print("Enter the position of the piece to highlight moves (e.g., a3): ");
+            String input = scanner.nextLine();
+            ChessPosition pos = parseAlgebraic(input);
+            if (pos == null) {
+                return "Invalid position entered.";
+            }
+            if (currentBoard != null && currentGame != null) {
+                Graphics.drawBoard(out, new ChessGame(),true);
+
+            } else {
+                return "No active game loaded.";
+            }
+        } catch (Exception e) {
+            return "Unable to highlight legal moves: " + e.getMessage();
+        }
         return "";
     }
 
     private String resign(String... params) throws DataAccessException {
-        if (params.length == 0) {
-            return "Game ID is required for resigning.";
-        }
-        int gameId = Integer.parseInt(params[0]);
-        ws.resignGame(authData.authToken(), gameId);
-        return "You resigned the game";
+        int currentGameId = Integer.parseInt(params[0]);
+        ws.leaveGame(authData.authToken(), currentGameId);
+        state = State.SIGNEDIN;
+        return "You left the game";
     }
 
     private String leave(String[] params) throws DataAccessException {
@@ -109,33 +127,38 @@ public class ChessClient {
     }
 
     private String redrawChessBoard(String[] params) {
-        if (params[1].equalsIgnoreCase("WHITE")){
-            Graphics.drawBoard(out, new ChessGame(),false);
-        } else if (params[1].equalsIgnoreCase("BLACK")){
-            Graphics.drawBoard(out, new ChessGame(),true);
-
+        if (currentGame != null) {
+            Graphics.drawBoard(out, currentGame, currentGame.getTeamTurn()== ChessGame.TeamColor.BLACK);
+            return "";
+        } else {
+            return "No game loaded.";
         }
-        return "";
 
     }
 
     private String makeMove(String[] params) {
-        if (!params[0].contains(",")) {
-            return "Error: Move format is invalid. Use: move <start,end>";
+        if (params.length < 1) {
+            return "Invalid input. Usage: move <c1,a7>";
         }
-
-        String[] squares = params[0].split(",");
-        ChessPosition start = parseAlgebraic(squares[0]);
-        ChessPosition end = parseAlgebraic(squares[1]);
+        String moveInput = params[0];
+        String[] pieces = moveInput.split(",");
+        if (pieces.length != 2) {
+            return "Invalid move format. Expected format: c1,a7";
+        }
+        ChessPosition start = parseAlgebraic(pieces[0].trim());
+        ChessPosition end = parseAlgebraic(pieces[1].trim());
+        if (start == null || end == null) {
+            return "Invalid positions in move command.";
+        }
         ChessMove move = new ChessMove(start, end, null);
-        int gameId = Integer.parseInt(params[1]);
 
         try {
-            ws.makeMove(authData.authToken(), gameId, move);
+            int currentGameId = Integer.parseInt(params[0]);
+            ws.makeMove(authData.authToken(), currentGameId, move);
         } catch (DataAccessException e) {
             return "Failed to make move: " + e.getMessage();
         }
-        return "You made a move";
+        return "Move executed.";
     }
 
 
@@ -173,8 +196,6 @@ public class ChessClient {
             Graphics.drawBoard(out, new ChessGame(),true);
 
         }
-        ws = new WebSocketFacade(serverUrl, notificationHandler);
-        ws.connect(authData.authToken(), Integer.parseInt(params[0]));
         state = State.GAMEPLAY;
         return String.format("You joined as %s.", params[1]);
 
