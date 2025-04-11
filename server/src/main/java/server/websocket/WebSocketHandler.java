@@ -23,18 +23,9 @@ import java.util.*;
 public class WebSocketHandler {
 
     private final ConnectionManager sessions = new ConnectionManager();
-    private static final Map<Integer, GameState> gameStates = new HashMap<>();
-    private final SQLUserDAO userDao;
+    private final Map<Integer, GameState> gameStates = new HashMap<>();
     private final SQLGameDAO gameDao;
     private final SQLAuthDAO authDao;
-
-    {
-        try {
-            userDao = new SQLUserDAO();
-        } catch (DataAccessException e) {
-            throw new RuntimeException(e);
-        }
-    }
 
     {
         try {

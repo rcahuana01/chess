@@ -12,16 +12,5 @@ public class GameState {
     public Set<String> observers = new HashSet<>();
     public boolean isOver = false;
 
-    public boolean isPlayer(String token) {
-        return token.equals(whitePlayer) || token.equals(blackPlayer);
-    }
-
-    public boolean isObserver(String token) {
-        return observers.contains(token);
-    }
-
-    public boolean isKnown(String token) {
-        return isPlayer(token) || isObserver(token);
-    }
 }
 

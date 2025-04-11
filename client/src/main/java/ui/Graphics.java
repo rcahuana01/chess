@@ -44,9 +44,10 @@ public class Graphics {
 //            drawSquare(out, SET_BG_COLOR_YELLOW, rank);
 //            for (int c  = 0; c < BOARD_SIZE; c++){
 //                int col = reversed ? BOARD_SIZE - 1 - c : c;
-//                String bg = isLegalMove(legalMoves, row, col) ? SET_BG_COLOR_YELLOW : ((row + col) % 2 == 0 ? SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE);
+////                String bg = isLegalMove(legalMoves, row, col) ? SET_BG_COLOR_YELLOW : ((row + col) % 2 == 0 ?
+//                SET_BG_COLOR_BLACK : SET_BG_COLOR_WHITE);
 //                String symbol = (piece == null) ? null : getSymbol(piece);
-//                drawSquare(out, bg, symbol);
+////                drawSquare(out, bg, symbol);
 //            }
 //            drawSquare(out, SET_BG_COLOR_LIGHT_GREY, rank);
 //            out.println(RESET_BG_COLOR);
