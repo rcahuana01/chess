@@ -1,9 +1,6 @@
 package ui;
 
-import chess.ChessBoard;
-import chess.ChessGame;
-import chess.ChessMove;
-import chess.ChessPosition;
+import chess.*;
 import dataaccess.DataAccessException;
 import dataaccess.GameDAO;
 import model.AuthData;
@@ -89,7 +86,7 @@ public class ChessClient implements NotificationHandler {
 
     private String helpGamePlay() {
         return """
-                move <c1,a7> - makes move from c1 to a7
+                move <e7,e8> - makes a move; if promotion, you'll be prompted
                 redraw - redraws the board
                 leave - removes you from the game
                 resign - forfeits the game and ends it
@@ -132,7 +129,24 @@ public class ChessClient implements NotificationHandler {
         if (start == null || end == null) {
             return "Invalid positions in move command.";
         }
-        ChessMove move = new ChessMove(start, end, null);
+        ChessPiece startPiece = currentBoard.getPiece(start);
+        ChessPiece.PieceType promotionPiece = null;
+
+        if (startPiece.getPieceType()== ChessPiece.PieceType.PAWN){
+            int promotionRow = (startPiece.getTeamColor() == ChessGame.TeamColor.WHITE) ? 8 : 1;
+            if (end.getRow()==promotionRow){
+                out.println("Promote to [Q]ueen, [R]ook, [B]ishop, or [K]night");
+                String input = scanner.nextLine().trim().toUpperCase();
+                switch (input) {
+                    case "R" -> promotionPiece = ChessPiece.PieceType.ROOK;
+                    case "B" -> promotionPiece = ChessPiece.PieceType.BISHOP;
+                    case "K" -> promotionPiece = ChessPiece.PieceType.KNIGHT;
+                    case "Q" -> promotionPiece = ChessPiece.PieceType.QUEEN;
+
+                }
+            }
+        }
+        ChessMove move = new ChessMove(start, end, promotionPiece);
         try {
             ws.makeMove(authData.authToken(), currentGameId, move);
         } catch (DataAccessException e) {
@@ -189,15 +203,17 @@ public class ChessClient implements NotificationHandler {
 
     private ChessPosition parseAlgebraic(String pos) {
         pos = pos.trim().toLowerCase();
-        if (pos.length() < 2) {
-            return null;
-        }
+        if (pos.length() != 2) {return null;}
         char file = pos.charAt(0);
         char rank = pos.charAt(1);
+        if (file < 'a' || file > 'h') {return null;}
+        if (rank < '1' || rank > '8') {return null;}
         int col = file - 'a' + 1;
-        int row = Character.getNumericValue(rank);
+        int row = rank - '0';
         return new ChessPosition(row, col);
     }
+
+
 
     public String create(String... params) throws DataAccessException {
         if (params.length == 0) {

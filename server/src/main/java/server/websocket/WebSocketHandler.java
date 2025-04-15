@@ -104,6 +104,8 @@ public class WebSocketHandler {
 
             } else {
                 gameState.observers.add(username);
+                note = username + " has joined as observer.";
+
             }
         }
 
@@ -141,7 +143,7 @@ public class WebSocketHandler {
         }
 
         sessions.removeSessionFromGame(command.getGameID(), session);
-        String note = username + " left the game " + command.getGameID();
+        String note = username + " left the game ";
         broadcastNotification(command.getGameID(), note, session);
     }
 
@@ -169,7 +171,7 @@ public class WebSocketHandler {
         } else {
             gameState.blackPlayer = null;
         }
-        String note = username + " resigned from game " + command.getGameID();
+        String note = username + " resigned from game ";
         broadcastNotification(command.getGameID(), note, null);
         sessions.removeSessionFromGame(command.getGameID(), session);
     }
