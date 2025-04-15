@@ -138,8 +138,9 @@ public class ChessClient implements NotificationHandler {
         } catch (DataAccessException e) {
             return "Failed to make move: " + e.getMessage();
         }
-        return "Move executed.";
+        return "";
     }
+
 
     private String redrawChessBoard() {
         if (currentGame != null) {
