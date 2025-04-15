@@ -21,8 +21,6 @@ public class ServerFacade {
 
     private final String serverUrl;
     private String authToken;
-    private final Map<Integer, Integer> gameIndexMap = new HashMap<>();
-
     public ServerFacade(String url) {
         serverUrl = url;
     }
@@ -31,16 +29,6 @@ public class ServerFacade {
         int gameId = new Random().nextInt(1000000);
         GameData game = new GameData(gameId, null,null, params[0], new ChessGame());
         this.makeRequest("POST", "/game", game, GameData.class, authToken);
-        gameIndexMap.clear();
-        record ListGames(Collection<GameData> games) {}
-        var response = this.makeRequest("GET", "/game", null, ListGames.class, authToken);
-        List<GameData> gameList = new ArrayList<>(response.games());
-        int i = 1;
-        for (GameData gamedata : gameList) {
-            gameIndexMap.put(i, gamedata.gameID());
-            System.out.println(i + " " + gamedata.gameName());
-            i++;
-        }
     }
 
     public Collection<GameData> list() throws DataAccessException {
@@ -49,27 +37,12 @@ public class ServerFacade {
         if (response == null || response.games() == null) {
             throw new DataAccessException("Error: No games found.");
         }
-        gameIndexMap.clear();
         List<GameData> gameList = new ArrayList<>(response.games());
-        int i = 1;
-        System.out.printf("%-3s %-15s %-15s %-15s%n", "ID", "Name", "White Player", "Black Player");
-        System.out.println("------------------------------------------------------");        for (GameData game : gameList) {
-            gameIndexMap.put(i, game.gameID());
-            String whitePlayer = game.whiteUsername() == null ? "N/A" : game.whiteUsername();
-            String blackPlayer = game.blackUsername() == null ? "N/A" : game.blackUsername();
-            System.out.printf("%-3d %-15s %-15s %-15s%n", i, game.gameName(), whitePlayer, blackPlayer);
-            i++;
-        }
-
         return gameList;
     }
 
     public void join(String... params) throws DataAccessException {
-        int index = Integer.parseInt(params[0]);
-        if (!gameIndexMap.containsKey(index)) {
-            throw new DataAccessException("Invalid game index: " + index);
-        }
-        int gameId = gameIndexMap.get(index);
+        int gameId = Integer.parseInt(params[0]);
         var joinRequest = new JoinRequest(gameId, params[1].toUpperCase());
         this.makeRequest("PUT", "/game", joinRequest, null, authToken);
     }
@@ -78,14 +51,18 @@ public class ServerFacade {
         this.makeRequest("DELETE", "/session", null, null, authToken);
     }
 
-    public void login(String... params) throws DataAccessException{
+    public AuthData login(String... params) throws DataAccessException{
         UserData user = new UserData(params[0], params[1],null);
-        authToken = this.makeRequest("POST", "/session", user, AuthData.class, null).authToken();
+        AuthData auth = this.makeRequest("POST", "/session", user, AuthData.class, null);
+        authToken = auth.authToken();
+        return auth;
     }
 
-    public void register(String... params) throws DataAccessException{
+    public AuthData register(String... params) throws DataAccessException{
         UserData user = new UserData(params[0], params[1], params[2]);
-        authToken = this.makeRequest("POST", "/user", user, AuthData.class, null).authToken();
+        AuthData auth = this.makeRequest("POST", "/user", user, AuthData.class, null);
+        authToken = auth.authToken();
+        return auth;
     }
 
     private <T> T makeRequest(String method, String path, Object request, Class<T> responseClass, String authToken) throws DataAccessException {
@@ -146,10 +123,6 @@ public class ServerFacade {
     }
     public void clear() throws DataAccessException{
         this.makeRequest("DELETE", "/db", null,null,null);
-    }
-
-    public int getGameIdForIndex(int index) {
-        return gameIndexMap.get(index);
     }
 
 }

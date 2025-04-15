@@ -90,14 +90,18 @@ public class WebSocketHandler {
         if (gameState.isOver) {
             throw new DataAccessException("Game is over, cannot connect");
         }
-
+        String note = "";
         if (!username.equals(gameState.whitePlayer) &&
                 !username.equals(gameState.blackPlayer) &&
                 !gameState.observers.contains(username)) {
             if (gameState.whitePlayer == null && username.equals(gameData.whiteUsername())) {
                 gameState.whitePlayer = username;
+                note = username + " has joined as " + "WHITE";
+
             } else if (gameState.blackPlayer == null && username.equals(gameData.blackUsername())) {
                 gameState.blackPlayer = username;
+                note = username + " has joined as " + "BLACK";
+
             } else {
                 gameState.observers.add(username);
             }
@@ -106,7 +110,6 @@ public class WebSocketHandler {
         sessions.addSessionToGame(command.getGameID(), session);
         ServerMessage loadGameMsg = new ServerMessage(gameState.game);
         session.getRemote().sendString(new Gson().toJson(loadGameMsg));
-        String note = username + " has connected to game " + command.getGameID();
         broadcastNotification(command.getGameID(), note, session);
     }
 
@@ -204,7 +207,7 @@ public class WebSocketHandler {
         ServerMessage loadGameMsg = new ServerMessage(gs.game);
         broadcastMessage(command.getGameID(), loadGameMsg);
 
-        String note = username + " made a move: " + move;
+        String note = username + " made a move: " + move.getStartPosition().toString() + "," + move.getEndPosition().toString();
         broadcastNotification(command.getGameID(), note, session);
         ChessGame.TeamColor next = gs.game.getTeamTurn();
         if (gs.game.isInCheck(next)) {

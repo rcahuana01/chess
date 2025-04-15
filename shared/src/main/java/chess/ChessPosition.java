@@ -41,6 +41,16 @@ public class ChessPosition {
         return Objects.hash(row, col);
     }
 
+    public String toAlgebraic() {
+        char file = (char) ('a' + (col - 1));
+        return file + Integer.toString(row);
+    }
+
+    @Override
+    public String toString() {
+        return toAlgebraic();
+    }
+
     /**
      * @return which column this position is in
      * 1 codes for the left row

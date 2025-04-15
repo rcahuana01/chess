@@ -21,19 +21,16 @@ public class ServerMessage {
     private String errorMessage;
     private ChessGame game;
 
-    // NOTIFICATION constructor
     public ServerMessage(ServerMessageType type, String message) {
         this.serverMessageType = type;
         this.message = message;
     }
 
-    // LOAD_GAME constructor
     public ServerMessage(ChessGame game) {
         this.serverMessageType = ServerMessageType.LOAD_GAME;
         this.game = game;
     }
 
-    // ERROR constructor
     public ServerMessage(String errorMessage) {
         this.serverMessageType = ServerMessageType.ERROR;
         this.errorMessage = errorMessage;

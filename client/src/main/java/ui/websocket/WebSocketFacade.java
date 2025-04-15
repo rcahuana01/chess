@@ -44,14 +44,19 @@ public class WebSocketFacade extends Endpoint {
     public void onOpen(Session session, EndpointConfig endpointConfig) {
     }
 
-    public void connect(String authToken, int gameId) throws DataAccessException {
+    public void connect(String authToken, int gameId, boolean isObserver, String color) throws DataAccessException {
         try {
-            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT, authToken, gameId);
+            var action = new UserGameCommand(UserGameCommand.CommandType.CONNECT,authToken,gameId);
+            // Optionally store observer/color if your server requires them
+            action.setObserver(isObserver);
+            action.setColor(color);
+
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
         } catch (IOException ex) {
             throw new DataAccessException(ex.getMessage());
         }
     }
+
 
     public void makeMove(String authToken, int gameId, ChessMove move) throws DataAccessException {
         try {
@@ -75,7 +80,6 @@ public class WebSocketFacade extends Endpoint {
         try {
             var action = new UserGameCommand(UserGameCommand.CommandType.RESIGN, authToken, gameId);
             this.session.getBasicRemote().sendText(new Gson().toJson(action));
-            this.session.close();
         } catch (IOException ex) {
             throw new DataAccessException(ex.getMessage());
         }

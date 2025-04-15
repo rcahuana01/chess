@@ -5,6 +5,7 @@ import chess.ChessGame;
 import chess.ChessMove;
 import chess.ChessPosition;
 import dataaccess.DataAccessException;
+import dataaccess.GameDAO;
 import model.AuthData;
 import model.GameData;
 import model.UserData;
@@ -22,6 +23,8 @@ public class ChessClient implements NotificationHandler {
     private final ServerFacade server;
     private WebSocketFacade ws;
     private final String serverUrl;
+    private final Map<Integer, Integer> gameIndexMap;
+
     private final NotificationHandler notificationHandler;
     private AuthData authData;
     private ChessBoard currentBoard = null;
@@ -33,10 +36,12 @@ public class ChessClient implements NotificationHandler {
     private int currentGameId = -1;
     private String currentPlayerColor = "";
 
-    public ChessClient(String serverUrl, NotificationHandler handler) {
+    public ChessClient(String serverUrl, NotificationHandler handler) throws DataAccessException {
         server = new ServerFacade(serverUrl);
+        this.gameIndexMap = new HashMap<>();
         this.notificationHandler = handler;
         this.serverUrl = serverUrl;
+        this.ws = new WebSocketFacade(serverUrl.replace("http", "ws"), this);
         PrintStream out = new PrintStream(System.out, true, StandardCharsets.UTF_8);
     }
 
@@ -156,11 +161,11 @@ public class ChessClient implements NotificationHandler {
         String confirm = scanner.nextLine();
         if (confirm.equalsIgnoreCase("y")) {
             ws.resignGame(authData.authToken(), currentGameId);
-            state = State.SIGNEDIN;
             return "You resigned the game";
         } else {
             return "Resignation canceled.";
         }
+
     }
 
     private String highlightMoves(String[] params) {
@@ -202,45 +207,54 @@ public class ChessClient implements NotificationHandler {
     }
 
     public String list() throws DataAccessException {
-        server.list();
+        Collection<GameData> gameList = server.list();
+        int i = 1;
+        System.out.printf("%-3s %-15s %-15s %-15s%n", "ID", "Name", "White Player", "Black Player");
+        System.out.println("------------------------------------------------------");
+        for (GameData game : gameList) {
+            gameIndexMap.put(i, game.gameID());
+            String whitePlayer = game.whiteUsername() == null ? "N/A" : game.whiteUsername();
+            String blackPlayer = game.blackUsername() == null ? "N/A" : game.blackUsername();
+            System.out.printf("%-3d %-15s %-15s %-15s%n", i, game.gameName(), whitePlayer, blackPlayer);
+            i++;
+        }
         state = State.SIGNEDIN;
         return "";
     }
 
-    /**
-     * Adjusted join(...) to store a placeholder ChessGame so that 'currentGame' isn't null.
-     */
     public String join(String... params) throws DataAccessException {
         if (params.length < 2) {
             return "Error: Missing parameters. Use:  join <ID> [WHITE|BLACK]";
         }
-        currentGameId = Integer.parseInt(params[0]);
-        server.join(params[0], params[1].toUpperCase());
+
+        int index = Integer.parseInt(params[0]);
+        if (!gameIndexMap.containsKey(index)) {
+            return "Error: Invalid game index.";
+        }
+
+        currentGameId = gameIndexMap.get(index);
+        server.join(String.valueOf(currentGameId), params[1].toUpperCase());
+
         currentGame = new ChessGame();
         currentBoard = currentGame.getBoard();
+        ws.connect(authData.authToken(), currentGameId, false, params[1].toUpperCase());
 
-        if (params[1].equalsIgnoreCase("WHITE")) {
-            Graphics.drawBoard(out, currentGame, false);
-        } else if (params[1].equalsIgnoreCase("BLACK")) {
-            Graphics.drawBoard(out, currentGame, true);
-        }
         currentPlayerColor = params[1].toUpperCase();
         state = State.GAMEPLAY;
         return String.format("You joined as %s.", params[1]);
     }
 
-    /**
-     * Adjusted observe(...) to also set a placeholder ChessGame so 'redraw' won't fail.
-     */
     public String observe(String... params) throws DataAccessException {
         if (params.length < 1) {
             return "Game ID is required.";
         }
-        currentGameId = Integer.parseInt(params[0]);
-        currentGame = new ChessGame();
-        currentBoard = currentGame.getBoard();
-        Graphics.drawBoard(out, currentGame, false);
-        state = State.SIGNEDIN;
+        int index = Integer.parseInt(params[0]);
+
+        currentGameId = gameIndexMap.get(index);
+        ws.connect(authData.authToken(), currentGameId, true, "");
+
+        currentPlayerColor = "";
+        state = State.GAMEPLAY;
         return String.format("You joined as observer to game %s.", params[0]);
     }
 
@@ -254,7 +268,7 @@ public class ChessClient implements NotificationHandler {
         if (params.length < 2) {
             return "Error: Missing parameters. Use: login <USERNAME> <PASSWORD>";
         }
-        server.login(params[0], params[1]);
+        authData = server.login(params[0], params[1]);
         state = State.SIGNEDIN;
         return String.format("You logged in as %s.", params[0]);
     }
@@ -264,7 +278,7 @@ public class ChessClient implements NotificationHandler {
             return "Error: Missing parameters. Use: register <USERNAME> <PASSWORD> <EMAIL>";
         }
         try {
-            server.register(params[0], params[1], params[2]);
+            authData = server.register(params[0], params[1], params[2]);
             state = State.SIGNEDIN;
             return String.format("You logged in as %s.", params[0]);
         } catch (DataAccessException e) {
@@ -279,7 +293,23 @@ public class ChessClient implements NotificationHandler {
     }
 
     @Override
-    public void notify(ServerMessage notification) {
-        System.out.println("INFO: " + notification.getMessage());
+    public void notify(ServerMessage serverMsg) {
+        switch (serverMsg.getServerMessageType()) {
+            case LOAD_GAME -> {
+                this.currentGame = serverMsg.getGame();
+                this.currentBoard = (currentGame != null) ? currentGame.getBoard() : null;
+                boolean reversed = currentPlayerColor.equalsIgnoreCase("black");
+                out.println();
+                Graphics.drawBoard(out, currentGame, reversed);
+
+            }
+            case NOTIFICATION -> {
+                System.out.println("NOTIFICATION: " + serverMsg.getMessage());
+            }
+            case ERROR -> {
+                System.out.println("ERROR: " + serverMsg.getErrorMessage());
+            }
+        }
     }
+
 }
