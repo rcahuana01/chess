@@ -59,7 +59,7 @@ public class Server {
 
         Spark.port(desiredPort);
 
-        Spark.staticFiles.location("public");
+        Spark.staticFiles.location("web");
         Spark.webSocket("/ws", webSocketHandler);
 
 
