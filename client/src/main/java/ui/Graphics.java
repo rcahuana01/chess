@@ -89,9 +89,9 @@ public class Graphics {
     }
 
     private static boolean isLegalDestination(Collection<ChessMove> moves, int arrRow, int arrCol) {
-        if (moves == null) return false;
+        if (moves == null) {return false;}
         for (ChessMove move : moves) {
-            int endRow = move.getEnd().getRow() - 1;   // 1-based to 0-based
+            int endRow = move.getEnd().getRow() - 1;
             int endCol = move.getEnd().getColumn() - 1;
             if (endRow == arrRow && endCol == arrCol) {
                 return true;

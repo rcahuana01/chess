@@ -188,8 +188,9 @@ public class ChessClient implements NotificationHandler {
 
     private ChessPosition parseAlgebraic(String pos) {
         pos = pos.trim().toLowerCase();
-        if (pos.length() < 2)
+        if (pos.length() < 2) {
             return null;
+        }
         char file = pos.charAt(0);
         char rank = pos.charAt(1);
         int col = file - 'a' + 1;
